@@ -33,7 +33,7 @@ class PelangganController extends Controller
         $site = Site::all();
         $layanan = Layanan::all();
 
-        return view('pelanggan.create', compact('site','layanan'));
+        return view('create', compact('site','layanan'));
     }
 
     // 🔥 SIMPAN DATA

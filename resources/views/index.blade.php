@@ -1,5 +1,6 @@
 <h2>Data Pelanggan</h2>
 
+<a href="/admin">< HOME</a>
 <a href="/instalasi">+ Tambah Pelanggan</a>
 
 <table border="1" cellpadding="10">
