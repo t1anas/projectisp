@@ -3,6 +3,7 @@
 use App\Http\Controllers\SesiController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\PelangganController;
+use App\Http\Controllers\PemasukanController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -32,3 +33,4 @@ Route::get('/pelanggan', [PelangganController::class, 'index']);
 Route::get('/pemasukan', function () {
     return view('pemasukan');
 });
+Route::resource('pemasukan', PemasukanController::class);

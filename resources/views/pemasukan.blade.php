@@ -141,17 +141,17 @@ body{
                 </div>
 
                 <div class="col-md-3">
-                    <label class="form-label fw-semibold">Metode</label>
+                    <label class="form-label fw-semibold invisible" >Metode</label>
                     <select class="form-select">
-                        <option>Semua Metode</option>
-                        <option>Cash</option>
-                        <option>Transfer</option>
-                        <option>QRIS</option>
+                        <option value="">Semua Metode</option>
+                        @foreach ($metode as $m)
+                            <option value="{{ $m->id }}">{{ $m->nama_metode }}</option>
+                        @endforeach
                     </select>
                 </div>
 
                 <div class="col-md-3">
-                    <label class="form-label fw-semibold">Cari</label>
+                    <label class="form-label fw-semibold invisible">Cari</label>
                     <input type="text" class="form-control" placeholder="Cari pelanggan...">
                 </div>
 
@@ -187,10 +187,41 @@ body{
                 </thead>
 
                 <tbody>
-
+                    @foreach ($pembayaran as $item)
                     <tr>
-                        <td>1</td>
-                        <td>20/04/2026</td>
+                        <td>{{ $loop->iteration }}</td>
+                        <td>{{ $item->tanggal }}</td>
+                        <td>{{ $item->pelanggan->nama ?? '-' }}</td>
+                        <td>{{ $item->layanan->nama_paket ?? '-' }}</td>
+                        <td>{{ $item->tagihan }}</td>
+                        <td>{{ $item->metode }}</td>
+                        <td>
+                            @if ($item->status == 'lunas')
+                                <span class="badge bg-success">Lunas</span>
+                            @else
+                                <span class="badge bg-danger">Belum</span>
+                            @endif
+                        </td>
+                        <td>
+                            <button class="action-btn btn-primary"><i class="bi bi-eye"></i></button>
+                            <button class="action-btn btn-warning"><i class="bi bi-pencil"></i></button>
+                        </td>
+                    </tr>
+                    @endforeach
+                </tbody>
+
+            </table>
+        </div>
+
+    </div>
+
+</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>
                         <td>Ines Farah</td>
                         <td>20 Mbps</td>
                         <td>Rp 150.000</td>
