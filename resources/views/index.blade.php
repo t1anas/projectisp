@@ -115,6 +115,7 @@
                             <th>Site</th>
                             <th>Layanan</th>
                             <th>No. Telepon</th>
+                            <th>Aksi</th>
                         </tr>
                     </thead>
                     <tbody>

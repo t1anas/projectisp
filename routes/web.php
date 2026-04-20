@@ -28,3 +28,7 @@ Route::get('/instalasi', [PelangganController::class, 'create']);
 Route::post('/pelanggan/store', [PelangganController::class, 'store']);
 
 Route::get('/pelanggan', [PelangganController::class, 'index']);
+
+Route::get('/pemasukan', function () {
+    return view('pemasukan');
+});
