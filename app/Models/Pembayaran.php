@@ -7,24 +7,36 @@ use Illuminate\Database\Eloquent\Model;
 
 class Pembayaran extends Model
 {
-    protected $table = 'pembayaran';
     use HasFactory;
-    public function tagihan()
-{
-    return $this->belongsTo(Tagihan::class);
-}
 
-public function metode()
+    protected $table = 'pembayaran';
+
+protected $fillable = [
+    'pelanggan_id',
+    'layanan_id',
+    'tanggal_bayar',
+    'tagihan_id',
+    'metode_id',
+];
+
+    // Relasi ke Tagihan
+    public function tagihan()
+    {
+        return $this->belongsTo(Tagihan::class, 'tagihan_id');
+    }
+
+    // Relasi ke Metode Pembayaran
+    public function metode()
+    {
+        return $this->belongsTo(MetodePembayaran::class, 'metode_id');
+    }
+    public function pelanggan()
 {
-    return $this->belongsTo(MetodePembayaran::class, 'metode_id');
-}
-public function pelanggan()
-{
-    return $this->belongsTo(Pelanggan::class, 'id_pelanggan');
+    return $this->belongsTo(Pelanggan::class);
 }
 
 public function layanan()
 {
-    return $this->belongsTo(Layanan::class, 'id_layanan');
+    return $this->belongsTo(Layanan::class);
 }
 }

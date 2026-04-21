@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Tagihan extends Model
 {
+    protected $table = 'tagihan';
     use HasFactory;
     public function pelanggan()
 {

@@ -34,3 +34,4 @@ Route::get('/pemasukan', function () {
     return view('pemasukan');
 });
 Route::resource('pemasukan', PemasukanController::class);
+Route::post('/pemasukan/store', [PemasukanController::class, 'store']);
