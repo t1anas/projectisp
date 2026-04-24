@@ -32,17 +32,6 @@ body{
 </head>
 
 <body>
-<script>
-document.getElementById('pelanggan').addEventListener('change', function() {
-    let selected = this.options[this.selectedIndex];
-
-    let tagihanId = selected.getAttribute('data-tagihan');
-    let nominal   = selected.getAttribute('data-nominal');
-
-    document.getElementById('tagihan_id').value = tagihanId;
-    document.getElementById('tagihan_view').value = 'Rp ' + Number(nominal).toLocaleString('id-ID');
-});
-</script>
 <div style="display:flex; min-height:100vh;">
 
 <!-- SIDEBAR -->
@@ -178,7 +167,6 @@ document.getElementById('pelanggan').addEventListener('change', function() {
             <button type="button" class="btn btn-success btn-sm"
                 data-bs-toggle="modal"
                 data-bs-target="#modalPembayaran">
-
                 <i class="bi bi-plus-lg"></i> Tambah Pembayaran
             </button>
 
@@ -207,7 +195,6 @@ document.getElementById('pelanggan').addEventListener('change', function() {
                 </thead>
 
                 <tbody>
-
                     @foreach ($pembayaran as $item)
                     <tr>
                         <td>{{ $loop->iteration }}</td>
@@ -216,7 +203,6 @@ document.getElementById('pelanggan').addEventListener('change', function() {
                         <td>{{ $item->layanan->nama_paket ?? '-' }}</td>
                         <td>Rp {{ number_format($item->jumlah_bayar,0,',','.') }}</td>
                         <td>{{ $item->metode->nama_metode ?? '-' }}</td>
-
                         <td>
                             @if ($item->status == 'lunas')
                                 <span class="badge bg-success">Lunas</span>
@@ -224,19 +210,16 @@ document.getElementById('pelanggan').addEventListener('change', function() {
                                 <span class="badge bg-danger">Belum</span>
                             @endif
                         </td>
-
                         <td>
                             <button class="action-btn btn-primary">
                                 <i class="bi bi-eye"></i>
                             </button>
-
                             <button class="action-btn btn-warning">
                                 <i class="bi bi-pencil"></i>
                             </button>
                         </td>
                     </tr>
                     @endforeach
-
                 </tbody>
 
             </table>
@@ -259,75 +242,78 @@ document.getElementById('pelanggan').addEventListener('change', function() {
                 <h5 class="modal-title">
                     <i class="bi bi-cash-stack"></i> Tambah Pembayaran
                 </h5>
-
                 <button type="button"
                     class="btn-close btn-close-white"
                     data-bs-dismiss="modal">
                 </button>
             </div>
 
-            <form action="{{ url('/pemasukan/store') }}" method="POST">
+            <form action="{{ route('pemasukan.store') }}" method="POST">
                 @csrf
 
                 <div class="modal-body">
 
                     <div class="row g-3">
 
+                        <!-- Nama Pelanggan -->
                         <div class="col-md-6">
                             <label class="form-label">Nama Pelanggan</label>
                             <select name="pelanggan_id" id="pelanggan" class="form-select" required>
                                 <option value="">-- Pilih Pelanggan --</option>
-                                 @foreach($pelanggan as $p)
-                                    <option 
+                                @foreach($pelanggan as $p)
+                                    <option
                                         value="{{ $p->id }}"
-                                        data-tagihan="{{ $p->tagihan->first()->id ?? '' }}"
-                                        data-nominal="{{ $p->tagihan->first()->jumlah ?? 0 }}"
-                                         {{ $p->nama }}
+                                        data-layanan="{{ $p->layanan_id }}"
+                                        data-paket="{{ $p->layanan->nama_paket ?? '' }}"
+                                        data-harga="{{ $p->layanan->harga ?? 0 }}"
+                                        data-tagihan="{{ $p->tagihan->first()->id ?? '' }}">
+                                        {{ $p->nama }}
                                     </option>
-                                    @endforeach
+                                @endforeach
                             </select>
                         </div>
 
+                        <!-- Tanggal -->
                         <div class="col-md-6">
                             <label class="form-label">Tanggal</label>
                             <input type="date" name="tanggal_bayar" class="form-control" required>
                         </div>
 
+                        <!-- Paket (otomatis dari pelanggan) -->
                         <div class="col-md-6">
                             <label class="form-label">Paket</label>
-                            <select name="layanan_id" class="form-select" required>
-                                <option value="">-- Pilih Paket --</option>
-                                @foreach($layanan as $l)
-                                    <option value="{{ $l->id }}">{{ $l->nama_paket }}</option>
-                                @endforeach
-                            </select>
+                            <input type="hidden" name="layanan_id" id="layanan_id">
+                            <input type="text" id="paket_view" class="form-control" readonly
+                                   placeholder="Otomatis terisi saat pilih pelanggan">
                         </div>
 
+                        <!-- Tagihan (otomatis dari pelanggan) -->
                         <div class="col-md-6">
                             <label class="form-label">Tagihan</label>
                             <input type="hidden" name="tagihan_id" id="tagihan_id">
-                            <input type="text" id="tagihan_view" class="form-control" readonly>
-                                <option value="">-- Pilih Tagihan --</option>
-                                @foreach($tagihan as $t)
-                                    <option value="{{ $t->id }}">Tagihan #{{ $t->id }}</option>
-                                @endforeach
-                            </select>
+                            <input type="text" id="tagihan_view" class="form-control" readonly
+                                   placeholder="Otomatis terisi saat pilih pelanggan">
                         </div>
 
+                        <!-- Jumlah Bayar (dari harga layanan) -->
                         <div class="col-md-6">
                             <label class="form-label">Jumlah Bayar</label>
-                            <input type="number" name="jumlah_bayar" class="form-control" required>
+                            <input type="number" name="jumlah_bayar" id="jumlah_bayar"
+                                   class="form-control" readonly>
                         </div>
 
+                        <!-- Metode -->
                         <div class="col-md-6">
                             <label class="form-label">Metode</label>
                             <select name="metode_id" class="form-select" required>
+                                <option value="">-- Pilih Metode --</option>
                                 @foreach($metode as $m)
                                     <option value="{{ $m->id }}">{{ $m->nama_metode }}</option>
                                 @endforeach
                             </select>
                         </div>
 
+                        <!-- Status -->
                         <div class="col-md-6">
                             <label class="form-label">Status</label>
                             <select name="status" class="form-select">
@@ -341,17 +327,14 @@ document.getElementById('pelanggan').addEventListener('change', function() {
                 </div>
 
                 <div class="modal-footer">
-
                     <button type="button"
                         class="btn btn-secondary"
                         data-bs-dismiss="modal">
                         Batal
                     </button>
-
                     <button type="submit" class="btn btn-success">
                         Simpan
                     </button>
-
                 </div>
 
             </form>
@@ -363,6 +346,25 @@ document.getElementById('pelanggan').addEventListener('change', function() {
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    document.getElementById('pelanggan').addEventListener('change', function () {
+        let opt = this.options[this.selectedIndex];
+
+        let layananId  = opt.getAttribute('data-layanan') || '';
+        let paket      = opt.getAttribute('data-paket')   || '';
+        let harga      = opt.getAttribute('data-harga')   || 0;
+        let tagihanId  = opt.getAttribute('data-tagihan') || '';
+
+        document.getElementById('layanan_id').value  = layananId;
+        document.getElementById('paket_view').value  = paket;
+        document.getElementById('tagihan_id').value  = tagihanId;
+        document.getElementById('tagihan_view').value = tagihanId ? 'Tagihan #' + tagihanId : '';
+        document.getElementById('jumlah_bayar').value = harga;
+    });
+});
+</script>
 
 </body>
 </html>

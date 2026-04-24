@@ -14,9 +14,11 @@ class Pembayaran extends Model
 protected $fillable = [
     'pelanggan_id',
     'layanan_id',
-    'tanggal_bayar',
     'tagihan_id',
     'metode_id',
+    'tanggal_bayar',
+    'jumlah_bayar',
+    'status',
 ];
 
     // Relasi ke Tagihan

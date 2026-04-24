@@ -139,7 +139,7 @@
 
         <div class="section-label">Main Board</div>
 
-        <a href="{{ url('/dashboard') }}" class="menu-item active">
+        <a href="{{ url('/index') }}" class="menu-item active">
             <i class="bi bi-speedometer2"></i> Dashboard
         </a>
         <a href="{{ url('/layanan') }}" class="menu-item">

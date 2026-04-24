@@ -25,7 +25,7 @@
 
         <div class="section-label">Main Board</div>
 
-        <a href="{{ url('admin') }}" class="menu-item">
+        <a href="{{ url('/cs/cs') }}" class="menu-item">
             <i class="bi bi-speedometer2"></i> Dashboard
         </a>
         <a href="{{ url('/layanan') }}" class="menu-item">
@@ -33,9 +33,6 @@
         </a>
         <a href="{{ url('/instalasi') }}" class="menu-item active">
             <i class="bi bi-router"></i> Instalasi Baru
-        </a>
-        <a href="{{ url('/pemasukan') }}" class="menu-item">
-            <i class="bi bi-wallet2"></i> Pemasukan
         </a>
 
         <div class="section-label">Pelanggan</div>

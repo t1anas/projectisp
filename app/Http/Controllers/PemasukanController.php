@@ -14,18 +14,14 @@ class PemasukanController extends Controller
     // TAMPIL DATA
 public function index()
 {
-    $pembayaran = Pembayaran::with('pelanggan','layanan','metode')->get();
+    $pembayaran = Pembayaran::with('pelanggan', 'layanan', 'metode')->get();
     $metode     = MetodePembayaran::all();
-    $pelanggan  = Pelanggan::all();
     $layanan    = Layanan::all();
-    $tagihan = Tagihan::all();
+    $tagihan    = Tagihan::all();
+    $pelanggan  = Pelanggan::with('layanan')->get(); // ← pastikan load relasi layanan
 
     return view('pemasukan', compact(
-        'pembayaran',
-        'metode',
-        'pelanggan',
-        'layanan',
-        'tagihan'
+        'pembayaran', 'metode', 'pelanggan', 'layanan', 'tagihan'
     ));
 }
 
@@ -42,25 +38,31 @@ public function index()
     }
 
     // SIMPAN DATA
-    public function store(Request $request)
-    {
-        $request->validate([
-            'tagihan_id'   => 'required',
-            'metode_id'    => 'required',
-            'tanggal_bayar'=> 'required|date',
-            'jumlah_bayar' => 'required|numeric'
-        ]);
+public function store(Request $request)
+{
+    $request->validate([
+        'pelanggan_id'  => 'required',
+        'layanan_id'    => 'required',
+        'tagihan_id'    => 'required',
+        'metode_id'     => 'required',
+        'tanggal_bayar' => 'required|date',
+        'jumlah_bayar'  => 'required|numeric',
+        'status'        => 'required|in:lunas,belum',
+    ]);
 
-        Pembayaran::create([
-            'tagihan_id'    => $request->tagihan_id,
-            'metode_id'     => $request->metode_id,
-            'tanggal_bayar' => $request->tanggal_bayar,
-            'jumlah_bayar'  => $request->jumlah_bayar
-        ]);
+    Pembayaran::create([
+        'pelanggan_id'  => $request->pelanggan_id,
+        'layanan_id'    => $request->layanan_id,
+        'tagihan_id'    => $request->tagihan_id,
+        'metode_id'     => $request->metode_id,
+        'tanggal_bayar' => $request->tanggal_bayar,
+        'jumlah_bayar'  => $request->jumlah_bayar,
+        'status'        => $request->status,
+    ]);
 
-        return redirect()->route('pemasukan.index')
-            ->with('success', 'Data pembayaran berhasil ditambahkan');
-    }
+    return redirect()->route('pemasukan.index')
+        ->with('success', 'Data pembayaran berhasil ditambahkan');
+}
 
     // EDIT
     public function edit($id)

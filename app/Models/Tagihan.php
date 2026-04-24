@@ -8,6 +8,13 @@ use Illuminate\Database\Eloquent\Model;
 class Tagihan extends Model
 {
     protected $table = 'tagihan';
+        protected $fillable = [
+        'pelanggan_id',
+        'jumlah',
+        'status',
+        'bulan',
+        'tahun',
+    ];
     use HasFactory;
     public function pelanggan()
 {
