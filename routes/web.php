@@ -1,3 +1,4 @@
+```php
 <?php
 
 use App\Http\Controllers\SesiController;
@@ -5,6 +6,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\PelangganController;
 use App\Http\Controllers\PemasukanController;
 use App\Http\Controllers\CSController;
+use App\Http\Controllers\LayananController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -13,8 +15,8 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 */
 Route::middleware(['guest'])->group(function () {
-    Route::get('/', [SesiController::class,'index'])->name('login');
-    Route::post('/', [SesiController::class,'login']);
+    Route::get('/', [SesiController::class, 'index'])->name('login');
+    Route::post('/', [SesiController::class, 'login']);
 
     Route::get('/login', [SesiController::class, 'index']);
     Route::post('/login', [SesiController::class, 'login']);
@@ -36,24 +38,37 @@ Route::get('/home', function () {
 */
 Route::middleware(['auth'])->group(function () {
 
-    // 🔥 DASHBOARD
-    Route::get('/admin', [AdminController::class,'index'])->middleware('userakses:admin');
-    Route::get('/cs/cs', [CSController::class,'dashboard'])
-    ->middleware('userakses:cs');
+    /*
+    |--------------------------------------------------------------------------
+    | DASHBOARD
+    |--------------------------------------------------------------------------
+    */
+    Route::get('/admin', [AdminController::class, 'index'])
+        ->middleware('userakses:admin');
 
-    // 🔥 ROLE LAIN (opsional)
-    Route::get('/admin/noc', [AdminController::class,'noc'])->middleware('userakses:noc');
-    Route::get('/admin/admin', [AdminController::class,'admin'])->middleware('userakses:admin');
+    Route::get('/cs/cs', [CSController::class, 'dashboard'])
+        ->middleware('userakses:cs');
 
-    // 🔥 LOGOUT
-    Route::post('/logout', [SesiController::class,'logout'])->name('logout');
+    Route::get('/admin/noc', [AdminController::class, 'noc'])
+        ->middleware('userakses:noc');
+
+    Route::get('/admin/admin', [AdminController::class, 'admin'])
+        ->middleware('userakses:admin');
 
     /*
     |--------------------------------------------------------------------------
-    | CS MENU
+    | LOGOUT
+    |--------------------------------------------------------------------------
+    */
+    Route::post('/logout', [SesiController::class, 'logout'])->name('logout');
+
+    /*
+    |--------------------------------------------------------------------------
+    | MENU CS
     |--------------------------------------------------------------------------
     */
     Route::middleware('userakses:cs')->group(function () {
+
         Route::get('/cs/scan', function () {
             return view('scan_cs');
         });
@@ -70,6 +85,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/pelanggan/{id}', [PelangganController::class, 'show']);
     Route::get('/instalasi', [PelangganController::class, 'create']);
     Route::post('/pelanggan/store', [PelangganController::class, 'store']);
+    Route::put('/pelanggan/{id}', [PelangganController::class, 'update']);
+    Route::delete('/pelanggan/{id}', [PelangganController::class, 'destroy']);
 
     /*
     |--------------------------------------------------------------------------
@@ -77,4 +94,12 @@ Route::middleware(['auth'])->group(function () {
     |--------------------------------------------------------------------------
     */
     Route::resource('pemasukan', PemasukanController::class);
+
+    /*
+    |--------------------------------------------------------------------------
+    | LAYANAN
+    |--------------------------------------------------------------------------
+    */
+    Route::resource('layanan', LayananController::class);
+
 });

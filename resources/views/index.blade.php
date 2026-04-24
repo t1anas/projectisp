@@ -1,3 +1,4 @@
+```php
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -97,14 +98,11 @@
             </div>
 
             <!-- ACTION BUTTON -->
-            <div style="padding:20px;">
-                <a href="/admin" class="btn btn-secondary btn-sm">
-                    <i class="bi bi-arrow-left"></i> Home
-                </a>
-                <a href="/instalasi" class="btn btn-primary btn-sm">
-                    <i class="bi bi-plus-lg"></i> Tambah Pelanggan
-                </a>
-            </div>
+                <div style="padding:20px;">
+    <a href="/instalasi" class="btn btn-primary btn-sm">
+        <i class="bi bi-plus-lg"></i> Tambah Pelanggan
+    </a>
+</div>
 
             <!-- TABLE -->
             <div class="table-responsive px-3 pb-4">
@@ -118,6 +116,7 @@
                             <th>Aksi</th>
                         </tr>
                     </thead>
+
                     <tbody>
                         @foreach($pelanggan as $p)
                         <tr>
@@ -125,9 +124,127 @@
                             <td>{{ $p->site->nama_site ?? '-' }}</td>
                             <td>{{ $p->layanan->nama_paket ?? '-' }}</td>
                             <td>{{ $p->no_hp ?? '-' }}</td>
+
+                            <!-- TAMBAHAN AKSI TANPA MENGUBAH PUNYAMU -->
+                            <td>
+                                <form action="{{ url('/pelanggan/'.$p->id) }}" method="POST" style="display:inline-block;">
+                                    @csrf
+                                    <!-- MENJADI INI -->
+
+    <!-- BUTTON UPDATE -->
+    <button type="button"
+        class="btn btn-warning btn-sm"
+        data-bs-toggle="modal"
+        data-bs-target="#editModal{{ $p->id }}">
+        <i class="bi bi-pencil-square"></i> Update
+    </button>
+
+    <!-- FORM DELETE (TERPISAH) -->
+    <form action="{{ url('/pelanggan/'.$p->id) }}"
+        method="POST"
+        style="display:inline-block;">
+        @csrf
+        @method('DELETE')
+
+        <button type="submit"
+            class="btn btn-danger btn-sm"
+            onclick="return confirm('Yakin hapus data ini?')">
+            <i class="bi bi-trash"></i> Delete
+        </button>
+    </form>
+
+</td>
+
+<!-- MODAL UPDATE (DI LUAR FORM DELETE) -->
+<div class="modal fade" id="editModal{{ $p->id }}" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+
+            <form action="{{ url('/pelanggan/'.$p->id) }}" method="POST">
+                @csrf
+                @method('PUT')
+
+                <div class="modal-header bg-warning">
+                    <h5 class="modal-title">Update Pelanggan</h5>
+
+                    <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal">
+                    </button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="row g-3">
+
+                        <div class="col-md-6">
+                            <label class="form-label">Nama</label>
+                            <input type="text"
+                                name="nama"
+                                class="form-control"
+                                value="{{ $p->nama }}"
+                                required>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">No Telepon</label>
+                            <input type="text"
+                                name="no_hp"
+                                class="form-control"
+                                value="{{ $p->no_hp }}">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Site</label>
+                            <select name="site_id" class="form-select" required>
+                                @foreach($site as $s)
+                                    <option value="{{ $s->id }}"
+                                        {{ $p->site_id == $s->id ? 'selected' : '' }}>
+                                        {{ $s->nama_site }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Layanan</label>
+                            <select name="layanan_id" class="form-select" required>
+                                @foreach($layanan as $l)
+                                    <option value="{{ $l->id }}"
+                                        {{ $p->layanan_id == $l->id ? 'selected' : '' }}>
+                                        {{ $l->nama_paket }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button"
+                        class="btn btn-secondary"
+                        data-bs-dismiss="modal">
+                        Batal
+                    </button>
+
+                    <button type="submit"
+                        class="btn btn-warning">
+                        Simpan Perubahan
+                    </button>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+</div>
+                            </td>
+                            <!-- END TAMBAHAN -->
+
                         </tr>
                         @endforeach
                     </tbody>
+
                 </table>
             </div>
 

@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use App\Models\Pelanggan;
@@ -11,16 +10,18 @@ use Illuminate\Http\Request;
 class PelangganController extends Controller
 {
     public function index()
-{
-    $pelanggan = Pelanggan::with('layanan','site')->get();
+    {
+        $pelanggan = Pelanggan::with('layanan', 'site')->get();
+        $site      = Site::all();
+        $layanan   = Layanan::all();
 
-    return view('index', compact('pelanggan'));
+        return view('index', compact('pelanggan', 'site', 'layanan'));
+    }
 
-}
-    // 🔥 DETAIL (QR masuk sini)
+    // 🔥 DETAIL
     public function detail($kode)
     {
-        $pelanggan = Pelanggan::where('kode_pelanggan', $kode)
+        $pelanggan = Pelanggan::where('nik', $kode)
             ->with(['tagihan.pembayaran', 'layanan', 'site'])
             ->firstOrFail();
 
@@ -30,46 +31,75 @@ class PelangganController extends Controller
     // 🔥 FORM INPUT
     public function create()
     {
-        $site = Site::all();
+        $site    = Site::all();
         $layanan = Layanan::all();
 
-        return view('create', compact('site','layanan'));
+        return view('create', compact('site', 'layanan'));
     }
 
     // 🔥 SIMPAN DATA
     public function store(Request $request)
     {
-        // validasi dulu (biar aman)
         $request->validate([
-            'nama' => 'required',
-            'site_id' => 'required',
-            'layanan_id' => 'required',
-            'kode_wilayah' => 'required'
+            'nama'          => 'required',
+            'site_id'       => 'required',
+            'layanan_id'    => 'required',
+            'nik'  => 'required'
         ]);
 
         $site = Site::find($request->site_id);
 
-        // generate nomor urut
         $count = Pelanggan::where('site_id', $request->site_id)
-                    ->where('kode_wilayah', $request->kode_wilayah)
+                    ->where('nik', $request->nik)
                     ->count() + 1;
 
         $nomor = str_pad($count, 4, '0', STR_PAD_LEFT);
 
-        // contoh: PON60001
-        $kode = $site->kode_site . $request->kode_wilayah . $nomor;
+        $kode = $site->kode_site . $request->nik . $nomor;
 
         Pelanggan::create([
             'kode_pelanggan' => $kode,
-            'nama' => $request->nama,
-            'alamat' => $request->alamat,
-            'no_hp' => $request->no_hp,
-            'site_id' => $request->site_id,
-            'layanan_id' => $request->layanan_id,
-            'kode_wilayah' => $request->kode_wilayah,
-            'lokasi_link' => $request->lokasi_link
+            'nama'           => $request->nama,
+            'alamat'         => $request->alamat,
+            'no_hp'          => $request->no_hp,
+            'site_id'        => $request->site_id,
+            'layanan_id'     => $request->layanan_id,
+            'nik'   => $request->nik,
+            'lokasi_link'    => $request->lokasi_link
         ]);
 
         return redirect('/pelanggan')->with('success', 'Berhasil tambah pelanggan');
+    }
+
+    // 🔥 UPDATE DATA
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'nama'       => 'required',
+            'site_id'    => 'required',
+            'layanan_id' => 'required'
+        ]);
+
+        $pelanggan = Pelanggan::findOrFail($id);
+
+        $pelanggan->update([
+            'nama'       => $request->nama,
+            'alamat'     => $request->alamat,
+            'no_hp'      => $request->no_hp,
+            'site_id'    => $request->site_id,
+            'layanan_id' => $request->layanan_id,
+            'lokasi_link'=> $request->lokasi_link
+        ]);
+
+        return redirect('/pelanggan')->with('success', 'Data berhasil diupdate');
+    }
+
+    // 🔥 HAPUS DATA
+    public function destroy($id)
+    {
+        $pelanggan = Pelanggan::findOrFail($id);
+        $pelanggan->delete();
+
+        return redirect('/pelanggan')->with('success', 'Data berhasil dihapus');
     }
 }

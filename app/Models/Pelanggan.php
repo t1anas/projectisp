@@ -16,7 +16,7 @@ class Pelanggan extends Model
         'no_hp',
         'site_id',
         'layanan_id',
-        'kode_wilayah',
+        'nik',
         'lokasi_link'
     ];
 

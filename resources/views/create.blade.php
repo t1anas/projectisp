@@ -142,10 +142,10 @@
                         </select>
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label">Kode Wilayah</label>
+                        <label class="form-label">NIK</label>
                         <div class="input-icon-wrap">
                             <i class="bi bi-hash icon"></i>
-                            <input type="text" name="kode_wilayah" class="form-control" placeholder="contoh: 6">
+                            <input type="char" name="nik" class="form-control" placeholder="contoh: 3500xxxx">
                         </div>
                     </div>
                     <div class="col-12">
