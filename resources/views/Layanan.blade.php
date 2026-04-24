@@ -1,4 +1,3 @@
-```php id="h3d9k1"
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -85,9 +84,11 @@ body{
         <i class="bi bi-router"></i> Instalasi Baru
     </a>
 
+    @if(Auth::user()->role == 'admin')
     <a href="{{ url('/pemasukan') }}" class="menu-item">
         <i class="bi bi-wallet2"></i> Pemasukan
     </a>
+@endif
 
     <div class="section-label">Pelanggan</div>
 
@@ -212,22 +213,22 @@ body{
 
                 <tbody>
 
-                    @foreach($layanan as $l)
+                    @foreach($pelanggan as $p)
                     <tr>
 
                         <td>{{ $loop->iteration }}</td>
 
-                        <td>{{ $l->created_at->format('d/m/Y') }}</td>
+                        <td>{{ $p->created_at->format('d/m/Y') }}</td>
 
-                        <td>{{ optional($l->pelanggan)->nama ?? '-' }}</td>
+                        <td>{{ $p->nama }}</td>
 
-                        <td>Rp {{ number_format($l->harga,0,',','.') }}</td>
+                        <td>Rp {{ number_format($p->layanan->harga ?? 0,0,',','.') }}</td>
 
-                        <td>{{ $l->nama_paket }}</td>
+                        <td>{{ $p->layanan->nama_paket ?? '-' }}</td>
 
                         <td>
-                            <span class="badge-status {{ $l->status == 'AKTIF' ? 'aktif':'nonaktif' }}">
-                                {{ $l->status }}
+                            <span class="badge-status {{ $p->layanan->status == 'AKTIF' ? 'aktif':'nonaktif' }}">
+                                {{ $p->layanan->status }}
                             </span>
                         </td>
 

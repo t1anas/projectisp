@@ -1,4 +1,3 @@
-```php
 <?php
 
 use App\Http\Controllers\SesiController;
@@ -43,6 +42,11 @@ Route::middleware(['auth'])->group(function () {
     | DASHBOARD
     |--------------------------------------------------------------------------
     */
+
+    Route::middleware(['auth'])->group(function () {
+    Route::get('/pemasukan', [PemasukanController::class, 'index'])
+        ->middleware('role:admin');
+});
     Route::get('/admin', [AdminController::class, 'index'])
         ->middleware('userakses:admin');
 

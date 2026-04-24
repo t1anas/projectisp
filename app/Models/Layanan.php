@@ -14,7 +14,7 @@ class Layanan extends Model
     ];
 
     public function pelanggan()
-    {
-        return $this->belongsTo(Pelanggan::class, 'id');
-    }
+{
+    return $this->hasMany(Pelanggan::class, 'layanan_id');
+}
 }

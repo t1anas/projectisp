@@ -107,6 +107,11 @@
     <a href="{{ url('/cs/cs') }}" class="menu-item active"><i class="bi bi-speedometer2"></i> Dashboard</a>
     <a href="{{ url('/layanan') }}" class="menu-item"><i class="bi bi-wifi"></i> Data Layanan</a>
     <a href="{{ url('/instalasi') }}" class="menu-item"><i class="bi bi-router"></i> Instalasi Baru</a>
+    @if(Auth::user()->role == 'admin')
+        <a href="{{ url('/pemasukan') }}" class="menu-item">
+            <i class="bi bi-wallet2"></i> Pemasukan
+        </a>
+    @endif
     <div class="section-label">Pelanggan</div>
     <a href="{{ url('/pelanggan') }}" class="menu-item"><i class="bi bi-people"></i> Data Pelanggan</a>
     <div class="profile-section">

@@ -1,13 +1,13 @@
 <?php
 
 namespace App\Http\Controllers;
-use App\Models\Layanan;
+use App\Models\Pelanggan;
 
 class LayananController extends Controller
 {
 public function index()
 {
-    $layanan = Layanan::with('pelanggan')->get();
-    return view('layanan', compact('layanan'));
+    $pelanggan = Pelanggan::with('layanan')->get();
+    return view('layanan', compact('pelanggan'));
 }
 }

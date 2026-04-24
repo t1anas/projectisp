@@ -58,9 +58,11 @@ body{
         <i class="bi bi-router"></i> Instalasi Baru
     </a>
 
-    <a href="{{ url('/pemasukan') }}" class="menu-item active">
+    @if(Auth::user()->role == 'admin')
+    <a href="{{ url('/pemasukan') }}" class="menu-item">
         <i class="bi bi-wallet2"></i> Pemasukan
     </a>
+@endif
 
     <div class="section-label">Pelanggan</div>
 
