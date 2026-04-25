@@ -166,7 +166,7 @@
                 @csrf
                 @method('PUT')
 
-                <div class="modal-header bg-warning">
+                <div class="modal-header" style="background: linear-gradient(135deg, #28a745, #20c157); color: white;">
                     <h5 class="modal-title">Update Pelanggan</h5>
 
                     <button type="button"
@@ -230,9 +230,9 @@
                     </button>
 
                     <button type="submit"
-                        class="btn btn-warning">
-                        Simpan Perubahan
-                    </button>
+    class="btn btn-success">
+    Simpan Perubahan
+</button>
                 </div>
 
             </form>
