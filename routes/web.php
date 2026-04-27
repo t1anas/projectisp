@@ -86,7 +86,6 @@ Route::middleware(['auth'])->group(function () {
     |--------------------------------------------------------------------------
     */
     Route::get('/pelanggan', [PelangganController::class, 'index']);
-    Route::get('/pelanggan/{id}', [PelangganController::class, 'show']);
     Route::get('/instalasi', [PelangganController::class, 'create']);
     Route::post('/pelanggan/store', [PelangganController::class, 'store']);
     Route::put('/pelanggan/{id}', [PelangganController::class, 'update']);
@@ -110,3 +109,5 @@ Route::middleware(['auth'])->group(function () {
 Route::get('/approve', [PelangganController::class, 'approvePage']);
 Route::post('/pelanggan/{id}/approve', [PelangganController::class, 'approve'])
     ->name('pelanggan.approve');
+Route::post('/pelanggan/generate-tagihan', [PelangganController::class, 'generateTagihan'])
+    ->name('pelanggan.generateTagihan');

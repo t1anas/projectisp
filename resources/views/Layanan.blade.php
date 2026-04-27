@@ -336,6 +336,12 @@ body {
                                         data-bs-target="#modalNotif{{ $p->id }}">
                                         <i class="bi bi-bell-fill"></i>
                                     </button>
+                                    <form action="{{ route('pelanggan.generateTagihan') }}" method="POST">
+    @csrf
+    <button type="submit" class="btn btn-success">
+        +
+    </button>
+</form>
                                 </div>
                             </td>
                         </tr>

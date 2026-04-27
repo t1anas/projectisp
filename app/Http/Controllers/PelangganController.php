@@ -139,4 +139,32 @@ public function approvePage()
 
     return view('approve', compact('pelanggan'));
 }
+public function generateTagihan()
+{
+    $pelanggan = Pelanggan::with('layanan')->get();
+
+    foreach ($pelanggan as $p) {
+
+        if (!$p->layanan) continue;
+
+        $cek = Tagihan::where('pelanggan_id', $p->id)
+            ->whereMonth('tanggal', now()->month)
+            ->whereYear('tanggal', now()->year)
+            ->exists();
+
+        if (!$cek) {
+            Tagihan::create([
+    'pelanggan_id' => $p->id,
+    'layanan_id' => $p->layanan->id,
+    'tanggal' => now(),
+    'bulan' => now()->month,
+    'tahun' => now()->year,
+    'total' => $p->layanan->harga,
+    'status' => 'belum bayar'
+]);
+        }
+    }
+
+    return back()->with('success', 'Tagihan berhasil digenerate');
+}
 }

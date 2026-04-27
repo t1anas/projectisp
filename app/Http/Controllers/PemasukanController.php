@@ -18,7 +18,7 @@ public function index()
     $metode     = MetodePembayaran::all();
     $layanan    = Layanan::all();
     $tagihan    = Tagihan::all();
-    $pelanggan  = Pelanggan::with('layanan')->get(); // ← pastikan load relasi layanan
+    $pelanggan = Pelanggan::with(['layanan', 'tagihan'])->get();
 
     return view('pemasukan', compact(
         'pembayaran', 'metode', 'pelanggan', 'layanan', 'tagihan'
@@ -41,18 +41,18 @@ public function index()
 public function store(Request $request)
 {
     $request->validate([
-        'pelanggan_id'  => 'required',
-        'layanan_id'    => 'required',
+        'pelanggan_id' => 'required',
+        'layanan_id'   => 'required',
         'tagihan_id'    => 'required',
         'metode_id'     => 'required',
         'tanggal_bayar' => 'required|date',
         'jumlah_bayar'  => 'required|numeric',
-        'status'        => 'required|in:lunas,belum',
+        'status'        => 'required|in:lunas,belum lunas',
     ]);
 
     Pembayaran::create([
-        'pelanggan_id'  => $request->pelanggan_id,
-        'layanan_id'    => $request->layanan_id,
+        'pelanggan_id' => $request->pelanggan_id,
+        'layanan_id'   => $request->layanan_id,
         'tagihan_id'    => $request->tagihan_id,
         'metode_id'     => $request->metode_id,
         'tanggal_bayar' => $request->tanggal_bayar,
@@ -82,6 +82,9 @@ public function store(Request $request)
     public function update(Request $request, $id)
     {
         $request->validate([
+            'pelanggan_id' => 'required',
+            'layanan_id'   => 'required',
+            'status'       => 'required|in:lunas,belum lunas',
             'tagihan_id'   => 'required',
             'metode_id'    => 'required',
             'tanggal_bayar'=> 'required|date',
@@ -91,6 +94,9 @@ public function store(Request $request)
         $pembayaran = Pembayaran::findOrFail($id);
 
         $pembayaran->update([
+            'pelanggan_id' => $request->pelanggan_id,
+            'layanan_id'   => $request->layanan_id,
+            'status'       => $request->status,
             'tagihan_id'    => $request->tagihan_id,
             'metode_id'     => $request->metode_id,
             'tanggal_bayar' => $request->tanggal_bayar,
