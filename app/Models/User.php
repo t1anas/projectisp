@@ -42,4 +42,13 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+    public function getDashboardUrlAttribute()
+{
+    return match($this->role) {
+        'admin' => url('/admin'),
+        'cs' => url('/cs/cs'),
+        'noc' => url('/noc'),
+        default => url('/'),
+    };
+}
 }

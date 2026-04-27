@@ -107,3 +107,6 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('layanan', LayananController::class);
 
 });
+Route::get('/approve', [PelangganController::class, 'approvePage']);
+Route::post('/pelanggan/{id}/approve', [PelangganController::class, 'approve'])
+    ->name('pelanggan.approve');

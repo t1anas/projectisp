@@ -3,9 +3,11 @@ namespace App\Http\Controllers;
 
 use App\Models\Pelanggan;
 use App\Models\Tagihan;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use App\Models\Site;
 use App\Models\Layanan;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class PelangganController extends Controller
 {
@@ -20,13 +22,13 @@ class PelangganController extends Controller
 
     // 🔥 DETAIL
     public function detail($kode)
-    {
-        $pelanggan = Pelanggan::where('nik', $kode)
-            ->with(['tagihan.pembayaran', 'layanan', 'site'])
-            ->firstOrFail();
+{
+    $pelanggan = Pelanggan::where('kode_pelanggan', $kode)
+        ->with(['tagihan.pembayaran', 'layanan', 'site'])
+        ->firstOrFail();
 
-        return view('pelanggan.detail', compact('pelanggan'));
-    }
+    return view('pelanggan.detail', compact('pelanggan'));
+}
 
     // 🔥 FORM INPUT
     public function create()
@@ -58,15 +60,19 @@ class PelangganController extends Controller
         $kode = $site->kode_site . $request->nik . $nomor;
 
         Pelanggan::create([
-            'kode_pelanggan' => $kode,
-            'nama'           => $request->nama,
-            'alamat'         => $request->alamat,
-            'no_hp'          => $request->no_hp,
-            'site_id'        => $request->site_id,
-            'layanan_id'     => $request->layanan_id,
-            'nik'   => $request->nik,
-            'lokasi_link'    => $request->lokasi_link
-        ]);
+    'kode_pelanggan' => $kode,
+    'nama'           => $request->nama,
+    'alamat'         => $request->alamat,
+    'no_hp'          => $request->no_hp,
+    'site_id'        => $request->site_id,
+    'layanan_id'     => $request->layanan_id,
+    'nik'            => $request->nik,
+    'lokasi_link'    => $request->lokasi_link,
+
+    'status'         => 'pending',
+    'created_by'     => Auth::id()
+]);
+
 
         return redirect('/pelanggan')->with('success', 'Berhasil tambah pelanggan');
     }
@@ -102,4 +108,35 @@ class PelangganController extends Controller
 
         return redirect('/pelanggan')->with('success', 'Data berhasil dihapus');
     }
+    public function approve($id)
+{
+    $p = Pelanggan::with('layanan')->findOrFail($id);
+
+    // update status
+    $p->status = 'aktif';
+    $p->approved_by = Auth::id();
+    $p->approved_at = now();
+
+    // 🔥 QR (pakai URL biar dinamis)
+    $url = url('/pelanggan/'.$p->kode_pelanggan);
+
+    $qr = QrCode::size(300)->generate($url);
+
+    $filename = 'qr_'.$p->kode_pelanggan.'.svg';
+    file_put_contents(public_path('qrcodes/'.$filename), $qr);
+
+    $p->qr_code = 'qrcodes/'.$filename;
+
+    $p->save();
+
+    return back()->with('success', 'Pelanggan berhasil di-approve + QR dibuat');
+}
+public function approvePage()
+{
+    $pelanggan = Pelanggan::with('layanan')
+        ->where('status', 'pending')
+        ->get();
+
+    return view('approve', compact('pelanggan'));
+}
 }

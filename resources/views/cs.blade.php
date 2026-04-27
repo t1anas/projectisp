@@ -104,7 +104,7 @@
       <span class="logo-text">JAGONET</span>
     </div>
     <div class="section-label">Main Board</div>
-    <a href="{{ url('/cs/cs') }}" class="menu-item active"><i class="bi bi-speedometer2"></i> Dashboard</a>
+    <a href="{{ Auth::user()->dashboard_url }}" class="menu-item active"><i class="bi bi-speedometer2"></i> Dashboard</a>
     <a href="{{ url('/layanan') }}" class="menu-item"><i class="bi bi-wifi"></i> Data Layanan</a>
     <a href="{{ url('/instalasi') }}" class="menu-item"><i class="bi bi-router"></i> Instalasi Baru</a>
     @if(Auth::user()->role == 'admin')
@@ -124,7 +124,12 @@
           <div class="admin-name">{{ Auth::user()->name }}</div>
         </div>
       </div>
-      <button class="logout-btn"><i class="bi bi-box-arrow-right"></i> LOG OUT</button>
+       <form method="POST" action="{{ route('logout') }}">
+                @csrf
+                <button type="submit" class="logout-btn">
+                    <i class="bi bi-box-arrow-right"></i> LOG OUT
+                </button>
+            </form>
     </div>
   </div>
 

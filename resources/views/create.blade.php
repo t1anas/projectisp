@@ -25,7 +25,7 @@
 
         <div class="section-label">Main Board</div>
 
-        <a href="{{ url('/cs/cs') }}" class="menu-item">
+        <a href="{{ Auth::user()->dashboard_url }}" class="menu-item">
             <i class="bi bi-speedometer2"></i> Dashboard
         </a>
         <a href="{{ url('/layanan') }}" class="menu-item">
