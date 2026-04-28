@@ -167,4 +167,12 @@ public function generateTagihan()
 
     return back()->with('success', 'Tagihan berhasil digenerate');
 }
+public function show($id)
+{
+    $pelanggan = Pelanggan::with('layanan')->findOrFail($id);
+    $tagihan = Tagihan::where('pelanggan_id', $id)->get();
+
+    return view('detail', compact('pelanggan', 'tagihan'));
+}
+
 }

@@ -1,4 +1,3 @@
-```php
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -35,9 +34,9 @@
             <i class="bi bi-router"></i> Instalasi Baru
         </a>
         @if(Auth::user()->role == 'admin')
-            <a href="{{ url('/pemasukan') }}" class="menu-item">
-                <i class="bi bi-wallet2"></i> Pemasukan
-            </a>
+        <a href="{{ url('/pemasukan') }}" class="menu-item">
+            <i class="bi bi-wallet2"></i> Pemasukan
+        </a>
         @endif
 
         <div class="section-label">Pelanggan</div>
@@ -46,7 +45,7 @@
             <i class="bi bi-people"></i> Data Pelanggan
         </a>
 
-        <!-- Profile -->
+        <!-- PROFILE -->
         <div class="profile-section">
             <div class="admin-card">
                 <div class="admin-avatar">
@@ -57,7 +56,6 @@
                     <div class="admin-name">{{ Auth::user()->name }}</div>
                 </div>
             </div>
-
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
                 <button type="submit" class="logout-btn">
@@ -66,6 +64,7 @@
             </form>
         </div>
     </div>
+    <!-- END SIDEBAR -->
 
     <!-- MAIN CONTENT -->
     <div class="main-content" style="flex:1;">
@@ -99,12 +98,12 @@
                 </div>
             </div>
 
-            <!-- ACTION BUTTON -->
-                <div style="padding:20px;">
-    <a href="/instalasi" class="btn btn-primary btn-sm">
-        <i class="bi bi-plus-lg"></i> Tambah Pelanggan
-    </a>
-</div>
+            <!-- TOMBOL TAMBAH -->
+            <div style="padding:20px;">
+                <a href="/instalasi" class="btn btn-primary btn-sm">
+                    <i class="bi bi-plus-lg"></i> Tambah Pelanggan
+                </a>
+            </div>
 
             <!-- TABLE -->
             <div class="table-responsive px-3 pb-4">
@@ -118,7 +117,6 @@
                             <th>Aksi</th>
                         </tr>
                     </thead>
-
                     <tbody class="text-center">
                         @foreach($pelanggan as $p)
                         <tr>
@@ -126,53 +124,63 @@
                             <td>{{ $p->site->nama_site ?? '-' }}</td>
                             <td>{{ $p->layanan->nama_paket ?? '-' }}</td>
                             <td>{{ $p->no_hp ?? '-' }}</td>
-
-                            <!-- TAMBAHAN AKSI TANPA MENGUBAH PUNYAMU -->
                             <td>
-                                <form action="{{ url('/pelanggan/'.$p->id) }}" method="POST" style="display:inline-block;">
+                                {{-- TOMBOL UPDATE: tidak pakai form, cukup buka modal --}}
+                                <button type="button"
+                                        class="btn btn-warning btn-sm"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#editModal{{ $p->id }}">
+                                    <i class="bi bi-pencil-square"></i> Update
+                                </button>
+
+                                {{-- FORM DELETE: berdiri sendiri, tidak bersarang --}}
+                                <form action="{{ url('/pelanggan/'.$p->id) }}"
+                                      method="POST"
+                                      style="display:inline-block;"
+                                      onsubmit="return confirm('Yakin hapus data ini?')">
                                     @csrf
-                                    <!-- MENJADI INI -->
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-danger btn-sm">
+                                        <i class="bi bi-trash"></i> Delete
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+            <!-- END TABLE -->
 
-    <!-- BUTTON UPDATE -->
-    <button type="button"
-        class="btn btn-warning btn-sm"
-        data-bs-toggle="modal"
-        data-bs-target="#editModal{{ $p->id }}">
-        <i class="bi bi-pencil-square"></i> Update
-    </button>
+        </div>
+        <!-- END CARD -->
 
-    <!-- FORM DELETE (TERPISAH) -->
-    <form action="{{ url('/pelanggan/'.$p->id) }}"
-        method="POST"
-        style="display:inline-block;">
-        @csrf
-        @method('DELETE')
+    </div>
+    <!-- END MAIN CONTENT -->
 
-        <button type="submit"
-            class="btn btn-danger btn-sm"
-            onclick="return confirm('Yakin hapus data ini?')">
-            <i class="bi bi-trash"></i> Delete
-        </button>
-    </form>
+</div>
+<!-- END WRAPPER -->
 
-</td>
 
-<!-- MODAL UPDATE (DI LUAR FORM DELETE) -->
-<div class="modal fade" id="editModal{{ $p->id }}" tabindex="-1">
-    <div class="modal-dialog modal-lg">
+{{-- =============================================
+     MODAL UPDATE
+     Wajib di luar wrapper agar tidak ada
+     form bersarang (form dalam form)
+     ============================================= --}}
+@foreach($pelanggan as $p)
+<div class="modal fade" id="editModal{{ $p->id }}" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
 
             <form action="{{ url('/pelanggan/'.$p->id) }}" method="POST">
                 @csrf
                 @method('PUT')
 
-                <div class="modal-header" style="background: linear-gradient(135deg, #28a745, #20c157); color: white;">
+                <div class="modal-header"
+                     style="background:linear-gradient(135deg,#28a745,#20c157); color:#fff;">
                     <h5 class="modal-title">Update Pelanggan</h5>
-
-                    <button type="button"
-                        class="btn-close"
-                        data-bs-dismiss="modal">
-                    </button>
+                    <button type="button" class="btn-close btn-close-white"
+                            data-bs-dismiss="modal"></button>
                 </div>
 
                 <div class="modal-body">
@@ -180,29 +188,24 @@
 
                         <div class="col-md-6">
                             <label class="form-label">Nama</label>
-                            <input type="text"
-                                name="nama"
-                                class="form-control"
-                                value="{{ $p->nama }}"
-                                required>
+                            <input type="text" name="nama" class="form-control"
+                                   value="{{ $p->nama }}" required>
                         </div>
 
                         <div class="col-md-6">
                             <label class="form-label">No Telepon</label>
-                            <input type="text"
-                                name="no_hp"
-                                class="form-control"
-                                value="{{ $p->no_hp }}">
+                            <input type="text" name="no_hp" class="form-control"
+                                   value="{{ $p->no_hp }}">
                         </div>
 
                         <div class="col-md-6">
                             <label class="form-label">Site</label>
                             <select name="site_id" class="form-select" required>
                                 @foreach($site as $s)
-                                    <option value="{{ $s->id }}"
-                                        {{ $p->site_id == $s->id ? 'selected' : '' }}>
-                                        {{ $s->nama_site }}
-                                    </option>
+                                <option value="{{ $s->id }}"
+                                    {{ $p->site_id == $s->id ? 'selected' : '' }}>
+                                    {{ $s->nama_site }}
+                                </option>
                                 @endforeach
                             </select>
                         </div>
@@ -211,10 +214,10 @@
                             <label class="form-label">Layanan</label>
                             <select name="layanan_id" class="form-select" required>
                                 @foreach($layanan as $l)
-                                    <option value="{{ $l->id }}"
-                                        {{ $p->layanan_id == $l->id ? 'selected' : '' }}>
-                                        {{ $l->nama_paket }}
-                                    </option>
+                                <option value="{{ $l->id }}"
+                                    {{ $p->layanan_id == $l->id ? 'selected' : '' }}>
+                                    {{ $l->nama_paket }}
+                                </option>
                                 @endforeach
                             </select>
                         </div>
@@ -223,16 +226,11 @@
                 </div>
 
                 <div class="modal-footer">
-                    <button type="button"
-                        class="btn btn-secondary"
-                        data-bs-dismiss="modal">
-                        Batal
+                    <button type="button" class="btn btn-secondary"
+                            data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-success">
+                        Simpan Perubahan
                     </button>
-
-                    <button type="submit"
-    class="btn btn-success">
-    Simpan Perubahan
-</button>
                 </div>
 
             </form>
@@ -240,23 +238,9 @@
         </div>
     </div>
 </div>
-                            </td>
-                            <!-- END TAMBAHAN -->
-
-                        </tr>
-                        @endforeach
-                    </tbody>
-
-                </table>
-            </div>
-
-        </div>
-        <!-- /card -->
-
-    </div>
-</div>
+@endforeach
+{{-- END MODAL --}}
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
 </body>
 </html>

@@ -52,7 +52,9 @@ body {
 /* ---- ACTION BUTTONS ---- */
 .action-group {
     display: flex;
+    align-items: center;
     gap: 8px;
+    justify-content: center;
 }
 
 .action-modern {
@@ -66,6 +68,7 @@ body {
     transition: .25s;
     box-shadow: 0 6px 14px rgba(0, 0, 0, .06);
     cursor: pointer;
+    text-decoration: none;
 }
 
 .action-modern i {
@@ -96,59 +99,111 @@ body {
     color: #fff;
 }
 
+.btn-tambah {
+    width: 38px;
+    height: 38px;
+    border: none;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+    color: #059669;
+    font-size: 18px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: .25s;
+    box-shadow: 0 6px 14px rgba(0,0,0,.06);
+    padding: 0;
+}
+
+.btn-tambah:hover {
+    background: #22c55e;
+    color: #fff;
+    transform: translateY(-3px);
+}
+
 /* ---- MODAL NOTIFIKASI ---- */
 .modal-notif .modal-content {
-    border-radius: 22px;
+    border-radius: 18px;
     border: none;
     overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.15);
 }
 
 .notif-header {
-    background: linear-gradient(135deg, #17b33d, #0f8d2f);
-    color: #fff;
-    padding: 18px 24px;
-    font-size: 24px;
+    background: #fff;
+    color: #111;
+    padding: 22px 28px 16px;
+    font-size: 22px;
     font-weight: 800;
+    text-align: center;
+    letter-spacing: 1px;
+    border-bottom: 1px solid #eee;
 }
 
 .notif-body {
-    padding: 24px;
+    padding: 22px 28px 28px;
+    background: #fff;
 }
 
 .notif-box {
-    border: 1px solid #dcdcdc;
-    border-radius: 14px;
-    padding: 16px;
-    margin-bottom: 18px;
-    background: #fafafa;
+    border: 1.5px solid #d4d4d4;
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-bottom: 14px;
+    background: #fff;
 }
 
 .notif-label {
-    font-size: 13px;
+    font-size: 11px;
     font-weight: 800;
-    color: #111;
-    margin-bottom: 10px;
+    color: #222;
+    margin-bottom: 8px;
     text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .notif-text {
-    font-size: 14px;
+    font-size: 13.5px;
     color: #444;
-    line-height: 1.7;
+    line-height: 1.75;
+}
+
+.notif-preview-box {
+    border: 1.5px solid #d4d4d4;
+    border-radius: 10px;
+    padding: 16px 18px;
+    margin-bottom: 22px;
+    background: #fff;
+    font-size: 13.5px;
+    color: #333;
+    line-height: 1.8;
+}
+
+.notif-preview-box b {
+    font-size: 13px;
+    font-weight: 800;
+    color: #111;
 }
 
 .btn-kirim {
-    background: linear-gradient(135deg, #18b63e, #0f8d2f);
+    background: #22c55e;
     color: #fff;
     border: none;
-    border-radius: 12px;
-    padding: 12px 30px;
+    border-radius: 10px;
+    padding: 13px 0;
     font-weight: 800;
+    font-size: 14px;
+    letter-spacing: 1px;
     cursor: pointer;
+    width: 100%;
+    display: block;
+    transition: background 0.2s;
 }
 
 .btn-kirim:hover {
-    background: #0f8d2f;
+    background: #16a34a;
     color: #fff;
 }
 </style>
@@ -195,7 +250,6 @@ body {
 
         <!-- PROFILE -->
         <div class="profile-section">
-
             <div class="admin-card">
                 <div class="admin-avatar">
                     <i class="bi bi-person-fill text-white"></i>
@@ -205,14 +259,12 @@ body {
                     <div class="admin-name">{{ Auth::user()->name }}</div>
                 </div>
             </div>
-
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
                 <button type="submit" class="logout-btn">
                     <i class="bi bi-box-arrow-right"></i> LOG OUT
                 </button>
             </form>
-
         </div>
 
     </div>
@@ -313,33 +365,48 @@ body {
                             <td>{{ $p->layanan->nama_paket ?? '-' }}</td>
 
                             <td>
-                             @if(strtolower($p->status) == 'aktif')
-                                <span class="status-pill status-active">
-                                    <i class="bi bi-check-circle-fill"></i> Aktif
-                                </span>
-                            @else
-                                <span class="status-pill status-nonactive">
-                                    <i class="bi bi-x-circle-fill"></i> Nonaktif
-                                </span>
-                            @endif
+                                @if(strtolower($p->status) == 'aktif')
+                                    <span class="status-pill status-active">
+                                        <i class="bi bi-check-circle-fill"></i> Aktif
+                                    </span>
+                                @else
+                                    <span class="status-pill status-nonactive">
+                                        <i class="bi bi-x-circle-fill"></i> Nonaktif
+                                    </span>
+                                @endif
                             </td>
 
                             <td>
                                 <div class="action-group">
-                                    <button class="action-modern btn-detail" title="Detail">
-                                        <i class="bi bi-eye-fill"></i>
-                                    </button>
 
+                                    {{-- Tombol Detail --}}
+                                    <a href="{{ route('layanan.detail', $p->id) }}"
+                                       class="action-modern btn-detail"
+                                       title="Detail">
+                                        <i class="bi bi-eye-fill"></i>
+                                    </a>
+
+                                    {{-- Tombol Reminder --}}
                                     <button class="action-modern btn-reminder"
                                         title="Reminder"
                                         data-bs-toggle="modal"
                                         data-bs-target="#modalNotif{{ $p->id }}">
                                         <i class="bi bi-bell-fill"></i>
                                     </button>
-                                    <form action="{{ route('pelanggan.generateTagihan') }}" method="POST">
-                                    @csrf
-                                    <button type="submit" class="btn btn-success">+</button>
-                                </form>
+
+                                    {{-- Tombol Generate Tagihan --}}
+                                    <form method="POST"
+                                          action="{{ route('pelanggan.generateTagihan') }}"
+                                          style="margin:0;">
+                                        @csrf
+                                        <input type="hidden" name="pelanggan_id" value="{{ $p->id }}">
+                                        <button type="submit"
+                                                class="btn-tambah"
+                                                title="Generate Tagihan">
+                                            <i class="bi bi-plus-lg"></i>
+                                        </button>
+                                    </form>
+
                                 </div>
                             </td>
                         </tr>
@@ -359,17 +426,25 @@ body {
 </div>
 <!-- END WRAPPER -->
 
+
+{{-- =============================================
+     MODAL NOTIFIKASI
+     Diletakkan di luar wrapper utama agar tidak
+     terganggu overflow:hidden pada parent
+     ============================================= --}}
 @foreach($pelanggan as $p)
 <div class="modal fade modal-notif" id="modalNotif{{ $p->id }}" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-dialog modal-md modal-dialog-centered">
         <div class="modal-content">
 
+            {{-- HEADER --}}
             <div class="notif-header">
                 NOTIFIKASI
             </div>
 
             <div class="notif-body">
 
+                {{-- BOX 1: TAGIHAN INTERNET BULANAN --}}
                 <div class="notif-box">
                     <div class="notif-label">Tagihan Internet Bulanan</div>
                     <div class="notif-text">
@@ -378,43 +453,103 @@ body {
                     </div>
                 </div>
 
+                {{-- BOX 2: ISOLIR LAYANAN --}}
                 <div class="notif-box">
-                    <div class="notif-label">Isi Reminder</div>
+                    <div class="notif-label">Isolir Layanan</div>
                     <div class="notif-text">
                         Yth. {{ $p->nama }},<br>
-                        Kami informasikan bahwa tagihan internet Anda saat ini belum dibayar.
-                        Mohon segera melakukan pembayaran sebelum jatuh tempo.
+                        Kami informasikan bahwa layanan internet Anda saat ini
+                        <b>diisolir</b> dikarenakan tagihan {{ date('F') }} telah
+                        melebihi batas jatuh tempo pembayaran.
                     </div>
                 </div>
 
-                <div class="notif-box">
-                    <div class="notif-label">Preview Pesan</div>
-                    <div class="notif-text">
-                        <b>TAGIHAN INTERNET BULANAN</b><br><br>
-                        Nama Pelanggan : {{ $p->nama }}<br>
-                        Total Tagihan : Rp {{ number_format($p->layanan->harga ?? 0, 0, ',', '.') }}<br><br>
-                        Silakan lakukan pembayaran ke rekening berikut:<br>
-                        BCA : 1234567890 a/n Jagonet<br>
-                        BRI : 0987654321 a/n Jagonet<br><br>
-                        Kirim bukti pembayaran ke admin.<br>
-                        Terima kasih 🙏
-                    </div>
+                {{-- PREVIEW PESAN --}}
+                <div class="notif-label" style="margin-bottom:8px;">Preview Pesan</div>
+                <div class="notif-preview-box">
+                    <b>TAGIHAN INTERNET BULANAN</b><br><br>
+                    Nama Pelanggan : {{ $p->nama }}<br>
+                    Periode Tagihan : {{ date('F Y') }}<br>
+                    Total Tagihan : Rp {{ number_format($p->layanan->harga ?? 0, 0, ',', '.') }}<br><br>
+                    Silakan lakukan pembayaran sebelum tanggal [Jatuh Tempo] ke rekening berikut:<br>
+                    BCA : [No Rekening] a/n [Nama]<br>
+                    BRI : [No Rekening] a/n [Nama]<br><br>
+                    Kirim bukti pembayaran ke: [Nomor Admin]<br>
+                    Terima Kasih 😊🙏
                 </div>
 
-                <div class="text-center mt-4">
-                    <button class="btn-kirim" data-bs-dismiss="modal">
-                        KIRIM
-                    </button>
-                </div>
+                {{-- TOMBOL KIRIM --}}
+                <button class="btn-kirim" data-bs-dismiss="modal">
+                    KIRIM
+                </button>
 
             </div>
-            <!-- END notif-body -->
+            {{-- END notif-body --}}
 
         </div>
     </div>
 </div>
 @endforeach
 {{-- END MODAL --}}
+@foreach($tagihan as $t)
+<div class="modal fade" id="editTagihan{{ $t->id }}" tabindex="-1">
+<div class="modal-dialog">
+<div class="modal-content">
+
+<form action="{{ url('/tagihan/'.$t->id) }}" method="POST">
+@csrf
+@method('PUT')
+
+<div class="modal-header bg-warning">
+<h5 class="modal-title">Edit Tagihan</h5>
+<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+</div>
+
+<div class="modal-body">
+
+<div class="mb-3">
+<label>Periode</label>
+<input type="text" name="periode"
+class="form-control"
+value="{{ $t->periode }}">
+</div>
+
+<div class="mb-3">
+<label>Jumlah</label>
+<input type="number" name="jumlah"
+class="form-control"
+value="{{ $t->jumlah }}">
+</div>
+
+<div class="mb-3">
+<label>Status</label>
+<select name="status" class="form-control">
+<option value="Belum Bayar"
+{{ $t->status=='Belum Bayar' ? 'selected' : '' }}>
+Belum Bayar
+</option>
+
+<option value="Lunas"
+{{ $t->status=='Lunas' ? 'selected' : '' }}>
+Lunas
+</option>
+</select>
+</div>
+
+</div>
+
+<div class="modal-footer">
+<button type="submit" class="btn btn-success">
+Simpan
+</button>
+</div>
+
+</form>
+
+</div>
+</div>
+</div>
+@endforeach
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
