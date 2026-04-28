@@ -109,7 +109,7 @@
             <!-- TABLE -->
             <div class="table-responsive px-3 pb-4">
                 <table class="table table-bordered align-middle">
-                    <thead class="table-light">
+                    <thead class="table-light text-center fw-bold">
                         <tr>
                             <th>Nama</th>
                             <th>Site</th>
@@ -119,10 +119,10 @@
                         </tr>
                     </thead>
 
-                    <tbody>
+                    <tbody class="text-center">
                         @foreach($pelanggan as $p)
                         <tr>
-                            <td>{{ $p->nama }}</td>
+                            <td class="text-start">{{ $p->nama }}</td>
                             <td>{{ $p->site->nama_site ?? '-' }}</td>
                             <td>{{ $p->layanan->nama_paket ?? '-' }}</td>
                             <td>{{ $p->no_hp ?? '-' }}</td>

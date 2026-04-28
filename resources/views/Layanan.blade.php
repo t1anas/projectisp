@@ -287,7 +287,7 @@ body {
             <div class="table-responsive px-3 pb-4">
                 <table class="table table-bordered table-hover align-middle">
 
-                    <thead>
+                    <thead class="table-light text-center fw-bold">
                         <tr>
                             <th>No</th>
                             <th>Aktivasi</th>
@@ -299,16 +299,16 @@ body {
                         </tr>
                     </thead>
 
-                    <tbody>
+                    <tbody class="text-center">
                         @foreach($pelanggan as $p)
                         <tr>
                             <td>{{ $loop->iteration }}</td>
 
                             <td>{{ $p->created_at->format('d/m/Y') }}</td>
 
-                            <td>{{ $p->nama }}</td>
+                            <td class="text-start">{{ $p->nama }}</td>
 
-                            <td>Rp {{ number_format($p->layanan->harga ?? 0, 0, ',', '.') }}</td>
+                            <td class="text-start">Rp {{ number_format($p->layanan->harga ?? 0, 0, ',', '.') }}</td>
 
                             <td>{{ $p->layanan->nama_paket ?? '-' }}</td>
 
@@ -337,11 +337,9 @@ body {
                                         <i class="bi bi-bell-fill"></i>
                                     </button>
                                     <form action="{{ route('pelanggan.generateTagihan') }}" method="POST">
-    @csrf
-    <button type="submit" class="btn btn-success">
-        +
-    </button>
-</form>
+                                    @csrf
+                                    <button type="submit" class="btn btn-success">+</button>
+                                </form>
                                 </div>
                             </td>
                         </tr>

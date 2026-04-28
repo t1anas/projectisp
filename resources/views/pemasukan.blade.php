@@ -96,6 +96,19 @@ body{
 
 <!-- MAIN CONTENT -->
 <div class="main-content" style="flex:1;">
+    @if(session('error'))
+    <div class="alert alert-danger alert-dismissible fade show m-3">
+        {{ session('error') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+@endif
+
+@if(session('success'))
+    <div class="alert alert-success alert-dismissible fade show m-3">
+        {{ session('success') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+@endif
 
     <div class="topbar">
 
@@ -183,7 +196,7 @@ body{
 
             <table class="table table-bordered table-hover align-middle">
 
-                <thead class="table-light">
+                <thead class="table-light text-center fw-bold">
                     <tr>
                         <th>No</th>
                         <th>Tanggal</th>
@@ -216,9 +229,20 @@ body{
                             <button class="action-btn btn-primary">
                                 <i class="bi bi-eye"></i>
                             </button>
+
                             <button class="action-btn btn-warning">
                                 <i class="bi bi-pencil"></i>
                             </button>
+                            <form action="{{ route('pemasukan.destroy', $item->id) }}"
+                                method="POST"
+                                style="display:inline;"
+                                onsubmit="return confirm('Yakin mau hapus data ini?')">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="action-btn btn-danger">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                            </form>
                         </td>
                     </tr>
                     @endforeach

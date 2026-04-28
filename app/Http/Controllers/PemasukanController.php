@@ -43,22 +43,40 @@ public function store(Request $request)
     $request->validate([
         'pelanggan_id' => 'required',
         'layanan_id'   => 'required',
-        'tagihan_id'    => 'required',
-        'metode_id'     => 'required',
-        'tanggal_bayar' => 'required|date',
-        'jumlah_bayar'  => 'required|numeric',
-        'status'        => 'required|in:lunas,belum lunas',
+        'tagihan_id'   => 'required',
+        'metode_id'    => 'required',
+        'tanggal_bayar'=> 'required|date',
+        'jumlah_bayar' => 'required|numeric',
     ]);
 
+    // ambil tagihan
+    $tagihan = Tagihan::findOrFail($request->tagihan_id);
+
+    if ($tagihan->status == 'lunas') {
+        return back()->with('error', 'Tagihan sudah lunas!');
+    }
+
+    
     Pembayaran::create([
         'pelanggan_id' => $request->pelanggan_id,
         'layanan_id'   => $request->layanan_id,
-        'tagihan_id'    => $request->tagihan_id,
-        'metode_id'     => $request->metode_id,
-        'tanggal_bayar' => $request->tanggal_bayar,
-        'jumlah_bayar'  => $request->jumlah_bayar,
-        'status'        => $request->status,
+        'tagihan_id'   => $request->tagihan_id,
+        'metode_id'    => $request->metode_id,
+        'tanggal_bayar'=> $request->tanggal_bayar,
+        'jumlah_bayar' => $request->jumlah_bayar,
+        'status'       => 'lunas'
     ]);
+
+    $totalBayar = Pembayaran::where('tagihan_id', $tagihan->id)
+        ->sum('jumlah_bayar');
+
+    if ($totalBayar >= $tagihan->jumlah) {
+        $tagihan->status = 'lunas';
+    } else {
+        $tagihan->status = 'belum lunas';
+    }
+
+    $tagihan->save();
 
     return redirect()->route('pemasukan.index')
         ->with('success', 'Data pembayaran berhasil ditambahkan');
@@ -109,10 +127,28 @@ public function store(Request $request)
 
     // HAPUS
     public function destroy($id)
-    {
-        Pembayaran::findOrFail($id)->delete();
+{
+    $pembayaran = Pembayaran::findOrFail($id);
 
-        return redirect()->route('pemasukan.index')
-            ->with('success', 'Data pembayaran berhasil dihapus');
+    // ambil tagihan terkait
+    $tagihan = Tagihan::findOrFail($pembayaran->tagihan_id);
+
+    // hapus pembayaran
+    $pembayaran->delete();
+
+    $totalBayar = Pembayaran::where('tagihan_id', $tagihan->id)
+        ->sum('jumlah_bayar');
+
+    // update status
+    if ($totalBayar >= $tagihan->jumlah) {
+        $tagihan->status = 'lunas';
+    } else {
+        $tagihan->status = 'belum lunas';
     }
+
+    $tagihan->save();
+
+    return redirect()->route('pemasukan.index')
+        ->with('success', 'Pembayaran dihapus & status tagihan diperbarui');
+}
 }
