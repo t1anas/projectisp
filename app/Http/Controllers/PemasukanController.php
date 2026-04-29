@@ -11,21 +11,43 @@ use App\Models\Layanan;
 
 class PemasukanController extends Controller
 {
-    // TAMPIL DATA
-public function index()
+    //index=menampilkan data
+public function index(Request $request)
 {
-    $pembayaran = Pembayaran::with('pelanggan', 'layanan', 'metode')->get();
+    $query = Pembayaran::with('pelanggan', 'layanan', 'metode');
+
+    if ($request->tgl_awal && $request->tgl_akhir) {
+        $query->whereBetween('tanggal_bayar', [
+            $request->tgl_awal,
+            $request->tgl_akhir
+        ]);
+    }
+
+    if ($request->metode) {
+        $query->where('metode_id', $request->metode);
+    }
+
+    if ($request->cari) {
+        $query->whereHas('pelanggan', function ($q) use ($request) {
+            $q->where('nama', 'like', '%' . $request->cari . '%');
+        });
+    }
+
+    $pembayaran = $query->get();
+
+    $total = $pembayaran->sum('jumlah_bayar');
+
     $metode     = MetodePembayaran::all();
     $layanan    = Layanan::all();
     $tagihan    = Tagihan::all();
-    $pelanggan = Pelanggan::with(['layanan', 'tagihan'])->get();
+    $pelanggan  = Pelanggan::with(['layanan', 'tagihan'])->get();
 
-    return view('pemasukan', compact(
-        'pembayaran', 'metode', 'pelanggan', 'layanan', 'tagihan'
+    return view('pembayaran', compact(
+        'pembayaran', 'metode', 'pelanggan', 'layanan', 'tagihan', 'total'
     ));
 }
 
-    // FORM TAMBAH
+    //untuk form tambah data
     public function create()
     {
         $tagihan = Tagihan::all();
@@ -37,7 +59,7 @@ public function index()
         ));
     }
 
-    // SIMPAN DATA
+    //store=menyimpan data
 public function store(Request $request)
 {
     $request->validate([
@@ -78,11 +100,11 @@ public function store(Request $request)
 
     $tagihan->save();
 
-    return redirect()->route('pemasukan.index')
+    return redirect()->route('pembayaran')
         ->with('success', 'Data pembayaran berhasil ditambahkan');
 }
 
-    // EDIT
+    //untuk edit data
     public function edit($id)
     {
         $pembayaran = Pembayaran::findOrFail($id);
@@ -121,11 +143,11 @@ public function store(Request $request)
             'jumlah_bayar'  => $request->jumlah_bayar
         ]);
 
-        return redirect()->route('pemasukan.index')
+        return redirect()->route('pembayaran')
             ->with('success', 'Data pembayaran berhasil diupdate');
     }
 
-    // HAPUS
+    //fungsi untuk hapus data
     public function destroy($id)
 {
     $pembayaran = Pembayaran::findOrFail($id);
@@ -148,7 +170,11 @@ public function store(Request $request)
 
     $tagihan->save();
 
-    return redirect()->route('pemasukan.index')
+    return redirect()->route('pembayaran')
         ->with('success', 'Pembayaran dihapus & status tagihan diperbarui');
+}
+public function menu()
+{
+    return view('pemasukan');
 }
 }

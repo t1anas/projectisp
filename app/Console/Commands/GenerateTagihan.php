@@ -21,35 +21,31 @@ class GenerateTagihan extends Command
 
     foreach ($pelanggan as $p) {
 
-        // ❌ skip kalau tidak punya layanan
         if (!$p->layanan) continue;
 
-        // 🔥 hitung H-1 dari tanggal daftar
-        $tanggalDaftar = Carbon::parse($p->created_at)->day;
-        $tanggalTagihan = $tanggalDaftar - 1;
+        // ambil tanggal daftar
+        $tanggalDaftar = Carbon::parse($p->created_at);
 
-        if ($tanggalTagihan == 0) {
-            $tanggalTagihan = now()->subDay()->day;
-        }
+        // H-1 dari tanggal daftar
+        $tanggalTagihan = $tanggalDaftar->copy()->subDay();
 
-        // ❌ kalau bukan harinya → skip
-        if ($hariIni != $tanggalTagihan) continue;
+        // kalau bukan hari ini → skip
+        if ($hariIni != $tanggalTagihan->day) continue;
 
-        // ✅ cek biar tidak double
         $cek = Tagihan::where('pelanggan_id', $p->id)
             ->whereMonth('tanggal', now()->month)
             ->whereYear('tanggal', now()->year)
             ->exists();
 
-        if (!$cek) {
-            Tagihan::create([
-                'pelanggan_id' => $p->id,
-                'layanan_id' => $p->layanan->id,
-                'tanggal' => now(),
-                'total' => $p->layanan->harga,
-                'status' => 'belum bayar'
-            ]);
-        }
+if (!$cek) {
+    Tagihan::create([
+        'pelanggan_id' => $p->id,
+        'layanan_id'   => $p->layanan->id,
+        'tanggal'      => $tanggalTagihan, 
+        'total'        => $p->layanan->harga,
+        'status'       => 'belum bayar',
+    ]);
+}
     }
 
     $this->info('Generate tagihan otomatis selesai');

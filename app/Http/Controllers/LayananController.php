@@ -9,8 +9,9 @@ class LayananController extends Controller
     public function index()
     {
         $pelanggan = Pelanggan::with('layanan')->get();
+        $tagihan = $pelanggan->pluck('tagihan')->flatten();
 
-        return view('layanan', compact('pelanggan'));
+        return view('layanan', compact('pelanggan', 'tagihan'));
     }
 
     public function detail($id)

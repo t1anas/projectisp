@@ -21,7 +21,6 @@ body {
     vertical-align: middle;
 }
 
-/* ---- STATUS BADGE ---- */
 .status-pill {
     display: inline-flex;
     align-items: center;
@@ -49,7 +48,6 @@ body {
     border-color: #ffc4c4;
 }
 
-/* ---- ACTION BUTTONS ---- */
 .action-group {
     display: flex;
     align-items: center;
@@ -123,7 +121,6 @@ body {
     transform: translateY(-3px);
 }
 
-/* ---- MODAL NOTIFIKASI ---- */
 .modal-notif .modal-content {
     border-radius: 18px;
     border: none;
@@ -426,50 +423,42 @@ body {
 </div>
 <!-- END WRAPPER -->
 
-
-{{-- =============================================
-     MODAL NOTIFIKASI
-     Diletakkan di luar wrapper utama agar tidak
-     terganggu overflow:hidden pada parent
-     ============================================= --}}
 @foreach($pelanggan as $p)
 <div class="modal fade modal-notif" id="modalNotif{{ $p->id }}" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-md modal-dialog-centered">
         <div class="modal-content">
 
-            {{-- HEADER --}}
             <div class="notif-header">
                 NOTIFIKASI
             </div>
 
             <div class="notif-body">
 
-                {{-- BOX 1: TAGIHAN INTERNET BULANAN --}}
                 <div class="notif-box">
                     <div class="notif-label">Tagihan Internet Bulanan</div>
                     <div class="notif-text">
                         Nama Pelanggan : {{ $p->nama }}<br>
-                        Periode Tagihan : {{ date('F Y') }}
+                        @php $periodeTagihan = \Carbon\Carbon::parse($p->created_at)->subDay(); 
+                        @endphp
+                        Periode Tagihan : {{ $periodeTagihan->translatedFormat('F Y') }}
                     </div>
                 </div>
 
-                {{-- BOX 2: ISOLIR LAYANAN --}}
                 <div class="notif-box">
                     <div class="notif-label">Isolir Layanan</div>
                     <div class="notif-text">
                         Yth. {{ $p->nama }},<br>
                         Kami informasikan bahwa layanan internet Anda saat ini
-                        <b>diisolir</b> dikarenakan tagihan {{ date('F') }} telah
+                        <b>diisolir</b> dikarenakan tagihan {{ $periodeTagihan->translatedFormat('F Y') }} telah
                         melebihi batas jatuh tempo pembayaran.
                     </div>
                 </div>
 
-                {{-- PREVIEW PESAN --}}
                 <div class="notif-label" style="margin-bottom:8px;">Preview Pesan</div>
                 <div class="notif-preview-box">
                     <b>TAGIHAN INTERNET BULANAN</b><br><br>
                     Nama Pelanggan : {{ $p->nama }}<br>
-                    Periode Tagihan : {{ date('F Y') }}<br>
+                    Periode Tagihan : {{ $periodeTagihan->translatedFormat('F Y') }}<br>
                     Total Tagihan : Rp {{ number_format($p->layanan->harga ?? 0, 0, ',', '.') }}<br><br>
                     Silakan lakukan pembayaran sebelum tanggal [Jatuh Tempo] ke rekening berikut:<br>
                     BCA : [No Rekening] a/n [Nama]<br>
@@ -478,19 +467,16 @@ body {
                     Terima Kasih 😊🙏
                 </div>
 
-                {{-- TOMBOL KIRIM --}}
                 <button class="btn-kirim" data-bs-dismiss="modal">
                     KIRIM
                 </button>
 
             </div>
-            {{-- END notif-body --}}
 
         </div>
     </div>
 </div>
 @endforeach
-{{-- END MODAL --}}
 @foreach($tagihan as $t)
 <div class="modal fade" id="editTagihan{{ $t->id }}" tabindex="-1">
 <div class="modal-dialog">

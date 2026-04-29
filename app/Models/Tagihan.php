@@ -30,4 +30,9 @@ class Tagihan extends Model
         return $this->hasOne(Pembayaran::class, 'tagihan_id');
     }
 
+
+public function layanan()
+{
+    return $this->belongsTo(Layanan::class);
 }
+    }
