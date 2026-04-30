@@ -28,4 +28,5 @@ class LayananController extends Controller
     {
         return redirect()->route('layanan.detail', $id);
     }
+    
 }

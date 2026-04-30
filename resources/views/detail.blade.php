@@ -472,9 +472,12 @@ body {
                         
                         {{-- ACTION BUTTONS --}}
                         <div class="profil-actions">
-                            <a href="{{ url('/layanan/'.$pelanggan->id.'/edit') }}" class="btn-edit-tagihan">
-                                <i class="bi bi-pencil-square"></i> Edit Tagihan
-                            </a>
+                           <button type="button"
+        class="btn-edit-tagihan"
+        data-bs-toggle="modal"
+        data-bs-target="#editTagihan{{ $pelanggan->id }}">
+    <i class="bi bi-pencil-square"></i> Edit Tagihan
+</button>
                             <a href="{{ url('/layanan/'.$pelanggan->id.'/isolir') }}" class="btn-isolir">
                                 <i class="bi bi-bell-fill"></i> Isolir Pelanggan
                             </a>
@@ -561,8 +564,119 @@ body {
     <!-- END MAIN CONTENT -->
 
 </div>
-<!-- END WRAPPER -->
+<!-- END WRAPPER --> 
+<div class="modal fade" id="detailModal{{ $pelanggan->id }}" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0 rounded-4">
 
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title fw-bold">
+                    Detail Layanan
+                </h5>
+                <button type="button"
+                        class="btn-close btn-close-white"
+                        data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body p-4">
+
+                <div class="mb-3">
+                    <strong>Nama :</strong>
+                    {{ $pelanggan->nama }}
+                </div>
+
+                <div class="mb-3">
+                    <strong>No HP :</strong>
+                    {{ $p->no_hp ?? '-' }}
+                </div>
+
+                <div class="mb-3">
+                    <strong>Alamat :</strong>
+                    {{ $p->alamat ?? '-' }}
+                </div>
+
+                <div class="mb-3">
+                    <strong>Paket :</strong>
+                    {{ $p->layanan->nama_paket ?? '-' }}
+                </div>
+
+                <div class="mb-3">
+                    <strong>Harga :</strong>
+                    Rp {{ number_format($p->layanan->harga ?? 0,0,',','.') }}
+                </div>
+
+                <div class="mb-3">
+                    <strong>Status :</strong>
+                    {{ ucfirst($pelanggan->status) }}
+                </div>
+
+                <div class="mb-3">
+                    <strong>Tanggal Aktivasi :</strong>
+                   {{ $pelanggan->created_at->format('d M Y') }}
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="editTagihan{{ $pelanggan->id }}" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 rounded-4">
+
+            <form action="{{ url('/tagihan/'.$tagihan[0]->id) }}" method="POST">
+                @csrf
+                @method('PUT')
+
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title fw-bold">
+                        Edit Tagihan
+                    </h5>
+
+                    <button type="button"
+                            class="btn-close btn-close-white"
+                            data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body p-4">
+
+                    <div class="mb-3">
+                        <label class="form-label">Jumlah Tagihan</label>
+                        <input type="number"
+                               name="jumlah"
+                               class="form-control"
+                               value="{{ $tagihan[0]->jumlah ?? 0 }}">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Paket</label>
+                        <input type="text"
+                               name="nama_paket"
+                               class="form-control"
+                               value="{{ $pelanggan->layanan->nama_paket ?? '' }}">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Keterangan</label>
+                        <textarea name="keterangan"
+                                  class="form-control"
+                                  rows="3">{{ $tagihan[0]->keterangan ?? '' }}</textarea>
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="submit"
+                            class="btn btn-success w-100">
+                        Simpan Perubahan
+                    </button>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+</div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

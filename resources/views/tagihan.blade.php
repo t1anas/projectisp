@@ -326,7 +326,63 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f4f6f9; }
     </div>
 </div>
 @endforeach
+@foreach($tagihan as $t)
+<div class="modal fade" id="editTagihan{{ $t->id }}" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
 
+            <form action="{{ url('/tagihan/'.$t->id) }}" method="POST">
+                @csrf
+                @method('PUT')
+
+                <div class="modal-header bg-warning">
+                    <h5 class="modal-title">Edit Tagihan</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+
+                    <div class="mb-3">
+                        <label>Jumlah Tagihan</label>
+                        <input type="number" name="total"
+                               class="form-control"
+                               value="{{ $t->total }}">
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Paket</label>
+                        <input type="text"
+                               class="form-control"
+                               value="{{ $t->pelanggan->layanan->nama_paket ?? '-' }}"
+                               readonly>
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Status</label>
+                        <select name="status" class="form-control">
+                            <option value="belum bayar" {{ $t->status=='belum bayar' ? 'selected' : '' }}>
+                                Belum Bayar
+                            </option>
+                            <option value="lunas" {{ $t->status=='lunas' ? 'selected' : '' }}>
+                                Lunas
+                            </option>
+                        </select>
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success">
+                        Simpan Perubahan
+                    </button>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+</div>
+@endforeach
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

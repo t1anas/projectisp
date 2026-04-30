@@ -9,7 +9,12 @@ use App\Http\Controllers\LayananController;
 use App\Http\Controllers\TagihanController;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware(['guest'])->group(function () {
+/*
+|--------------------------------------------------------------------------
+| Guest Routes
+|--------------------------------------------------------------------------
+*/
+Route::middleware('guest')->group(function () {
     Route::get('/',      [SesiController::class, 'index'])->name('login');
     Route::post('/',     [SesiController::class, 'login']);
     Route::get('/login', [SesiController::class, 'index']);
@@ -18,49 +23,54 @@ Route::middleware(['guest'])->group(function () {
 
 Route::get('/home', fn() => redirect('/admin'));
 
-Route::middleware(['auth'])->group(function () {
+/*
+|--------------------------------------------------------------------------
+| Authenticated Routes
+|--------------------------------------------------------------------------
+*/
+Route::middleware('auth')->group(function () {
 
     /*--- LOGOUT ---*/
     Route::post('/logout', [SesiController::class, 'logout'])->name('logout');
 
     /*--- DASHBOARD ---*/
-    Route::get('/admin',      [AdminController::class, 'index'])    ->middleware('userakses:admin');
-    Route::get('/admin/noc',  [AdminController::class, 'noc'])      ->middleware('userakses:noc');
-    Route::get('/admin/admin',[AdminController::class, 'admin'])    ->middleware('userakses:admin');
-    Route::get('/cs/cs',      [CSController::class, 'dashboard'])->middleware('userakses:cs');
+    Route::get('/admin',       [AdminController::class, 'index'] )->middleware('userakses:admin');
+    Route::get('/admin/noc',   [AdminController::class, 'noc']   )->middleware('userakses:noc');
+    Route::get('/admin/admin', [AdminController::class, 'admin'] )->middleware('userakses:admin');
+    Route::get('/cs/cs',       [CSController::class,   'dashboard'])->middleware('userakses:cs');
 
-Route::get('/pemasukan', [PemasukanController::class, 'menu'])
-    ->middleware('userakses:admin')
-    ->name('pemasukan');
+    /*--- PEMASUKAN ---*/
+    Route::get('/pemasukan', [PemasukanController::class, 'menu'])
+        ->middleware('userakses:admin')
+        ->name('pemasukan');
 
-    // halaman pembayaran
-    Route::get('/pembayaran', [PemasukanController::class, 'index'])
-        ->name('pembayaran');
-    Route::delete('/pembayaran/{id}', [PemasukanController::class, 'destroy'])
-        ->name('pembayaran.destroy');
-    Route::get('/pembayaran/{id}/edit', [PemasukanController::class, 'edit'])
-        ->name('pembayaran.edit');
-    Route::put('/pembayaran/{id}', [PemasukanController::class, 'update'])
-        ->name('pembayaran.update');
-    route::post('/pembayaran/store', [PemasukanController::class, 'store'])
-        ->name('pembayaran.store');
-
-    /*--- MENU CS ---*/
-    Route::middleware('userakses:cs')->group(function () {
-        Route::get('/cs/scan', fn() => view('scan_cs'));
-        Route::post('/cs/pembayaran/store', [PemasukanController::class, 'store']);
+    /*--- PEMBAYARAN ---*/
+    Route::prefix('pembayaran')->group(function () {
+        Route::get('/',          [PemasukanController::class, 'index'] )->name('pembayaran');
+        Route::post('/store',    [PemasukanController::class, 'store'] )->name('pembayaran.store');
+        Route::get('/{id}/edit', [PemasukanController::class, 'edit']  )->name('pembayaran.edit');
+        Route::put('/{id}',      [PemasukanController::class, 'update'])->name('pembayaran.update');
+        Route::delete('/{id}',   [PemasukanController::class, 'destroy'])->name('pembayaran.destroy');
     });
 
-    /*--- DATA PELANGGAN ---*/
-    Route::get('/pelanggan',         [PelangganController::class, 'index']);
-    Route::get('/pelanggan/{id}',    [PelangganController::class, 'show']);
-    Route::get('/instalasi',         [PelangganController::class, 'create']);
-    Route::post('/pelanggan/store',  [PelangganController::class, 'store']);
-    Route::put('/pelanggan/{id}',    [PelangganController::class, 'update']);
-    Route::delete('/pelanggan/{id}', [PelangganController::class, 'destroy']);
+    /*--- CS ---*/
+    Route::middleware('userakses:cs')->prefix('cs')->group(function () {
+        Route::get('/scan',              fn() => view('scan_cs'));
+        Route::post('/pembayaran/store', [PemasukanController::class, 'store']);
+    });
 
-    Route::post('/pelanggan/generate-tagihan', [PelangganController::class, 'generateTagihan'])
-        ->name('pelanggan.generateTagihan');
+    /*--- PELANGGAN ---*/
+    Route::prefix('pelanggan')->group(function () {
+        Route::get('/',                   [PelangganController::class, 'index']);
+        Route::get('/{id}',               [PelangganController::class, 'show']);
+        Route::post('/store',             [PelangganController::class, 'store']);
+        Route::put('/{id}',               [PelangganController::class, 'update']);
+        Route::delete('/{id}',            [PelangganController::class, 'destroy']);
+        Route::post('/generate-tagihan',  [PelangganController::class, 'generateTagihan'])
+            ->name('pelanggan.generateTagihan');
+    });
+
+    Route::get('/instalasi', [PelangganController::class, 'create']);
 
     /*--- LAYANAN ---*/
     Route::resource('layanan', LayananController::class);
@@ -68,14 +78,13 @@ Route::get('/pemasukan', [PemasukanController::class, 'menu'])
         ->name('layanan.detail');
 
     /*--- TAGIHAN ---*/
-    Route::get('/tagihan/{id}/kwitansi', [TagihanController::class, 'kwitansi'])
-        ->name('tagihan.kwitansi');
-    Route::get('/tagihan/{id}/bayar',    [TagihanController::class, 'bayar'])
-        ->name('tagihan.bayar');
-    Route::delete('/tagihan/{id}',       [TagihanController::class, 'destroy'])
-        ->name('tagihan.destroy');
-    Route::put('/tagihan/{id}', [TagihanController::class, 'update'])
-        ->name('tagihan.update');
-    Route::get('/tagihan', [TagihanController::class, 'index'])
-        ->name('tagihan');
+    Route::prefix('tagihan')->group(function () {
+        Route::get('/',             [TagihanController::class, 'index']  )->name('tagihan');
+        Route::put('/{id}',         [TagihanController::class, 'update'] )->name('tagihan.update');
+        Route::delete('/{id}',      [TagihanController::class, 'destroy'])->name('tagihan.destroy');
+        Route::get('/{id}/kwitansi',[TagihanController::class, 'kwitansi'])->name('tagihan.kwitansi');
+        Route::get('/{id}/bayar',   [TagihanController::class, 'bayar']  )->name('tagihan.bayar');
+    });
+Route::delete('/tagihan/{id}', [TagihanController::class, 'destroy']);
+Route::put('/pembayaran/{id}', [PembayaranController::class, 'update'])->name('pembayaran.update');
 });

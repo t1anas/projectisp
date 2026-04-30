@@ -240,13 +240,20 @@ body{
                             @endif
                         </td>
                         <td>
-                            <button class="action-btn btn-primary">
-                                <i class="bi bi-eye"></i>
-                            </button>
 
-                            <button class="action-btn btn-warning">
-                                <i class="bi bi-pencil"></i>
-                            </button>
+
+                            <button class="action-btn btn-warning"
+    data-bs-toggle="modal"
+    data-bs-target="#modalEditPembayaran"
+    data-id="{{ $item->id }}"
+    data-tanggal="{{ $item->tanggal_bayar }}"
+    data-nama="{{ $item->pelanggan->nama ?? '-' }}"
+    data-paket="{{ $item->layanan->nama_paket ?? '-' }}"
+    data-jumlah="{{ $item->jumlah_bayar }}"
+    data-metode="{{ $item->metode_id }}"
+    data-status="{{ $item->status }}">
+    <i class="bi bi-pencil"></i>
+</button>
                             <form action="{{ route('pembayaran.destroy', $item->id) }}"
                                 method="POST"
                                 style="display:inline;"
@@ -386,7 +393,31 @@ body{
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // script pelanggan yang sudah ada
+    document.getElementById('pelanggan').addEventListener('change', function () {
+        ...
+    });
 
+    // ✅ TAMBAHKAN DI SINI, di dalam DOMContentLoaded yang sama
+    document.getElementById('modalEditPembayaran').addEventListener('show.bs.modal', function (e) {
+        let btn = e.relatedTarget;
+        let id  = btn.getAttribute('data-id');
+
+        document.getElementById('formEditPembayaran').action = '/pembayaran/' + id;
+        document.getElementById('edit_nama_pelanggan').value = btn.getAttribute('data-nama');
+        document.getElementById('edit_tanggal_bayar').value  = btn.getAttribute('data-tanggal');
+        document.getElementById('edit_paket').value          = btn.getAttribute('data-paket');
+        document.getElementById('edit_jumlah_bayar').value   = btn.getAttribute('data-jumlah');
+        document.getElementById('edit_metode_id').value      = btn.getAttribute('data-metode');
+        document.getElementById('edit_status').value         = btn.getAttribute('data-status');
+    });
+
+});
+</script>
+
+</body>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('pelanggan').addEventListener('change', function () {
@@ -405,6 +436,77 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 </script>
+<!-- MODAL EDIT PEMBAYARAN -->
+<div class="modal fade" id="modalEditPembayaran" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
 
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title">
+                    <i class="bi bi-pencil-square"></i> Edit Pembayaran
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+
+            <form id="formEditPembayaran" method="POST">
+                @csrf
+                @method('PUT')
+
+                <div class="modal-body">
+                    <div class="row g-3">
+
+                        <div class="col-md-6">
+                            <label class="form-label">Nama Pelanggan</label>
+                            <input type="text" id="edit_nama_pelanggan" class="form-control" readonly>
+                            <small class="text-muted">Pelanggan tidak dapat diubah</small>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Tanggal Bayar</label>
+                            <input type="date" name="tanggal_bayar" id="edit_tanggal_bayar" class="form-control" required>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Paket</label>
+                            <input type="text" id="edit_paket" class="form-control" readonly>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Jumlah Bayar</label>
+                            <input type="number" name="jumlah_bayar" id="edit_jumlah_bayar" class="form-control" required>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Metode</label>
+                            <select name="metode_id" id="edit_metode_id" class="form-select" required>
+                                <option value="">-- Pilih Metode --</option>
+                                @foreach($metode as $m)
+                                    <option value="{{ $m->id }}">{{ $m->nama_metode }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Status</label>
+                            <select name="status" id="edit_status" class="form-select">
+                                <option value="lunas">Lunas</option>
+                                <option value="belum">Belum</option>
+                            </select>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-success">
+                        <i class="bi bi-save"></i> Simpan
+                    </button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
 </body>
 </html>

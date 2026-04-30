@@ -177,4 +177,5 @@ public function menu()
 {
     return view('pemasukan');
 }
+
 }

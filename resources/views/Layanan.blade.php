@@ -377,11 +377,10 @@ body {
                                 <div class="action-group">
 
                                     {{-- Tombol Detail --}}
-                                    <a href="{{ route('layanan.detail', $p->id) }}"
-                                       class="action-modern btn-detail"
-                                       title="Detail">
-                                        <i class="bi bi-eye-fill"></i>
-                                    </a>
+                                   <a href="{{ route('layanan.detail', $p->id) }}"
+   class="action-modern btn-detail">
+   <i class="bi bi-eye-fill"></i>
+</a>
 
                                     {{-- Tombol Reminder --}}
                                     <button class="action-modern btn-reminder"
