@@ -13,6 +13,61 @@
 
 <style>
 /* ===== BASE ===== */
+.modal-bayar .modal-content {
+    border-radius: 18px;
+    border: none;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+}
+
+.bayar-header {
+    background: #fff;
+    padding: 20px;
+    text-align: center;
+    font-weight: 800;
+    font-size: 18px;
+    border-bottom: 1px solid #eee;
+}
+
+.bayar-body {
+    padding: 22px;
+    background: #fff;
+}
+
+.bayar-box {
+    border: 1.5px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 14px;
+    margin-bottom: 14px;
+}
+
+.bayar-label {
+    font-size: 11px;
+    font-weight: 800;
+    color: #555;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+}
+
+.bayar-input {
+    border-radius: 10px;
+    font-size: 13px;
+}
+
+.btn-konfirmasi {
+    width: 100%;
+    background: #22c55e;
+    border: none;
+    padding: 12px;
+    border-radius: 10px;
+    font-weight: 800;
+    color: #fff;
+    transition: .2s;
+}
+
+.btn-konfirmasi:hover {
+    background: #16a34a;
+}
 body {
     font-family: 'Plus Jakarta Sans', sans-serif;
     background: #f4f6f9;
@@ -506,9 +561,10 @@ body {
                                     <a href="{{ url('/tagihan/'.$t->id.'/kwitansi') }}" class="btn-cetak">
                                         <i class="bi bi-printer-fill"></i> Cetak Kwitansi
                                     </a>
-                                    <a href="{{ url('/tagihan/'.$t->id.'/bayar') }}" class="btn-bayar">
-                                        Bayar
-                                    </a>
+                                <button class="btn-bayar"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#modalBayar{{ $t->id }}">Bayar
+                                </button>
                                 </div>
                             </div>
 
@@ -585,7 +641,6 @@ body {
 </div>
 
 <!-- MODAL: BUAT TAGIHAN -->
-<!-- MODAL: BUAT TAGIHAN -->
 <div class="modal fade" id="tambahTagihan" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -661,5 +716,118 @@ body {
         });
     });
 </script>
+  
+@foreach($tagihan as $t)
+@if(strtolower($t->status) != 'lunas')
+
+<div class="modal fade modal-bayar" id="modalBayar{{ $t->id }}" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+<div class="modal-header">
+    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+</div>
+            <div class="bayar-header">
+                Pembayaran Tagihan
+            </div>
+
+            <form method="POST" action="{{ route('tagihan.bayar', $t->id) }}">
+                @csrf
+
+                <div class="bayar-body">
+
+                    <!-- INFO TAGIHAN -->
+                   <!-- PERIODE -->
+<div class="bayar-box" style="background: linear-gradient(135deg,#f0fdf4,#dcfce7); border-color:#bbf7d0;">
+    
+    <div class="bayar-label" style="color:#15803d;">
+        Periode Tagihan
+    </div>
+
+    <div style="display:flex; align-items:center; gap:10px;">
+        
+        <div style="
+            width:36px;
+            height:36px;
+            border-radius:10px;
+            background:#22c55e;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            color:#fff;
+            font-size:16px;
+        ">
+            <i class="bi bi-calendar-event"></i>
+        </div>
+
+        <div>
+            <div style="font-size:14px; font-weight:800; color:#166534;">
+                {{ strtoupper(\Carbon\Carbon::parse($t->tanggal)->translatedFormat('F Y')) }}
+            </div>
+            <div style="font-size:11px; color:#4b5563;">
+                Periode penagihan layanan
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- TOTAL -->
+<div class="bayar-box">
+    <div class="bayar-label">Total Tagihan</div>
+    <div class="input-group">
+        <span class="input-group-text">Rp</span>
+        <input type="number"
+               name="total"
+               class="form-control bayar-input"
+               value="{{ $t->total }}"
+               required>
+    </div>
+</div>
+
+                    <!-- TANGGAL -->
+                    <div class="bayar-box">
+                        <div class="bayar-label">Tanggal Pembayaran</div>
+                        <input type="date" name="tanggal_bayar"
+                               class="form-control bayar-input"
+                               value="{{ date('Y-m-d') }}" required>
+                    </div>
+
+                    <!-- METODE -->
+                    <div class="bayar-box">
+                        <div class="bayar-label">Metode Pembayaran</div>
+                        <select name="metode_id" class="form-select bayar-input" required>
+                            <option value="">Pilih Metode</option>
+                            @foreach($metode as $m)
+                                <option value="{{ $m->id }}">
+                                    {{ $m->nama_metode }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <!-- KETERANGAN -->
+                    <div class="bayar-box">
+                        <div class="bayar-label">Keterangan</div>
+                        <textarea name="keterangan"
+                                  class="form-control bayar-input"
+                                  rows="2"></textarea>
+                    </div>
+
+                    <!-- BUTTON -->
+                    <button type="submit" class="btn-konfirmasi">
+                        KONFIRMASI PEMBAYARAN
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+</div>
+
+@endif
+@endforeach
+
 </body>
 </html>
