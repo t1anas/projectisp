@@ -5,6 +5,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\PelangganController;
 use App\Http\Controllers\PemasukanController;
 use App\Http\Controllers\CSController;
+use App\Http\Controllers\DetailController;
 use App\Http\Controllers\LayananController;
 use App\Http\Controllers\TagihanController;
 use Illuminate\Support\Facades\Route;
@@ -50,7 +51,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/store',    [PemasukanController::class, 'store'] )->name('pembayaran.store');
         Route::get('/{id}/edit', [PemasukanController::class, 'edit']  )->name('pembayaran.edit');
         Route::put('/{id}',      [PemasukanController::class, 'update'])->name('pembayaran.update');
-        Route::delete('/{id}',   [PemasukanController::class, 'destroy'])->name('pembayaran.destroy');
+        Route::delete('/{id}/',   [PemasukanController::class, 'destroy'])->name('pembayaran.destroy');
     });
 
     /*--- CS ---*/
@@ -74,17 +75,13 @@ Route::middleware('auth')->group(function () {
 
     /*--- LAYANAN ---*/
     Route::resource('layanan', LayananController::class);
-    Route::get('/layanan/{id}/detail', [LayananController::class, 'detail'])
-        ->name('layanan.detail');
+    Route::get('/layanan/{id}/detail', [DetailController::class, 'index'])
+    ->name('layanan.detail');
 
     /*--- TAGIHAN ---*/
-    Route::prefix('tagihan')->group(function () {
-        Route::get('/',             [TagihanController::class, 'index']  )->name('tagihan');
-        Route::put('/{id}',         [TagihanController::class, 'update'] )->name('tagihan.update');
-        Route::delete('/{id}',      [TagihanController::class, 'destroy'])->name('tagihan.destroy');
-        Route::get('/{id}/kwitansi',[TagihanController::class, 'kwitansi'])->name('tagihan.kwitansi');
-        Route::get('/{id}/bayar',   [TagihanController::class, 'bayar']  )->name('tagihan.bayar');
+
+Route::resource('tagihan', TagihanController::class);
     });
 Route::delete('/tagihan/{id}', [TagihanController::class, 'destroy']);
-Route::put('/pembayaran/{id}', [PembayaranController::class, 'update'])->name('pembayaran.update');
-});
+Route::put('/pembayaran/{id}', [PemasukanController::class, 'update'])->name('pembayaran.update');
+Route::delete('/pembayaran/{id}', [PemasukanController::class, 'destroy'])->name('pembayaran.destroy');

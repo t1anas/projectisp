@@ -100,28 +100,47 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f4f6f9; }
                 </div>
             </div>
 
-            <form method="GET" action="{{ url('/tagihan') }}">
-            <div class="filter-box">
-                <div class="row g-3">
-                    <div class="col-md-4">
-                        <input type="text" name="cari" class="form-control" placeholder="Cari pelanggan..." value="{{ request('cari') }}">
-                    </div>
-                    <div class="col-md-3">
-                        <select name="status" class="form-select">
-                            <option value="">Semua Status</option>
-                            <option value="lunas" {{ request('status') == 'lunas' ? 'selected' : '' }}>Lunas</option>
-                            <option value="belum bayar" {{ request('status') == 'belum bayar' ? 'selected' : '' }}>Belum Bayar</option>
-                        </select>
-                    </div>
-                    <div class="col-md-2">
-                        <input type="month" name="bulan" class="form-control" value="{{ request('bulan') }}">
-                    </div>
-                    <div class="col-md-1">
-                        <button type="submit" class="btn btn-success w-100"><i class="bi bi-search"></i></button>
-                    </div>
+<!-- Ganti bagian filter-box -->
+<div class="filter-box">
+    <div class="row g-3 align-items-end">
+
+        {{-- TOMBOL TAMBAH (paling kiri) --}}
+        <div class="col-md-auto">
+            <button type="button" class="btn btn-primary h-100 px-3"
+                    data-bs-toggle="modal" data-bs-target="#modalTambahTagihan">
+                <i class="bi bi-plus-lg me-1"></i> Tambah
+            </button>
+        </div>
+
+        {{-- FILTER FORM --}}
+        <form method="GET" action="{{ url('/tagihan') }}" class="col">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <input type="text" name="cari" class="form-control"
+                           placeholder="Cari pelanggan..."
+                           value="{{ request('cari') }}">
+                </div>
+                <div class="col-md-3">
+                    <select name="status" class="form-select">
+                        <option value="">Semua Status</option>
+                        <option value="lunas"       {{ request('status') == 'lunas'       ? 'selected' : '' }}>Lunas</option>
+                        <option value="belum bayar" {{ request('status') == 'belum bayar' ? 'selected' : '' }}>Belum Bayar</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <input type="month" name="bulan" class="form-control"
+                           value="{{ request('bulan') }}">
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-success w-100">
+                        <i class="bi bi-search"></i>
+                    </button>
                 </div>
             </div>
-            </form>
+        </form>
+
+    </div>
+</div>
 
             <div class="table-responsive px-3 pb-4">
                 <table class="table table-bordered table-hover align-middle">
@@ -130,6 +149,7 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f4f6f9; }
                             <th>No</th>
                             <th>Tanggal</th>
                             <th>Pelanggan</th>
+                            <th>Jenis Tagihan</th>
                             <th>Layanan</th>
                             <th>Total</th>
                             <th>Status</th>
@@ -142,6 +162,7 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f4f6f9; }
                             <td>{{ $loop->iteration }}</td>
                             <td>{{ \Carbon\Carbon::parse($t->tanggal)->format('d/m/Y') }}</td>
                             <td class="text-start">{{ $t->pelanggan->nama ?? '-' }}</td>
+                            <td>{{ $t->jenis_tagihan ?? '-' }}</td>
                             <td>{{ $t->pelanggan->layanan->nama_paket ?? '-' }}</td>
                             <td class="text-start fw-semibold">Rp {{ number_format($t->total, 0, ',', '.') }}</td>
                             <td>
@@ -194,6 +215,90 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f4f6f9; }
     </div>
 </div>
 
+<!-- MODAL TAMBAH TAGIHAN -->
+<div class="modal fade" id="modalTambahTagihan" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form action="{{ url('/tagihan') }}" method="POST">
+                @csrf
+
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title">
+                        <i class="bi bi-plus-circle me-2"></i>Tambah Tagihan
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white"
+                            data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Pelanggan</label>
+                        <select name="pelanggan_id" class="form-select" required
+                                id="selectPelanggan" onchange="updateLayanan(this)">
+                            <option value="">-- Pilih Pelanggan --</option>
+                            @foreach($pelanggan as $p)
+                                <option value="{{ $p->id }}"
+                                        data-layanan="{{ $p->layanan->id ?? '' }}"
+                                        data-harga="{{ $p->layanan->harga ?? 0 }}">
+                                    {{ $p->nama }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <input type="hidden" name="layanan_id" id="inputLayananId">
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Tanggal</label>
+                        <input type="date" name="tanggal" class="form-control"
+                               value="{{ date('Y-m-d') }}" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Jumlah Tagihan</label>
+                        <input type="number" name="total" id="inputTotal"
+                               class="form-control" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Jenis Tagihan</label>
+                        <select name="jenis_tagihan" class="form-control" required>
+    <option value="">-- Pilih Jenis --</option>
+    <option value="tagihan internet bulanan">Tagihan Internet Bulanan</option>
+    <option value="tagihan instalasi">Tagihan Instalasi</option>
+    <option value="tagihan penjualan alat">Tagihan Penjualan Alat</option>
+    <option value="pendapatan jasa">Pendapatan Jasa</option>
+</select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Keterangan</label>
+                        <textarea name="keterangan" class="form-control" rows="2"></textarea>
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary"
+                            data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-save me-1"></i> Simpan
+                    </button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+function updateLayanan(select) {
+    const opt = select.options[select.selectedIndex];
+    document.getElementById('inputLayananId').value = opt.dataset.layanan ?? '';
+    document.getElementById('inputTotal').value     = opt.dataset.harga  ?? '';
+}
+</script>
 
 @foreach($tagihan as $t)
 <div class="modal fade" id="detailTagihan{{ $t->id }}" tabindex="-1">
@@ -342,34 +447,38 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f4f6f9; }
 
                 <div class="modal-body">
 
-                    <div class="mb-3">
-                        <label>Jumlah Tagihan</label>
-                        <input type="number" name="total"
-                               class="form-control"
-                               value="{{ $t->total }}">
-                    </div>
+    <div class="mb-3">
+        <label>Tanggal</label>
+        <input type="date" name="tanggal"
+               class="form-control"
+               value="{{ $t->tanggal }}">
+    </div>
 
-                    <div class="mb-3">
-                        <label>Paket</label>
-                        <input type="text"
-                               class="form-control"
-                               value="{{ $t->pelanggan->layanan->nama_paket ?? '-' }}"
-                               readonly>
-                    </div>
+    <div class="mb-3">
+        <label>Jumlah Tagihan</label>
+        <input type="number" name="total"
+               class="form-control"
+               value="{{ $t->total }}">
+    </div>
 
-                    <div class="mb-3">
-                        <label>Status</label>
-                        <select name="status" class="form-control">
-                            <option value="belum bayar" {{ $t->status=='belum bayar' ? 'selected' : '' }}>
-                                Belum Bayar
-                            </option>
-                            <option value="lunas" {{ $t->status=='lunas' ? 'selected' : '' }}>
-                                Lunas
-                            </option>
-                        </select>
-                    </div>
+    <div class="mb-3">
+        <label>Jenis Tagihan</label>
+        <select name="jenis_tagihan" class="form-control">
+    <option value="tagihan internet bulanan" {{ $t->jenis_tagihan=='tagihan internet bulanan' ? 'selected' : '' }}>Tagihan Internet Bulanan</option>
+    <option value="tagihan instalasi" {{ $t->jenis_tagihan=='tagihan instalasi' ? 'selected' : '' }}>Tagihan Instalasi</option>
+    <option value="tagihan penjualan alat" {{ $t->jenis_tagihan=='tagihan penjualan alat' ? 'selected' : '' }}>Tagihan Penjualan Alat</option>
+    <option value="pendapatan jasa" {{ $t->jenis_tagihan=='pendapatan jasa' ? 'selected' : '' }}>Pendapatan Jasa</option>
+</select>
+    </div>
 
-                </div>
+    <div class="mb-3">
+        <label>Keterangan</label>
+        <textarea name="keterangan" class="form-control">{{ $t->keterangan }}</textarea>
+    </div>
+
+    <input type="hidden" name="layanan_id" value="{{ $t->layanan_id }}">
+
+</div>
 
                 <div class="modal-footer">
                     <button type="submit" class="btn btn-success">

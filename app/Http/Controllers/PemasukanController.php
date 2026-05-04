@@ -95,7 +95,7 @@ public function store(Request $request)
     if ($totalBayar >= $tagihan->jumlah) {
         $tagihan->status = 'lunas';
     } else {
-        $tagihan->status = 'belum lunas';
+        $tagihan->status = 'belum bayar';
     }
 
     $tagihan->save();
@@ -119,59 +119,61 @@ public function store(Request $request)
     }
 
     // UPDATE
-    public function update(Request $request, $id)
-    {
-        $request->validate([
-            'pelanggan_id' => 'required',
-            'layanan_id'   => 'required',
-            'status'       => 'required|in:lunas,belum lunas',
-            'tagihan_id'   => 'required',
-            'metode_id'    => 'required',
-            'tanggal_bayar'=> 'required|date',
-            'jumlah_bayar' => 'required|numeric'
-        ]);
+public function update(Request $request, $id)
+{
+    // VALIDASI (sesuai input di form edit)
+    $request->validate([
+        'tanggal_bayar' => 'required|date',
+        'jumlah_bayar'  => 'required|numeric',
+        'metode_id'     => 'required',
+        'status'        => 'required|in:lunas,belum bayar',
+    ]);
 
-        $pembayaran = Pembayaran::findOrFail($id);
+    // AMBIL DATA
+    $pembayaran = Pembayaran::findOrFail($id);
 
-        $pembayaran->update([
-            'pelanggan_id' => $request->pelanggan_id,
-            'layanan_id'   => $request->layanan_id,
-            'status'       => $request->status,
-            'tagihan_id'    => $request->tagihan_id,
-            'metode_id'     => $request->metode_id,
-            'tanggal_bayar' => $request->tanggal_bayar,
-            'jumlah_bayar'  => $request->jumlah_bayar
-        ]);
+    // UPDATE DATA
+    $pembayaran->update([
+        'tanggal_bayar' => $request->tanggal_bayar,
+        'jumlah_bayar'  => $request->jumlah_bayar,
+        'metode_id'     => $request->metode_id,
+        'status'        => $request->status,
+    ]);
 
-        return redirect()->route('pembayaran')
-            ->with('success', 'Data pembayaran berhasil diupdate');
-    }
+    // REDIRECT
+    return redirect()->route('pembayaran')
+        ->with('success', 'Data pembayaran berhasil diupdate');
+}
 
     //fungsi untuk hapus data
     public function destroy($id)
 {
     $pembayaran = Pembayaran::findOrFail($id);
-
-    // ambil tagihan terkait
     $tagihan = Tagihan::findOrFail($pembayaran->tagihan_id);
 
     // hapus pembayaran
     $pembayaran->delete();
 
+    // hitung ulang total bayar
     $totalBayar = Pembayaran::where('tagihan_id', $tagihan->id)
-        ->sum('jumlah_bayar');
+    ->sum('jumlah_bayar');
 
-    // update status
-    if ($totalBayar >= $tagihan->jumlah) {
-        $tagihan->status = 'lunas';
-    } else {
-        $tagihan->status = 'belum lunas';
-    }
+if ($totalBayar == 0) {
+    $tagihan->status = 'belum bayar';
+} elseif ($totalBayar < $tagihan->jumlah) {
+    $tagihan->status = 'belum bayar';
+} else {
+    $tagihan->status = 'lunas';
+}
 
     $tagihan->save();
+    Pembayaran::where('tagihan_id', $tagihan->id)
+        ->update([
+            'status' => $tagihan->status == 'lunas' ? 'lunas' : 'belum bayar'
+        ]);
 
     return redirect()->route('pembayaran')
-        ->with('success', 'Pembayaran dihapus & status tagihan diperbarui');
+        ->with('success', 'Pembayaran dihapus & status diperbarui');
 }
 public function menu()
 {

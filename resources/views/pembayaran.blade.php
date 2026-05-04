@@ -241,19 +241,18 @@ body{
                         </td>
                         <td>
 
-
-                            <button class="action-btn btn-warning"
-    data-bs-toggle="modal"
-    data-bs-target="#modalEditPembayaran"
-    data-id="{{ $item->id }}"
-    data-tanggal="{{ $item->tanggal_bayar }}"
-    data-nama="{{ $item->pelanggan->nama ?? '-' }}"
-    data-paket="{{ $item->layanan->nama_paket ?? '-' }}"
-    data-jumlah="{{ $item->jumlah_bayar }}"
-    data-metode="{{ $item->metode_id }}"
-    data-status="{{ $item->status }}">
-    <i class="bi bi-pencil"></i>
-</button>
+                        <button class="action-btn btn-warning"
+                            data-bs-toggle="modal"
+                            data-bs-target="#modalEditPembayaran"
+                            data-id="{{ $item->id }}"
+                            data-tanggal="{{ $item->tanggal_bayar }}"
+                            data-nama="{{ $item->pelanggan->nama ?? '-' }}"
+                            data-paket="{{ $item->layanan->nama_paket ?? '-' }}"
+                            data-jumlah="{{ $item->jumlah_bayar }}"
+                            data-metode="{{ $item->metode_id }}"
+                            data-status="{{ $item->status }}">
+                            <i class="bi bi-pencil"></i>
+                        </button>
                             <form action="{{ route('pembayaran.destroy', $item->id) }}"
                                 method="POST"
                                 style="display:inline;"
@@ -313,13 +312,15 @@ body{
                                 <option value="">-- Pilih Pelanggan --</option>
                                 @foreach($pelanggan as $p)
                                     <option
-                                        value="{{ $p->id }}"
-                                        data-layanan="{{ $p->layanan_id }}"
-                                        data-paket="{{ $p->layanan->nama_paket ?? '' }}"
-                                        data-harga="{{ $p->layanan->harga ?? 0 }}"
-                                        data-tagihan="{{ $p->tagihan->first()->id ?? '' }}">
-                                        {{ $p->nama }}
-                                    </option>
+    value="{{ $p->id }}"
+    data-layanan="{{ $p->layanan_id }}"
+    data-paket="{{ $p->layanan->nama_paket ?? '' }}"
+    data-harga="{{ $p->layanan->harga ?? 0 }}"
+    data-tagihan-id="{{ optional($p->tagihan->first())->id }}"
+    data-tagihan-tanggal="{{ optional($p->tagihan->first())->tanggal }}">
+
+    {{ $p->nama }}
+</option>
                                 @endforeach
                             </select>
                         </div>
@@ -395,45 +396,70 @@ body{
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    // script pelanggan yang sudah ada
-    document.getElementById('pelanggan').addEventListener('change', function () {
-        ...
-    });
 
-    // ✅ TAMBAHKAN DI SINI, di dalam DOMContentLoaded yang sama
-    document.getElementById('modalEditPembayaran').addEventListener('show.bs.modal', function (e) {
-        let btn = e.relatedTarget;
-        let id  = btn.getAttribute('data-id');
+    // === PILIH PELANGGAN ===
+    let pelanggan = document.getElementById('pelanggan');
 
-        document.getElementById('formEditPembayaran').action = '/pembayaran/' + id;
-        document.getElementById('edit_nama_pelanggan').value = btn.getAttribute('data-nama');
-        document.getElementById('edit_tanggal_bayar').value  = btn.getAttribute('data-tanggal');
-        document.getElementById('edit_paket').value          = btn.getAttribute('data-paket');
-        document.getElementById('edit_jumlah_bayar').value   = btn.getAttribute('data-jumlah');
-        document.getElementById('edit_metode_id').value      = btn.getAttribute('data-metode');
-        document.getElementById('edit_status').value         = btn.getAttribute('data-status');
-    });
+    if (pelanggan) {
+        pelanggan.addEventListener('change', function () {
+            let opt = this.options[this.selectedIndex];
 
-});
-</script>
+            let layananId = opt.getAttribute('data-layanan') || '';
+            let paket     = opt.getAttribute('data-paket')   || '';
+            let harga     = opt.getAttribute('data-harga')   || 0;
 
-</body>
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-    document.getElementById('pelanggan').addEventListener('change', function () {
-        let opt = this.options[this.selectedIndex];
+            let tagihanId = opt.getAttribute('data-tagihan-id') || '';
+            let tanggal   = opt.getAttribute('data-tagihan-tanggal') || '';
 
-        let layananId  = opt.getAttribute('data-layanan') || '';
-        let paket      = opt.getAttribute('data-paket')   || '';
-        let harga      = opt.getAttribute('data-harga')   || 0;
-        let tagihanId  = opt.getAttribute('data-tagihan') || '';
+            // isi hidden & field lain
+            document.getElementById('layanan_id').value = layananId;
+            document.getElementById('paket_view').value = paket;
+            document.getElementById('jumlah_bayar').value = harga;
 
-        document.getElementById('layanan_id').value  = layananId;
-        document.getElementById('paket_view').value  = paket;
-        document.getElementById('tagihan_id').value  = tagihanId;
-        document.getElementById('tagihan_view').value = tagihanId ? 'Tagihan #' + tagihanId : '';
-        document.getElementById('jumlah_bayar').value = harga;
-    });
+            // simpan ID tagihan (untuk database)
+            document.getElementById('tagihan_id').value = tagihanId;
+
+            // tampilkan tanggal tagihan ke user
+            if (tanggal) {
+                let t = new Date(tanggal);
+                document.getElementById('tagihan_view').value =
+                    t.toLocaleDateString('id-ID');
+            } else {
+                document.getElementById('tagihan_view').value = '';
+            }
+        });
+    }
+
+    // === MODAL EDIT ===
+    let modalEdit = document.getElementById('modalEditPembayaran');
+
+    if (modalEdit) {
+        modalEdit.addEventListener('show.bs.modal', function (e) {
+            let btn = e.relatedTarget;
+
+            document.getElementById('formEditPembayaran').action =
+                '/pembayaran/' + btn.getAttribute('data-id');
+
+            document.getElementById('edit_nama_pelanggan').value =
+                btn.getAttribute('data-nama');
+
+            document.getElementById('edit_tanggal_bayar').value =
+                btn.getAttribute('data-tanggal');
+
+            document.getElementById('edit_paket').value =
+                btn.getAttribute('data-paket');
+
+            document.getElementById('edit_jumlah_bayar').value =
+                btn.getAttribute('data-jumlah');
+
+            document.getElementById('edit_metode_id').value =
+                btn.getAttribute('data-metode');
+
+            document.getElementById('edit_status').value =
+                btn.getAttribute('data-status');
+        });
+    }
+
 });
 </script>
 <!-- MODAL EDIT PEMBAYARAN -->

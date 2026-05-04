@@ -26,7 +26,7 @@ class LayananController extends Controller
 
     public function edit($id)
     {
-        return redirect()->route('layanan.detail', $id);
+        return redirect()->route('layanan', $id);
     }
     
 }

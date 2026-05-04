@@ -39,13 +39,18 @@ class GenerateTagihan extends Command
 
 if (!$cek) {
     Tagihan::create([
-        'pelanggan_id' => $p->id,
-        'layanan_id'   => $p->layanan->id,
-        'tanggal'      => $tanggalTagihan, 
-        'total'        => $p->layanan->harga,
-        'status'       => 'belum bayar',
+        'pelanggan_id'  => $p->id,
+        'layanan_id'    => $p->layanan->id,
+        'jenis_tagihan' => 'tagihan internet bulanan',
+        'tanggal'       => $tanggalTagihan,
+        'bulan'         => $tanggalTagihan->month,
+        'tahun'         => $tanggalTagihan->year,
+        'jatuh_tempo'   => $tanggalTagihan->copy()->addDays(3),
+        'total'         => $p->layanan->harga,
+        'status'        => 'belum bayar',
     ]);
 }
+
     }
 
     $this->info('Generate tagihan otomatis selesai');

@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Pelanggan;
 use App\Models\Tagihan;
+use App\Models\Layanan;
+
 
 class DetailController extends Controller
 {
@@ -14,7 +16,8 @@ class DetailController extends Controller
         $tagihan = Tagihan::where('pelanggan_id', $id)
                     ->latest()
                     ->get();
+        $layanan = Layanan::all();
 
-        return view('layanan.detail', compact('pelanggan', 'tagihan'));
+        return view('detail', compact('pelanggan', 'tagihan', 'layanan'));
     }
 }

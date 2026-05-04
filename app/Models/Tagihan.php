@@ -11,14 +11,18 @@ class Tagihan extends Model
 
     protected $table = 'tagihan';
 
-    protected $fillable = [
-        'pelanggan_id',
-        'tanggal',
-        'bulan',
-        'tahun',
-        'total',
-        'status'
-    ];
+protected $fillable = [
+    'pelanggan_id',
+    'layanan_id',
+    'jenis_tagihan',  // ← pastikan ada
+    'tanggal',
+    'bulan',
+    'tahun',
+    'jatuh_tempo',
+    'total',
+    'keterangan',
+    'status',
+];
 
     public function pelanggan()
     {

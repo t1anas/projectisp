@@ -12,25 +12,22 @@
 <link rel="stylesheet" href="{{ asset('inputform.css') }}">
 
 <style>
+/* ===== BASE ===== */
 body {
     font-family: 'Plus Jakarta Sans', sans-serif;
     background: #f4f6f9;
 }
 
-/* ==========================
-   PROFIL CARD (kiri)
-   ========================== */
 .profil-card {
     background: #fff;
-    border-radius: 14px;
+    border-radius: 16px;
     overflow: hidden;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
-    width: 100%;
+    box-shadow: 0 2px 14px rgba(0,0,0,0.07);
 }
 
 .profil-card-top {
     background: linear-gradient(160deg, #1e9e42, #22c55e);
-    padding: 18px 18px 42px;
+    padding: 20px 20px 48px;
     position: relative;
 }
 
@@ -38,18 +35,17 @@ body {
     display: flex;
     align-items: center;
     gap: 12px;
-    margin-bottom: 10px;
 }
 
 .profil-avatar {
-    width: 44px;
-    height: 44px;
+    width: 46px;
+    height: 46px;
     border-radius: 50%;
     background: rgba(255,255,255,0.25);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 20px;
+    font-size: 21px;
     color: #fff;
     flex-shrink: 0;
 }
@@ -62,17 +58,19 @@ body {
 }
 
 .profil-kode {
-    font-size: 10px;
-    color: rgba(255,255,255,0.7);
+    font-size: 10.5px;
+    color: rgba(255,255,255,0.72);
     letter-spacing: 0.3px;
+    margin-top: 2px;
 }
 
 .profil-badges {
     position: absolute;
-    bottom: 12px;
-    left: 18px;
+    bottom: 14px;
+    left: 20px;
     display: flex;
     gap: 7px;
+    flex-wrap: wrap;
 }
 
 .badge-aktif {
@@ -103,17 +101,17 @@ body {
     border-radius: 20px;
 }
 
-/* Info rows */
 .profil-info {
-    padding: 14px 18px 10px;
+    padding: 16px 20px 8px;
 }
 
 .profil-info-row {
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    padding: 8px 0;
-    border-bottom: 1px solid #f3f4f6;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 9px 0;
+    border-bottom: 1px solid #f1f3f5;
     font-size: 12.5px;
 }
 
@@ -122,8 +120,9 @@ body {
 }
 
 .profil-info-row .key {
-    color: #aaa;
+    color: #a0aab4;
     font-weight: 500;
+    flex-shrink: 0;
 }
 
 .profil-info-row .val {
@@ -132,9 +131,8 @@ body {
     text-align: right;
 }
 
-/* Action buttons */
 .profil-actions {
-    padding: 4px 18px 18px;
+    padding: 6px 20px 20px;
     display: flex;
     flex-direction: column;
     gap: 9px;
@@ -148,10 +146,10 @@ body {
     background: #fff;
     border: 1.5px solid #d1d5db;
     color: #374151;
-    font-size: 12px;
+    font-size: 12.5px;
     font-weight: 700;
-    padding: 9px;
-    border-radius: 9px;
+    padding: 10px;
+    border-radius: 10px;
     cursor: pointer;
     text-decoration: none;
     transition: all 0.18s;
@@ -172,10 +170,10 @@ body {
     background: #fffbeb;
     border: 1.5px solid #fde68a;
     color: #b45309;
-    font-size: 12px;
+    font-size: 12.5px;
     font-weight: 700;
-    padding: 9px;
-    border-radius: 9px;
+    padding: 10px;
+    border-radius: 10px;
     cursor: pointer;
     text-decoration: none;
     transition: all 0.18s;
@@ -188,9 +186,6 @@ body {
     color: #92400e;
 }
 
-/* ==========================
-   DAFTAR TAGIHAN (kanan)
-   ========================== */
 .tagihan-section-title {
     font-size: 17px;
     font-weight: 800;
@@ -200,18 +195,20 @@ body {
 
 .tagihan-item {
     background: #fff;
-    border-radius: 11px;
-    padding: 13px 16px;
-    margin-bottom: 8px;
-    box-shadow: 0 1px 5px rgba(0,0,0,0.05);
+    border-radius: 12px;
+    padding: 14px 18px;
+    margin-bottom: 9px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.05);
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 10px;
+    gap: 12px;
+    border: 1.5px solid transparent;
+    transition: box-shadow 0.15s;
 }
 
 .tagihan-item.berjalan {
-    border: 1.5px solid #bbf7d0;
+    border-color: #bbf7d0;
     background: #f0fdf4;
 }
 
@@ -224,7 +221,7 @@ body {
     font-size: 14px;
     font-weight: 800;
     color: #111;
-    margin-bottom: 2px;
+    margin-bottom: 3px;
 }
 
 .tagihan-item.berjalan .tagihan-bulan {
@@ -232,18 +229,17 @@ body {
 }
 
 .tagihan-status-text {
-    font-size: 11px;
-    color: #999;
+    font-size: 11.5px;
+    color: #9ca3af;
 }
 
 .tagihan-item-right {
     display: flex;
     align-items: center;
-    gap: 7px;
+    gap: 8px;
     flex-shrink: 0;
 }
 
-/* Tombol Cetak Kwitansi */
 .btn-cetak {
     display: inline-flex;
     align-items: center;
@@ -251,10 +247,10 @@ body {
     background: #f3f4f6;
     border: 1px solid #e5e7eb;
     color: #555;
-    font-size: 11px;
+    font-size: 11.5px;
     font-weight: 700;
-    padding: 6px 12px;
-    border-radius: 7px;
+    padding: 7px 13px;
+    border-radius: 8px;
     cursor: pointer;
     text-decoration: none;
     transition: all 0.15s;
@@ -266,7 +262,6 @@ body {
     color: #111;
 }
 
-/* Tombol Bayar */
 .btn-bayar {
     display: inline-flex;
     align-items: center;
@@ -274,10 +269,10 @@ body {
     background: #22c55e;
     border: none;
     color: #fff;
-    font-size: 11px;
+    font-size: 11.5px;
     font-weight: 800;
-    padding: 6px 16px;
-    border-radius: 7px;
+    padding: 7px 18px;
+    border-radius: 8px;
     cursor: pointer;
     text-decoration: none;
     transition: all 0.15s;
@@ -291,18 +286,17 @@ body {
     transform: translateY(-1px);
 }
 
-/* Tombol Hapus */
 .btn-hapus {
     display: inline-flex;
     align-items: center;
     gap: 5px;
-    background: #ff4d4d;
+    background: #ef4444;
     border: none;
     color: #fff;
-    font-size: 11px;
+    font-size: 11.5px;
     font-weight: 800;
-    padding: 6px 16px;
-    border-radius: 7px;
+    padding: 7px 18px;
+    border-radius: 8px;
     cursor: pointer;
     text-decoration: none;
     transition: all 0.15s;
@@ -316,15 +310,17 @@ body {
     transform: translateY(-1px);
 }
 
-/* Empty state */
 .empty-state {
     text-align: center;
-    padding: 50px 20px;
-    color: #ccc;
+    padding: 60px 20px;
+    color: #d1d5db;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.05);
 }
 
 .empty-state i {
-    font-size: 40px;
+    font-size: 42px;
     margin-bottom: 12px;
     display: block;
 }
@@ -332,6 +328,7 @@ body {
 .empty-state p {
     font-size: 13px;
     margin: 0;
+    color: #9ca3af;
 }
 </style>
 </head>
@@ -375,7 +372,6 @@ body {
             <i class="bi bi-people"></i> Data Pelanggan
         </a>
 
-        <!-- PROFILE -->
         <div class="profile-section">
             <div class="admin-card">
                 <div class="admin-avatar">
@@ -395,12 +391,10 @@ body {
         </div>
 
     </div>
-    <!-- END SIDEBAR -->
 
     <!-- MAIN CONTENT -->
     <div class="main-content" style="flex:1;">
 
-        <!-- TOPBAR -->
         <div class="topbar">
             <div>
                 <div class="page-title">Detail Layanan</div>
@@ -415,42 +409,40 @@ body {
             </div>
         </div>
 
-        <!-- CONTENT AREA -->
-        <div style="padding:24px;">
+        <div style="padding: 28px 24px;">
 
             <div class="row g-4 align-items-start">
 
-                <!-- ====== KIRI: PROFIL CARD ====== -->
+                <!-- KIRI: PROFIL CARD -->
                 <div class="col-md-4 col-lg-3">
                     <div class="profil-card">
 
                         <div class="profil-card-top">
-    <div class="profil-avatar-row">
-        <div class="profil-avatar">
-            <i class="bi bi-person-fill"></i>
-        </div>
-        <div>
-            <div class="profil-nama">{{ $pelanggan->nama }}</div>
-            <div class="profil-kode">
-                {{ $pelanggan->kode ?? 'CSR'.str_pad($pelanggan->id, 12, '0', STR_PAD_LEFT) }}
-            </div>
-        </div>
-    </div>
+                            <div class="profil-avatar-row">
+                                <div class="profil-avatar">
+                                    <i class="bi bi-person-fill"></i>
+                                </div>
+                                <div>
+                                    <div class="profil-nama">{{ $pelanggan->nama }}</div>
+                                    <div class="profil-kode">
+                                        {{ $pelanggan->kode ?? 'CSR'.str_pad($pelanggan->id, 12, '0', STR_PAD_LEFT) }}
+                                    </div>
+                                </div>
+                            </div>
 
-    <div class="profil-badges">
-        @if(strtolower($pelanggan->status ?? '') == 'aktif')
-            <span class="badge-aktif">Aktif</span>
-        @else
-            <span class="badge-nonaktif">Nonaktif</span>
-        @endif
+                            <div class="profil-badges">
+                                @if(strtolower($pelanggan->status ?? '') == 'aktif')
+                                    <span class="badge-aktif">Aktif</span>
+                                @else
+                                    <span class="badge-nonaktif">Nonaktif</span>
+                                @endif
 
-        <span class="badge-paket">
-            {{ $pelanggan->layanan->kecepatan ?? '' }}/{{ $pelanggan->layanan->nama_paket ?? '-' }}
-        </span>
-    </div>
-</div>
+                                <span class="badge-paket">
+                                    {{ $pelanggan->layanan->kecepatan ?? '' }}/{{ $pelanggan->layanan->nama_paket ?? '-' }}
+                                </span>
+                            </div>
+                        </div>
 
-                        {{-- INFO ROWS --}}
                         <div class="profil-info">
                             <div class="profil-info-row">
                                 <span class="key">Tagihan</span>
@@ -465,19 +457,18 @@ body {
                                 <span class="val">{{ $pelanggan->alamat ?? '-' }}</span>
                             </div>
                             <div class="profil-info-row">
-                                <span class="key">Tanggal Aktivasi</span>
+                                <span class="key">Aktivasi</span>
                                 <span class="val">{{ \Carbon\Carbon::parse($pelanggan->layanan->created_at)->format('d M Y') }}</span>
                             </div>
                         </div>
-                        
-                        {{-- ACTION BUTTONS --}}
+
                         <div class="profil-actions">
-                           <button type="button"
-        class="btn-edit-tagihan"
-        data-bs-toggle="modal"
-        data-bs-target="#editTagihan{{ $pelanggan->id }}">
-    <i class="bi bi-pencil-square"></i> Edit Tagihan
-</button>
+                            <button type="button"
+                                    class="btn-edit-tagihan"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#tambahTagihan">
+                                <i class="bi bi-plus-lg"></i> Buat Tagihan
+                            </button>
                             <a href="{{ url('/layanan/'.$pelanggan->id.'/isolir') }}" class="btn-isolir">
                                 <i class="bi bi-bell-fill"></i> Isolir Pelanggan
                             </a>
@@ -485,9 +476,8 @@ body {
 
                     </div>
                 </div>
-                {{-- END KIRI --}}
 
-                <!-- ====== KANAN: DAFTAR TAGIHAN ====== -->
+                <!-- KANAN: DAFTAR TAGIHAN -->
                 <div class="col-md-8 col-lg-9">
 
                     <div class="tagihan-section-title">Daftar Tagihan</div>
@@ -497,13 +487,20 @@ body {
                         @foreach($tagihan as $t)
 
                             @if(strtolower($t->status) != 'lunas')
-                            {{-- TAGIHAN BELUM LUNAS (berjalan) --}}
+                            {{-- BELUM LUNAS --}}
                             <div class="tagihan-item berjalan">
                                 <div class="tagihan-item-left">
                                     <div class="tagihan-bulan">
-                                        {{ \Carbon\Carbon::parse($t->periode)->translatedFormat('F Y') }}
+                                        {{ strtoupper(\Carbon\Carbon::parse($t->tanggal)->format('M Y')) }}
+                                        — {{ \Illuminate\Support\Str::title($t->jenis_tagihan ?? 'tagihan internet bulanan') }}
                                     </div>
-                                    <div class="tagihan-status-text">Tagihan Berjalan</div>
+                                    <div class="tagihan-status-text">
+                                        Tagihan Berjalan &middot; Jatuh Tempo:
+                                        {{ $t->jatuh_tempo ? \Carbon\Carbon::parse($t->jatuh_tempo)->format('d M Y') : '-' }}
+                                        @if($t->jatuh_tempo && \Carbon\Carbon::parse($t->jatuh_tempo)->isPast())
+                                            <span class="badge bg-danger ms-1" style="font-size:10px;">Lewat Jatuh Tempo</span>
+                                        @endif
+                                    </div>
                                 </div>
                                 <div class="tagihan-item-right">
                                     <a href="{{ url('/tagihan/'.$t->id.'/kwitansi') }}" class="btn-cetak">
@@ -516,14 +513,15 @@ body {
                             </div>
 
                             @else
-                            {{-- TAGIHAN SUDAH LUNAS --}}
+                            {{-- SUDAH LUNAS --}}
                             <div class="tagihan-item">
                                 <div class="tagihan-item-left">
                                     <div class="tagihan-bulan">
-                                        {{ \Carbon\Carbon::parse($t->periode)->translatedFormat('F Y') }}
+                                        {{ strtoupper(\Carbon\Carbon::parse($t->tanggal)->format('M Y')) }}
+                                        — {{ \Illuminate\Support\Str::title($t->jenis_tagihan ?? 'tagihan internet bulanan') }}
                                     </div>
                                     <div class="tagihan-status-text">
-                                        Lunas : {{ \Carbon\Carbon::parse($t->tanggal_bayar)->format('Y/m/d') }}
+                                        Lunas: {{ \Carbon\Carbon::parse($t->tanggal_bayar)->format('d/m/Y') }}
                                         via {{ strtoupper($t->metode ?? 'KAS') }}
                                     </div>
                                 </div>
@@ -553,130 +551,115 @@ body {
                     @endif
 
                 </div>
-                {{-- END KANAN --}}
 
             </div>
 
         </div>
-        {{-- END CONTENT AREA --}}
 
     </div>
-    <!-- END MAIN CONTENT -->
 
 </div>
-<!-- END WRAPPER --> 
+
+<!-- MODAL: DETAIL PELANGGAN -->
 <div class="modal fade" id="detailModal{{ $pelanggan->id }}" tabindex="-1">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content border-0 rounded-4">
 
             <div class="modal-header bg-success text-white">
-                <h5 class="modal-title fw-bold">
-                    Detail Layanan
-                </h5>
-                <button type="button"
-                        class="btn-close btn-close-white"
-                        data-bs-dismiss="modal"></button>
+                <h5 class="modal-title fw-bold">Detail Layanan</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
 
             <div class="modal-body p-4">
-
-                <div class="mb-3">
-                    <strong>Nama :</strong>
-                    {{ $pelanggan->nama }}
-                </div>
-
-                <div class="mb-3">
-                    <strong>No HP :</strong>
-                    {{ $p->no_hp ?? '-' }}
-                </div>
-
-                <div class="mb-3">
-                    <strong>Alamat :</strong>
-                    {{ $p->alamat ?? '-' }}
-                </div>
-
-                <div class="mb-3">
-                    <strong>Paket :</strong>
-                    {{ $p->layanan->nama_paket ?? '-' }}
-                </div>
-
-                <div class="mb-3">
-                    <strong>Harga :</strong>
-                    Rp {{ number_format($p->layanan->harga ?? 0,0,',','.') }}
-                </div>
-
-                <div class="mb-3">
-                    <strong>Status :</strong>
-                    {{ ucfirst($pelanggan->status) }}
-                </div>
-
-                <div class="mb-3">
-                    <strong>Tanggal Aktivasi :</strong>
-                   {{ $pelanggan->created_at->format('d M Y') }}
-                </div>
-
+                <div class="mb-3"><strong>Nama :</strong> {{ $pelanggan->nama }}</div>
+                <div class="mb-3"><strong>No HP :</strong> {{ $pelanggan->no_hp ?? '-' }}</div>
+                <div class="mb-3"><strong>Alamat :</strong> {{ $pelanggan->alamat ?? '-' }}</div>
+                <div class="mb-3"><strong>Paket :</strong> {{ $pelanggan->layanan->nama_paket ?? '-' }}</div>
+                <div class="mb-3"><strong>Harga :</strong> Rp {{ number_format($pelanggan->layanan->harga ?? 0,0,',','.') }}</div>
+                <div class="mb-3"><strong>Status :</strong> {{ ucfirst($pelanggan->status) }}</div>
+                <div class="mb-3"><strong>Tanggal Aktivasi :</strong> {{ $pelanggan->created_at->format('d M Y') }}</div>
             </div>
 
         </div>
     </div>
 </div>
-<div class="modal fade" id="editTagihan{{ $pelanggan->id }}" tabindex="-1">
+
+<!-- MODAL: BUAT TAGIHAN -->
+<!-- MODAL: BUAT TAGIHAN -->
+<div class="modal fade" id="tambahTagihan" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 rounded-4">
+        <div class="modal-content">
 
-            <form action="{{ url('/tagihan/'.$tagihan[0]->id) }}" method="POST">
-                @csrf
-                @method('PUT')
+            <form action="{{ route('tagihan.store') }}" method="POST">
+            @csrf
 
-                <div class="modal-header bg-success text-white">
-                    <h5 class="modal-title fw-bold">
-                        Edit Tagihan
-                    </h5>
+            <input type="hidden" name="pelanggan_id" value="{{ $pelanggan->id }}">
+            <input type="hidden" name="layanan_id"   value="{{ $pelanggan->layanan->id ?? '' }}">
 
-                    <button type="button"
-                            class="btn-close btn-close-white"
-                            data-bs-dismiss="modal"></button>
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title">Buat Tagihan</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+
+                <div class="mb-3">
+                    <label>Tanggal</label>
+                    <input type="date" name="tanggal" id="inputTanggal"
+                           class="form-control" required>
                 </div>
 
-                <div class="modal-body p-4">
-
-                    <div class="mb-3">
-                        <label class="form-label">Jumlah Tagihan</label>
-                        <input type="number"
-                               name="jumlah"
-                               class="form-control"
-                               value="{{ $tagihan[0]->jumlah ?? 0 }}">
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Paket</label>
-                        <input type="text"
-                               name="nama_paket"
-                               class="form-control"
-                               value="{{ $pelanggan->layanan->nama_paket ?? '' }}">
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Keterangan</label>
-                        <textarea name="keterangan"
-                                  class="form-control"
-                                  rows="3">{{ $tagihan[0]->keterangan ?? '' }}</textarea>
-                    </div>
-
+                <div class="mb-3">
+                    <label>Jatuh Tempo</label>
+                    <input type="date" name="jatuh_tempo" id="inputJatuhTempo"
+                           class="form-control" readonly>
                 </div>
 
-                <div class="modal-footer">
-                    <button type="submit"
-                            class="btn btn-success w-100">
-                        Simpan Perubahan
-                    </button>
+                <div class="mb-3">
+                    <label>Jumlah Tagihan</label>
+                    <input type="number" name="total" class="form-control"
+                           value="{{ $pelanggan->layanan->harga ?? 0 }}" required>
                 </div>
+
+                <div class="mb-3">
+                    <label>Jenis Tagihan</label>
+                    <select name="jenis_tagihan" class="form-control" required>
+                        <option value="">-- Pilih Jenis --</option>
+                        <option value="tagihan internet bulanan" selected>Tagihan Internet Bulanan</option>
+                        <option value="tagihan instalasi">Tagihan Instalasi</option>
+                        <option value="tagihan penjualan alat">Tagihan Penjualan Alat</option>
+                        <option value="pendapatan jasa">Pendapatan Jasa</option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label>Keterangan</label>
+                    <textarea name="keterangan" class="form-control"></textarea>
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-success">
+                    Simpan Tagihan
+                </button>
+            </div>
 
             </form>
-
         </div>
     </div>
 </div>
+    </div>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        document.getElementById('inputTanggal').addEventListener('change', function () {
+            const tgl = new Date(this.value);
+            tgl.setDate(tgl.getDate() + 3);
+            document.getElementById('inputJatuhTempo').value = tgl.toISOString().split('T')[0];
+        });
+    });
+</script>
 </body>
 </html>
