@@ -558,7 +558,7 @@ body {
                                     </div>
                                 </div>
                                 <div class="tagihan-item-right">
-                                    <a href="{{ url('/tagihan/'.$t->id.'/kwitansi') }}" class="btn-cetak">
+                                    <a href="{{ url('/kwitansi/'.$t->id) }}" target="_blank" class="btn-cetak">
                                         <i class="bi bi-printer-fill"></i> Cetak Kwitansi
                                     </a>
                                 <button class="btn-bayar"
@@ -577,8 +577,11 @@ body {
                                         — {{ \Illuminate\Support\Str::title($t->jenis_tagihan ?? 'tagihan internet bulanan') }}
                                     </div>
                                     <div class="tagihan-status-text">
-                                        Lunas: {{ \Carbon\Carbon::parse($t->tanggal_bayar)->format('d/m/Y') }}
-                                        via {{ strtoupper($t->metode ?? 'KAS') }}
+                                        Lunas:
+{{ $t->pembayaran ? \Carbon\Carbon::parse($t->pembayaran->tanggal_bayar)->format('d/m/Y') : '-' }}
+
+via
+{{ $t->pembayaran && $t->pembayaran->metode ? strtoupper($t->pembayaran->metode->nama_metode) : 'KAS' }}
                                     </div>
                                 </div>
                                 <div class="tagihan-item-right">
@@ -723,12 +726,12 @@ body {
 <div class="modal fade modal-bayar" id="modalBayar{{ $t->id }}" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-<div class="modal-header">
+
+            <div class="bayar-header" style="display:flex; align-items:center; justify-content:space-between; padding: 20px;">
+    <span></span>
+    <span>Pembayaran Tagihan</span>
     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
 </div>
-            <div class="bayar-header">
-                Pembayaran Tagihan
-            </div>
 
             <form method="POST" action="{{ route('tagihan.bayar', $t->id) }}">
                 @csrf
@@ -805,13 +808,16 @@ body {
                         </select>
                     </div>
 
-                    <!-- KETERANGAN -->
-                    <div class="bayar-box">
-                        <div class="bayar-label">Keterangan</div>
-                        <textarea name="keterangan"
-                                  class="form-control bayar-input"
-                                  rows="2"></textarea>
-                    </div>
+                   <!-- JENIS TAGIHAN -->
+<div class="bayar-box">
+    <div class="bayar-label">Jenis Tagihan</div>
+    <input type="text" 
+           name="keterangan"
+           class="form-control bayar-input"
+           value="{{ \Illuminate\Support\Str::title($t->jenis_tagihan ?? 'Tagihan Internet Bulanan') }}"
+           readonly
+           style="background:#f8fafc; color:#374151; font-weight:700;">
+</div>
 
                     <!-- BUTTON -->
                     <button type="submit" class="btn-konfirmasi">
@@ -826,6 +832,83 @@ body {
     </div>
 </div>
 
+@endif
+@if(session('success'))
+<div id="overlaySuccess" style="
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn .25s ease;
+">
+    <div style="
+        background: #fff;
+        border-radius: 24px;
+        box-shadow: 0 30px 80px rgba(0,0,0,0.2);
+        padding: 48px 40px;
+        text-align: center;
+        max-width: 360px;
+        width: 90%;
+        animation: popIn .3s ease;
+    ">
+        <!-- ICON -->
+        <div style="
+            width: 80px; height: 80px;
+            background: linear-gradient(135deg,#dcfce7,#bbf7d0);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+        ">
+            <i class="bi bi-check-lg" style="font-size:40px; color:#16a34a;"></i>
+        </div>
+
+        <!-- TEKS -->
+        <div style="font-size:22px; font-weight:900; color:#111; margin-bottom:8px;">
+            Pembayaran Berhasil!
+        </div>
+        <div style="font-size:14px; color:#6b7280; margin-bottom:32px;">
+            {{ session('success') }}
+        </div>
+
+        <!-- TOMBOL -->
+        <button onclick="document.getElementById('overlaySuccess').remove()" style="
+            background: linear-gradient(135deg,#16a34a,#22c55e);
+            color: #fff;
+            border: none;
+            padding: 13px 48px;
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: .2s;
+        ">
+            OK
+        </button>
+    </div>
+</div>
+
+<style>
+@keyframes fadeIn {
+    from { opacity:0; }
+    to   { opacity:1; }
+}
+@keyframes popIn {
+    from { opacity:0; transform: scale(.85); }
+    to   { opacity:1; transform: scale(1); }
+}
+</style>
+
+<script>
+    setTimeout(() => {
+        const el = document.getElementById('overlaySuccess');
+        if (el) el.remove();
+    }, 4000);
+</script>
 @endif
 @endforeach
 

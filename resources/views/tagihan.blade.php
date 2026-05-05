@@ -250,7 +250,7 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f4f6f9; }
 </div>
 
 <!-- MODAL TAMBAH TAGIHAN -->
-<<div class="modal fade" id="modalTambahTagihan" tabindex="-1">
+<div class="modal fade" id="modalTambahTagihan" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg" style="border-radius:20px; overflow:hidden;">
 

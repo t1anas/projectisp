@@ -31,6 +31,8 @@ protected $fillable = [
     public function metode()
     {
         return $this->belongsTo(MetodePembayaran::class, 'metode_id');
+            return $this->belongsTo(Metode::class);
+
     }
     public function pelanggan()
 {
@@ -41,4 +43,5 @@ public function layanan()
 {
     return $this->belongsTo(Layanan::class);
 }
+
 }

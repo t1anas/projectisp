@@ -8,6 +8,7 @@ use App\Http\Controllers\CSController;
 use App\Http\Controllers\DetailController;
 use App\Http\Controllers\LayananController;
 use App\Http\Controllers\TagihanController;
+use App\Http\Controllers\KwitansiController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -78,7 +79,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/layanan/{id}/detail', [DetailController::class, 'index'])->name('layanan.detail');
 
     /*--- TAGIHAN ---*/
-    Route::post('/tagihan/{id}/bayar', [DetailController::class, 'bayar'])->name('tagihan.bayar'); // ← pakai DetailController
     Route::resource('tagihan', TagihanController::class);
+Route::post('/tagihan/{id}/bayar', [TagihanController::class, 'bayar'])->name('tagihan.bayar');
+Route::get('/tagihan/{id}/kwitansi', [KwitansiController::class, 'cetak'])->name('kwitansi');
 
 });

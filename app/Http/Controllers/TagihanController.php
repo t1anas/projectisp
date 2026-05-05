@@ -2,13 +2,15 @@
 namespace App\Http\Controllers;
 
 use App\Models\Tagihan;
+use App\Models\Pembayaran;
+use App\Http\Controllers\PemasukanController;
 use Illuminate\Http\Request;
 
 class TagihanController extends Controller  
 {
     public function index()
     {
-        $query = Tagihan::with('pelanggan', 'layanan');
+        $query = Tagihan::with('pelanggan', 'layanan', 'pembayaran.metode');
 
         if (request('cari')) {
             $query->whereHas('pelanggan', function ($q) {
@@ -95,5 +97,26 @@ public function store(Request $request)
 
     return redirect()->back()->with('success', 'Tagihan berhasil dihapus');
 }
+public function bayar(Request $request, $id)
+{
+    $tagihan = Tagihan::findOrFail($id);
 
+    $tagihan->update(['status' => 'lunas']);
+
+    Pembayaran::create([
+        'tagihan_id'    => $tagihan->id,
+        'pelanggan_id'  => $tagihan->pelanggan_id,
+        'total'         => $request->total,
+        'tanggal_bayar' => $request->tanggal_bayar,
+        'metode_id'     => $request->metode_id,
+        'keterangan'    => $request->keterangan,
+    ]);
+
+    return back()->with('success', 'Pembayaran berhasil dicatat.');
+}
+public function kwitansi($id)
+{
+    $tagihan = Tagihan::with('pelanggan.layanan')->findOrFail($id);
+    return view('kwitansi', compact('tagihan'));
+}
 }

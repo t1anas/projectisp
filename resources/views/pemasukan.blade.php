@@ -77,7 +77,7 @@ body {
 
 /* Box 2 — Tagihan (biru) */
 .nav-box-blue {
-    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    background: linear-gradient(135deg, #f6ca3b, #e57b34);
     box-shadow: 0 12px 32px rgba(59,130,246,0.25);
     color: #fff;
 }

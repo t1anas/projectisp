@@ -22,11 +22,14 @@ protected $fillable = [
     'total',
     'keterangan',
     'status',
+    'tanggal_bayar', // ← tambah ini
+    'metode_id',   
 ];
 
     public function pelanggan()
     {
         return $this->belongsTo(Pelanggan::class, 'pelanggan_id');
+         return $this->hasOne(Pembayaran::class);
     }
 
     public function pembayaran()
@@ -39,4 +42,9 @@ public function layanan()
 {
     return $this->belongsTo(Layanan::class);
 }
+public function metode()
+{
+    return $this->belongsTo(\App\Models\MetodePembayaran::class, 'metode_id');
+}
+
     }
