@@ -197,7 +197,7 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f4f6f9; }
 </td>
                             <td class="text-start">{{ $t->pelanggan->nama ?? '-' }}</td>
                             <td>{{ $t->jenis_tagihan ?? '-' }}</td>
-                            <td>{{ $t->pelanggan->layanan->nama_paket ?? '-' }}</td>
+                            <td>{{ optional($t->layanan)->nama_paket ?? '-' }}</td>
                             <td class="text-start fw-semibold">Rp {{ number_format($t->total, 0, ',', '.') }}</td>
                             <td>
                                 @if($t->status == 'lunas')
@@ -461,7 +461,7 @@ function updateLayanan(select) {
                         <div class="p-3 rounded-4 border bg-light">
                             <small class="text-muted d-block mb-1">Nama Paket</small>
                             <div class="fw-bold">
-                                {{ $t->pelanggan->layanan->nama_paket ?? '-' }}
+                                {{ $t->layanan->nama_paket ?? '-' }}
                             </div>
                         </div>
                     </div>
@@ -526,7 +526,7 @@ function updateLayanan(select) {
                         <label class="form-label fw-semibold">Tanggal</label>
                         <input type="date" name="tanggal"
                                class="form-control rounded-3"
-                               value="{{ $t->tanggal }}">
+                               value="{{ \Carbon\Carbon::parse($t->tanggal)->format('Y-m-d') }}">
                     </div>
 
                     <div class="mb-3">
@@ -536,26 +536,44 @@ function updateLayanan(select) {
                                value="{{ $t->total }}">
                     </div>
 
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold">Jenis Tagihan</label>
-                        <select name="jenis_tagihan" class="form-control rounded-3">
-                            <option value="tagihan internet bulanan" {{ $t->jenis_tagihan=='tagihan internet bulanan' ? 'selected' : '' }}>Tagihan Internet Bulanan</option>
-                            <option value="tagihan instalasi" {{ $t->jenis_tagihan=='tagihan instalasi' ? 'selected' : '' }}>Tagihan Instalasi</option>
-                            <option value="tagihan penjualan alat" {{ $t->jenis_tagihan=='tagihan penjualan alat' ? 'selected' : '' }}>Tagihan Penjualan Alat</option>
-                            <option value="pendapatan jasa" {{ $t->jenis_tagihan=='pendapatan jasa' ? 'selected' : '' }}>Pendapatan Jasa</option>
-                        </select>
-                    </div>
+    
+    <div class="mb-3">
+    <label class="form-label fw-semibold">Layanan</label>
+    <div class="position-relative">
+        <select name="layanan_id" class="form-control rounded-3 pe-5">
+            <option disabled>-- Pilih Layanan --</option>
+            @foreach($layanan as $l)
+                <option value="{{ $l->id }}"
+                    {{ $t->layanan_id == $l->id ? 'selected' : '' }}>
+                    {{ $l->nama_paket }} ({{ $l->kecepatan }})
+                </option>
+            @endforeach
+        </select>
 
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold">Keterangan</label>
-                        <textarea name="keterangan"
-                                  class="form-control rounded-3"
-                                  rows="3">{{ $t->keterangan }}</textarea>
-                    </div>
+        <div class="mb-3">
+    <label class="form-label fw-semibold">Jenis Tagihan</label>
+    <input type="text"
+           class="form-control"
+           value="{{ $t->jenis_tagihan }}"
+           readonly>
+</div>
 
-                    <input type="hidden" name="layanan_id" value="{{ $t->layanan_id }}">
+        <i class="bi bi-chevron-down position-absolute"
+           style="right:14px; top:50%; transform:translateY(-50%); pointer-events:none; color:#888;">
+        </i>
+    </div>
+</div>
 
-                </div>
+<div class="mb-3">
+    <label class="form-label fw-semibold">Status Pembayaran</label>
+    <div class="position-relative">
+        <select name="status" class="form-control rounded-3 pe-5">
+            <option value="lunas"       {{ $t->status == 'lunas'       ? 'selected' : '' }}>Lunas</option>
+            <option value="belum bayar" {{ $t->status == 'belum bayar' ? 'selected' : '' }}>Belum Bayar</option>
+        </select>
+        <i class="bi bi-chevron-down position-absolute" style="right:14px; top:50%; transform:translateY(-50%); pointer-events:none; color:#888;"></i>
+    </div>
+</div>
 
                 <!-- FOOTER -->
                 <div class="px-4 pb-4 d-flex justify-content-end gap-2">

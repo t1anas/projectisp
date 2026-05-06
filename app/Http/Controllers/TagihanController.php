@@ -3,6 +3,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Tagihan;
 use App\Models\Pembayaran;
+use App\Models\Layanan;
 use App\Http\Controllers\PemasukanController;
 use Illuminate\Http\Request;
 
@@ -32,7 +33,8 @@ class TagihanController extends Controller
         $tagihan = $query->get();
         $total = $tagihan->sum('total');
         $pelanggan = \App\Models\Pelanggan::with('layanan')->get(); 
-    return view('tagihan', compact('tagihan', 'total', 'pelanggan')); 
+        $layanan = \App\Models\Layanan::all();
+    return view('tagihan', compact('tagihan', 'total', 'pelanggan', 'layanan')); 
        
     }
 
@@ -41,23 +43,23 @@ public function update(Request $request, $id)
     $request->validate([
         'tanggal'       => 'required|date',
         'total'         => 'required|numeric',
-        'jenis_tagihan' => 'required'
+        'layanan_id' => 'required|exists:layanan,id'
     ]);
 
     $tagihan = Tagihan::findOrFail($id);
 
     $jatuhTempo = \Carbon\Carbon::parse($request->tanggal)->addDays(3);
 
-    $tagihan->update([
-        'tanggal'       => $request->tanggal,
-        'bulan'         => date('m', strtotime($request->tanggal)),
-        'tahun'         => date('Y', strtotime($request->tanggal)),
-        'jumlah_bayar'  => $request->jumlah_bayar,
-        'jenis_tagihan' => $request->jenis_tagihan,
-        'keterangan'    => $request->keterangan,
-        'jatuh_tempo'   => $jatuhTempo,
-        'layanan_id'    => $request->layanan_id
-    ]);
+$tagihan->update([
+    'tanggal'       => $request->tanggal,
+    'bulan'         => date('m', strtotime($request->tanggal)),
+    'tahun'         => date('Y', strtotime($request->tanggal)),
+    'keterangan'    => $request->keterangan,
+    'jatuh_tempo'   => $jatuhTempo,
+    'layanan_id'    => $request->layanan_id ?? $tagihan->layanan_id,
+    'status'        => $request->status ?? $tagihan->status,
+    'total'         => $request->total,   
+]);
 
     return back()->with('success', 'Tagihan berhasil diupdate');
 }
@@ -133,4 +135,5 @@ public function kwitansi($id)
     $tagihan = Tagihan::with('pelanggan.layanan')->findOrFail($id);
     return view('kwitansi', compact('tagihan'));
 }
+
 }
