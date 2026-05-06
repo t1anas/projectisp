@@ -71,14 +71,12 @@ public function store(Request $request)
         'jumlah_bayar' => 'required|numeric',
     ]);
 
-    // ambil tagihan
     $tagihan = Tagihan::findOrFail($request->tagihan_id);
 
     if ($tagihan->status == 'lunas') {
         return back()->with('error', 'Tagihan sudah lunas!');
     }
 
-    
     Pembayaran::create([
         'pelanggan_id' => $request->pelanggan_id,
         'layanan_id'   => $request->layanan_id,
@@ -92,12 +90,8 @@ public function store(Request $request)
     $totalBayar = Pembayaran::where('tagihan_id', $tagihan->id)
         ->sum('jumlah_bayar');
 
-    if ($totalBayar >= $tagihan->jumlah) {
-        $tagihan->status = 'lunas';
-    } else {
-        $tagihan->status = 'belum bayar';
-    }
-
+    // ← FIX: 'jumlah' → 'total'
+    $tagihan->status = ($totalBayar >= $tagihan->total) ? 'lunas' : 'belum bayar';
     $tagihan->save();
 
     return redirect()->route('pembayaran')

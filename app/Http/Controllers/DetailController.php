@@ -24,24 +24,37 @@ class DetailController extends Controller
         return view('detail', compact('pelanggan', 'tagihan', 'layanan', 'metode'));
     }
 
-    public function bayar(Request $request, $id)
-    {
-        $tagihan = Tagihan::where('pelanggan_id', $id)
-                          ->where('status', 'belum bayar')
-                          ->latest()
-                          ->first();
+public function bayar(Request $request, $id)
+{
+    $request->validate([
+        'tanggal_bayar' => 'required|date',
+        'metode_id'     => 'required',
+        'total'         => 'required|numeric',
+    ]);
 
-        if (!$tagihan) {
-            return back()->with('error', 'Tidak ada tagihan yang perlu dibayar');
-        }
+    $tagihan = Tagihan::where('pelanggan_id', $id)
+                      ->where('status', 'belum bayar')
+                      ->latest()
+                      ->first();
 
-        $tagihan->update([
-            'status'       => 'lunas',
-            'tanggal_bayar'=> $request->tanggal_bayar,
-            'metode_id' => $request->metode_id,
-            'keterangan'   => $request->keterangan,
-        ]);
-
-        return back()->with('success', 'Pembayaran berhasil dikonfirmasi');
+    if (!$tagihan) {
+        return back()->with('error', 'Tidak ada tagihan yang perlu dibayar');
     }
+
+    // Buat record pembayaran
+    \App\Models\Pembayaran::create([
+        'tagihan_id'    => $tagihan->id,
+        'pelanggan_id'  => $tagihan->pelanggan_id,
+        'layanan_id'    => $tagihan->layanan_id,
+        'jumlah_bayar'  => $request->total,
+        'tanggal_bayar' => $request->tanggal_bayar,
+        'metode_id'     => $request->metode_id,
+        'status'        => 'lunas',
+    ]);
+
+    // Update status tagihan
+    $tagihan->update(['status' => 'lunas']);
+
+    return back()->with('success', 'Pembayaran berhasil dikonfirmasi');
+}
 }

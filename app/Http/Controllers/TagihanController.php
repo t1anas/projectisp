@@ -31,9 +31,8 @@ class TagihanController extends Controller
         
         $tagihan = $query->get();
         $total = $tagihan->sum('total');
-        $pelanggan = \App\Models\Pelanggan::with('layanan')->get(); // tambah ini
-
-    return view('tagihan', compact('tagihan', 'total', 'pelanggan')); // tambah pelanggan
+        $pelanggan = \App\Models\Pelanggan::with('layanan')->get(); 
+    return view('tagihan', compact('tagihan', 'total', 'pelanggan')); 
        
     }
 
@@ -53,7 +52,7 @@ public function update(Request $request, $id)
         'tanggal'       => $request->tanggal,
         'bulan'         => date('m', strtotime($request->tanggal)),
         'tahun'         => date('Y', strtotime($request->tanggal)),
-        'total'         => $request->total,
+        'jumlah_bayar'  => $request->jumlah_bayar,
         'jenis_tagihan' => $request->jenis_tagihan,
         'keterangan'    => $request->keterangan,
         'jatuh_tempo'   => $jatuhTempo,
@@ -83,6 +82,7 @@ public function store(Request $request)
         'tahun'        => date('Y', strtotime($request->tanggal)),
         'jatuh_tempo'  => $jatuhTempo,
         'total'        => $request->total,
+        'jumlah_bayar' => $request->jumlah_bayar,
         'keterangan'   => $request->keterangan,
         'status'       => 'belum bayar'
     ]);
@@ -99,18 +99,32 @@ public function store(Request $request)
 }
 public function bayar(Request $request, $id)
 {
+    $request->validate([
+        'total'         => 'required|numeric',
+        'tanggal_bayar' => 'required|date',
+        'metode_id'     => 'required',
+    ]);
+
     $tagihan = Tagihan::findOrFail($id);
 
-    $tagihan->update(['status' => 'lunas']);
+    // Cek jika sudah lunas
+    if ($tagihan->status === 'lunas') {
+        return back()->with('error', 'Tagihan sudah lunas.');
+    }
 
+    // Buat record pembayaran
     Pembayaran::create([
         'tagihan_id'    => $tagihan->id,
         'pelanggan_id'  => $tagihan->pelanggan_id,
-        'total'         => $request->total,
+        'layanan_id'    => $tagihan->layanan_id,   
+        'jumlah_bayar'  => $request->total,         
         'tanggal_bayar' => $request->tanggal_bayar,
         'metode_id'     => $request->metode_id,
-        'keterangan'    => $request->keterangan,
+        'status'        => 'lunas',
     ]);
+
+    // Update status tagihan
+    $tagihan->update(['status' => 'lunas']);
 
     return back()->with('success', 'Pembayaran berhasil dicatat.');
 }

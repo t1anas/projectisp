@@ -84,3 +84,5 @@ Route::post('/tagihan/{id}/bayar', [TagihanController::class, 'bayar'])->name('t
 Route::get('/tagihan/{id}/kwitansi', [KwitansiController::class, 'cetak'])->name('kwitansi');
 
 });
+Route::post('/layanan/{id}/bayar', [DetailController::class, 'bayar'])
+    ->name('detail.bayar');

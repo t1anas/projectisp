@@ -484,7 +484,6 @@ document.addEventListener('DOMContentLoaded', function () {
                         <div class="col-md-6">
                             <label class="form-label">Nama Pelanggan</label>
                             <input type="text" id="edit_nama_pelanggan" class="form-control" readonly>
-                            <small class="text-muted">Pelanggan tidak dapat diubah</small>
                         </div>
 
                         <div class="col-md-6">

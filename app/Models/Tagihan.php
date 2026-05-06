@@ -14,7 +14,7 @@ class Tagihan extends Model
 protected $fillable = [
     'pelanggan_id',
     'layanan_id',
-    'jenis_tagihan',  // ← pastikan ada
+    'jenis_tagihan',  
     'tanggal',
     'bulan',
     'tahun',
@@ -22,14 +22,13 @@ protected $fillable = [
     'total',
     'keterangan',
     'status',
-    'tanggal_bayar', // ← tambah ini
+    'tanggal_bayar', 
     'metode_id',   
 ];
 
     public function pelanggan()
     {
         return $this->belongsTo(Pelanggan::class, 'pelanggan_id');
-         return $this->hasOne(Pembayaran::class);
     }
 
     public function pembayaran()

@@ -911,6 +911,10 @@ via
 </script>
 @endif
 @endforeach
-
+@if(session('success'))
+<div id="overlaySuccess" ...>
+    ...
+</div>
+@endif
 </body>
 </html>
