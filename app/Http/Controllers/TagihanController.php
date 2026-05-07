@@ -4,10 +4,9 @@ namespace App\Http\Controllers;
 use App\Models\Tagihan;
 use App\Models\Pembayaran;
 use App\Models\Layanan;
-use App\Http\Controllers\PemasukanController;
 use Illuminate\Http\Request;
 
-class TagihanController extends Controller  
+class TagihanController extends Controller
 {
     public function index()
     {
@@ -24,116 +23,113 @@ class TagihanController extends Controller
         }
 
         if (request('bulan')) {
-            $bulan = request('bulan'); 
-
+            $bulan = request('bulan');
             $query->whereYear('tanggal', substr($bulan, 0, 4))
                   ->whereMonth('tanggal', substr($bulan, 5, 2));
         }
-        
-        $tagihan = $query->get();
-        $total = $tagihan->sum('total');
-        $pelanggan = \App\Models\Pelanggan::with('layanan')->get(); 
-        $layanan = \App\Models\Layanan::all();
-    return view('tagihan', compact('tagihan', 'total', 'pelanggan', 'layanan')); 
-       
+
+        $tagihan   = $query->get();
+        $total     = $tagihan->sum('total');
+        $pelanggan = \App\Models\Pelanggan::with('layanan')->get();
+        $layanan   = \App\Models\Layanan::all();
+
+        return view('tagihan', compact('tagihan', 'total', 'pelanggan', 'layanan'));
     }
 
-public function update(Request $request, $id)
-{
-    $request->validate([
-        'tanggal'       => 'required|date',
-        'total'         => 'required|numeric',
-        'layanan_id' => 'required|exists:layanan,id'
-    ]);
+    public function store(Request $request)
+    {
+        $request->validate([
+            'pelanggan_id'  => 'required',
+            'tanggal'       => 'required|date',
+            'total'         => 'required|numeric',
+            'jenis_tagihan' => 'required',
+            'keterangan'    => 'nullable',
+        ]);
 
-    $tagihan = Tagihan::findOrFail($id);
+        $jatuhTempo = \Carbon\Carbon::parse($request->tanggal)->addDays(3);
 
-    $jatuhTempo = \Carbon\Carbon::parse($request->tanggal)->addDays(3);
+        Tagihan::create([
+            'pelanggan_id'  => $request->pelanggan_id,
+            'layanan_id'    => $request->layanan_id,
+            'jenis_tagihan' => $request->jenis_tagihan,
+            'tanggal'       => $request->tanggal,
+            'bulan'         => date('m', strtotime($request->tanggal)),
+            'tahun'         => date('Y', strtotime($request->tanggal)),
+            'jatuh_tempo'   => $jatuhTempo,
+            'total'         => $request->total,
+            'jumlah_bayar'  => $request->jumlah_bayar,
+            'keterangan'    => $request->keterangan,
+            'status'        => 'belum bayar',
+        ]);
 
-$tagihan->update([
-    'tanggal'       => $request->tanggal,
-    'bulan'         => date('m', strtotime($request->tanggal)),
-    'tahun'         => date('Y', strtotime($request->tanggal)),
-    'keterangan'    => $request->keterangan,
-    'jatuh_tempo'   => $jatuhTempo,
-    'layanan_id'    => $request->layanan_id ?? $tagihan->layanan_id,
-    'status'        => $request->status ?? $tagihan->status,
-    'total'         => $request->total,   
-]);
+        return back()->with('success', 'Tagihan berhasil ditambahkan');
+    }
 
-    return back()->with('success', 'Tagihan berhasil diupdate');
-}
-public function store(Request $request)
-{
-    $request->validate([
-        'pelanggan_id'  => 'required',
-        'tanggal'       => 'required|date',
-        'total'         => 'required|numeric',
-        'jenis_tagihan' => 'required',
-        'keterangan'    => 'nullable'
-    ]);
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'tanggal'    => 'required|date',
+            'total'      => 'required|numeric',
+            'layanan_id' => 'nullable|exists:layanan,id',
+        ]);
 
-    $jatuhTempo = \Carbon\Carbon::parse($request->tanggal)->addDays(3);
+        $tagihan    = Tagihan::findOrFail($id);
+        $jatuhTempo = \Carbon\Carbon::parse($request->tanggal)->addDays(3);
 
-    Tagihan::create([
-        'pelanggan_id' => $request->pelanggan_id,
-        'layanan_id'   => $request->layanan_id,
-        'jenis_tagihan'=> $request->jenis_tagihan,
-        'tanggal'      => $request->tanggal,
-        'bulan'        => date('m', strtotime($request->tanggal)),
-        'tahun'        => date('Y', strtotime($request->tanggal)),
-        'jatuh_tempo'  => $jatuhTempo,
-        'total'        => $request->total,
-        'jumlah_bayar' => $request->jumlah_bayar,
-        'keterangan'   => $request->keterangan,
-        'status'       => 'belum bayar'
-    ]);
+        $tagihan->update([
+            'tanggal'     => $request->tanggal,
+            'bulan'       => date('m', strtotime($request->tanggal)),
+            'tahun'       => date('Y', strtotime($request->tanggal)),
+            'keterangan'  => $request->keterangan,
+            'jatuh_tempo' => $jatuhTempo,
+            'layanan_id'  => $request->layanan_id ?? $tagihan->layanan_id,
+            'status'      => $request->status     ?? $tagihan->status,
+            'total'       => $request->total,
+        ]);
 
-    return back()->with('success', 'Tagihan berhasil ditambahkan');
-}
+        return back()->with('success', 'Tagihan berhasil diupdate');
+    }
+
     public function destroy($id)
-{
-    $tagihan = Tagihan::findOrFail($id);
+    {
+        $tagihan = Tagihan::findOrFail($id);
+        $tagihan->delete();
 
-    $tagihan->delete();
-
-    return redirect()->back()->with('success', 'Tagihan berhasil dihapus');
-}
-public function bayar(Request $request, $id)
-{
-    $request->validate([
-        'total'         => 'required|numeric',
-        'tanggal_bayar' => 'required|date',
-        'metode_id'     => 'required',
-    ]);
-
-    $tagihan = Tagihan::findOrFail($id);
-
-    // Cek jika sudah lunas
-    if ($tagihan->status === 'lunas') {
-        return back()->with('error', 'Tagihan sudah lunas.');
+        return redirect()->back()->with('success', 'Tagihan berhasil dihapus');
     }
 
-    // Buat record pembayaran
-    Pembayaran::create([
-        'tagihan_id'    => $tagihan->id,
-        'pelanggan_id'  => $tagihan->pelanggan_id,
-        'layanan_id'    => $tagihan->layanan_id,   
-        'jumlah_bayar'  => $request->total,         
-        'tanggal_bayar' => $request->tanggal_bayar,
-        'metode_id'     => $request->metode_id,
-        'status'        => 'lunas',
-    ]);
+    public function bayar(Request $request, $id)
+    {
+        $request->validate([
+            'total'         => 'required|numeric',
+            'tanggal_bayar' => 'required|date',
+            'metode_id'     => 'required|exists:metode_pembayaran,id',
+        ]);
 
-    // Update status tagihan
-    $tagihan->update(['status' => 'lunas']);
+        $tagihan = Tagihan::findOrFail($id);
 
-    return back()->with('success', 'Pembayaran berhasil dicatat.');
-}
-public function kwitansi($id)
-{
-    $tagihan = Tagihan::with('pelanggan.layanan')->findOrFail($id);
-    return view('kwitansi', compact('tagihan'));
-}
+        if ($tagihan->status === 'lunas') {
+            return back()->with('error', 'Tagihan sudah lunas.');
+        }
 
+        Pembayaran::create([
+            'tagihan_id'    => $tagihan->id,
+            'pelanggan_id'  => $tagihan->pelanggan_id,
+            'layanan_id'    => $tagihan->layanan_id,
+            'jumlah_bayar'  => $request->total,
+            'tanggal_bayar' => $request->tanggal_bayar,
+            'metode_id'     => $request->metode_id,
+            'status'        => 'lunas',
+        ]);
+
+        $tagihan->update(['status' => 'lunas']);
+
+        return back()->with('success', 'Pembayaran berhasil dicatat.');
+    }
+
+    public function kwitansi($id)
+    {
+        $tagihan = Tagihan::with('pelanggan.layanan')->findOrFail($id);
+        return view('kwitansi', compact('tagihan'));
+    }
 }

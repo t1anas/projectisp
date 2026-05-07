@@ -299,115 +299,111 @@ body {
                 </div>
             </div>
 
-            <!-- FILTER -->
-            <div style="padding:20px; border-bottom:1px solid #eee;">
-                <div class="row g-3">
+{{-- FILTER --}}
+<div style="padding:20px; border-bottom:1px solid #eee;">
+    <div class="row g-3 align-items-end">
 
-                    <div class="col-md-4">
-                        <input type="text" class="form-control" placeholder="Cari pelanggan...">
-                    </div>
+        <div class="col-md-auto">
+            <form method="POST" action="{{ route('pelanggan.generateTagihan') }}" style="margin:0;">
+                @csrf
+                <input type="hidden" name="pelanggan_id" id="selectedPelangganId">
+                <button type="submit" class="btn btn-success px-2" title="Generate Tagihan">
+                    <i class="bi bi-plus-lg me-1"></i> Generate Tagihan
+                </button>
+            </form>
+        </div>
 
-                    <div class="col-md-3">
-                        <select class="form-select">
-                            <option>Semua Status</option>
-                            <option>AKTIF</option>
-                            <option>NONAKTIF</option>
-                        </select>
-                    </div>
+        <div class="col-md-3">
+            <input type="text" class="form-control" placeholder="Cari pelanggan...">
+        </div>
 
-                    <div class="col-md-2">
-                        <input type="date" class="form-control">
-                    </div>
+        <div class="col-md-2">
+            <select class="form-select">
+                <option>Semua Status</option>
+                <option>AKTIF</option>
+                <option>NONAKTIF</option>
+            </select>
+        </div>
 
-                    <div class="col-md-2">
-                        <input type="date" class="form-control">
-                    </div>
+        <div class="col-md-2">
+            <input type="date" class="form-control">
+        </div>
 
-                    <div class="col-md-1">
-                        <button class="btn btn-success w-100">
-                            <i class="bi bi-search"></i>
-                        </button>
-                    </div>
+        <div class="col-md-2">
+            <input type="date" class="form-control">
+        </div>
 
-                </div>
-            </div>
+        <div class="col-md-1">
+            <button class="btn btn-success w-100">
+                <i class="bi bi-search"></i>
+            </button>
+        </div>
+
+    </div>
+</div>
 
             <!-- TABLE -->
             <div class="table-responsive px-3 pb-4">
                 <table class="table table-bordered table-hover align-middle">
 
-                    <thead class="table-light text-center fw-bold">
-                        <tr>
-                            <th>No</th>
-                            <th>Aktivasi</th>
-                            <th>Nama</th>
-                            <th>Tagihan</th>
-                            <th>Paket</th>
-                            <th>Status</th>
-                            <th>Aksi</th>
-                        </tr>
-                    </thead>
+<thead class="table-light text-center fw-bold">
+    <tr>
+        <th style="width:40px;">
+            <input type="checkbox" id="checkAll"
+                   style="width:16px; height:16px; cursor:pointer;"
+                   onchange="toggleAll(this)">
+        </th>
+        <th>No</th>
+        <th>Aktivasi</th>
+        <th>Nama</th>
+        <th>Tagihan</th>
+        <th>Paket</th>
+        <th>Status</th>
+        <th>Aksi</th>
+    </tr>
+</thead>
 
-                    <tbody class="text-center">
-                        @foreach($pelanggan as $p)
-                        <tr>
-                            <td>{{ $loop->iteration }}</td>
-
-                            <td>{{ $p->created_at->format('d/m/Y') }}</td>
-
-                            <td class="text-start">{{ $p->nama }}</td>
-
-                            <td class="text-start">Rp {{ number_format($p->layanan->harga ?? 0, 0, ',', '.') }}</td>
-
-                            <td>{{ $p->layanan->nama_paket ?? '-' }}</td>
-
-                            <td>
-                                @if(strtolower($p->status) == 'aktif')
-                                    <span class="status-pill status-active">
-                                        <i class="bi bi-check-circle-fill"></i> Aktif
-                                    </span>
-                                @else
-                                    <span class="status-pill status-nonactive">
-                                        <i class="bi bi-x-circle-fill"></i> Nonaktif
-                                    </span>
-                                @endif
-                            </td>
-
-                            <td>
-                                <div class="action-group">
-
-                                    {{-- Tombol Detail --}}
-                                   <a href="{{ route('layanan.detail', $p->id) }}"
-   class="action-modern btn-detail">
-   <i class="bi bi-eye-fill"></i>
-</a>
-
-                                    {{-- Tombol Reminder --}}
-                                    <button class="action-modern btn-reminder"
-                                        title="Reminder"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#modalNotif{{ $p->id }}">
-                                        <i class="bi bi-bell-fill"></i>
-                                    </button>
-
-                                    {{-- Tombol Generate Tagihan --}}
-                                    <form method="POST"
-                                          action="{{ route('pelanggan.generateTagihan') }}"
-                                          style="margin:0;">
-                                        @csrf
-                                        <input type="hidden" name="pelanggan_id" value="{{ $p->id }}">
-                                        <button type="submit"
-                                                class="btn-tambah"
-                                                title="Generate Tagihan">
-                                            <i class="bi bi-plus-lg"></i>
-                                        </button>
-                                    </form>
-
-                                </div>
-                            </td>
-                        </tr>
-                        @endforeach
-                    </tbody>
+<tbody class="text-center">
+    @foreach($pelanggan as $p)
+    <tr>
+        <td>
+            <input type="checkbox" name="pelanggan_ids[]"
+                   value="{{ $p->id }}"
+                   class="row-check"
+                   style="width:16px; height:16px; cursor:pointer;"
+                   onchange="updateSelected()">
+        </td>
+        <td>{{ $loop->iteration }}</td>
+        <td>{{ $p->created_at->format('d/m/Y') }}</td>
+        <td class="text-start">{{ $p->nama }}</td>
+        <td class="text-start">Rp {{ number_format($p->layanan->harga ?? 0, 0, ',', '.') }}</td>
+        <td>{{ $p->layanan->nama_paket ?? '-' }}</td>
+        <td>
+            @if(strtolower($p->status) == 'aktif')
+                <span class="status-pill status-active">
+                    <i class="bi bi-check-circle-fill"></i> Aktif
+                </span>
+            @else
+                <span class="status-pill status-nonactive">
+                    <i class="bi bi-x-circle-fill"></i> Nonaktif
+                </span>
+            @endif
+        </td>
+        <td>
+            <div class="action-group">
+                <a href="{{ route('layanan.detail', $p->id) }}" class="action-modern btn-detail">
+                    <i class="bi bi-eye-fill"></i>
+                </a>
+                <button class="action-modern btn-reminder" title="Reminder"
+                        data-bs-toggle="modal"
+                        data-bs-target="#modalNotif{{ $p->id }}">
+                    <i class="bi bi-bell-fill"></i>
+                </button>
+            </div>
+        </td>
+    </tr>
+    @endforeach
+</tbody>
 
                 </table>
             </div>

@@ -9,7 +9,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="{{ asset('inputform.css') }}">
 <style>
-    .date-pill {
+.date-pill {
     display: inline-flex;
     align-items: center;
     gap: 6px;
@@ -21,17 +21,10 @@
     color: #0c0b28;
     border: 1px solid #dbeafe;
 }
-
-.date-pill i {
-    font-size: 11px;
-}
+.date-pill i { font-size: 11px; }
 .modal-content input,
 .modal-content select,
-.modal-content textarea {
-    border-radius: 10px;
-    transition: 0.2s;
-}
-
+.modal-content textarea { border-radius: 10px; transition: 0.2s; }
 .modal-content input:focus,
 .modal-content select:focus,
 .modal-content textarea:focus {
@@ -60,6 +53,7 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f4f6f9; }
 <body>
 <div style="display:flex; min-height:100vh;">
 
+    {{-- SIDEBAR --}}
     <div class="sidebar">
         <div class="sidebar-header">
             <div class="hamburger"><span></span><span></span><span></span></div>
@@ -89,6 +83,7 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f4f6f9; }
         </div>
     </div>
 
+    {{-- MAIN CONTENT --}}
     <div class="main-content" style="flex:1;">
 
         @if(session('error'))
@@ -129,48 +124,44 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f4f6f9; }
                 </div>
             </div>
 
-<!-- Ganti bagian filter-box -->
-<div class="filter-box">
-    <div class="row g-3 align-items-end">
-
-        {{-- TOMBOL TAMBAH (paling kiri) --}}
-        <div class="col-md-auto">
-            <button type="button" class="btn btn-primary h-100 px-3"
-                    data-bs-toggle="modal" data-bs-target="#modalTambahTagihan">
-                <i class="bi bi-plus-lg me-1"></i> Tambah
-            </button>
-        </div>
-
-        {{-- FILTER FORM --}}
-        <form method="GET" action="{{ url('/tagihan') }}" class="col">
-            <div class="row g-3">
-                <div class="col-md-4">
-                    <input type="text" name="cari" class="form-control"
-                           placeholder="Cari pelanggan..."
-                           value="{{ request('cari') }}">
-                </div>
-                <div class="col-md-3">
-                    <select name="status" class="form-select">
-                        <option value="">Semua Status</option>
-                        <option value="lunas"       {{ request('status') == 'lunas'       ? 'selected' : '' }}>Lunas</option>
-                        <option value="belum bayar" {{ request('status') == 'belum bayar' ? 'selected' : '' }}>Belum Bayar</option>
-                    </select>
-                </div>
-                <div class="col-md-3">
-                    <input type="month" name="bulan" class="form-control"
-                           value="{{ request('bulan') }}">
-                </div>
-                <div class="col-md-2">
-                    <button type="submit" class="btn btn-success w-100">
-                        <i class="bi bi-search"></i>
-                    </button>
+            {{-- FILTER --}}
+            <div class="filter-box">
+                <div class="row g-3 align-items-end">
+                    <div class="col-md-auto">
+                        <button type="button" class="btn btn-primary h-100 px-3"
+                                data-bs-toggle="modal" data-bs-target="#modalTambahTagihan">
+                            <i class="bi bi-plus-lg me-1"></i> Tambah
+                        </button>
+                    </div>
+                    <form method="GET" action="{{ url('/tagihan') }}" class="col">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <input type="text" name="cari" class="form-control"
+                                       placeholder="Cari pelanggan..."
+                                       value="{{ request('cari') }}">
+                            </div>
+                            <div class="col-md-3">
+                                <select name="status" class="form-select">
+                                    <option value="">Semua Status</option>
+                                    <option value="lunas"       {{ request('status') == 'lunas'       ? 'selected' : '' }}>Lunas</option>
+                                    <option value="belum bayar" {{ request('status') == 'belum bayar' ? 'selected' : '' }}>Belum Bayar</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <input type="month" name="bulan" class="form-control"
+                                       value="{{ request('bulan') }}">
+                            </div>
+                            <div class="col-md-2">
+                                <button type="submit" class="btn btn-success w-100">
+                                    <i class="bi bi-search"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
                 </div>
             </div>
-        </form>
 
-    </div>
-</div>
-
+            {{-- TABEL --}}
             <div class="table-responsive px-3 pb-4">
                 <table class="table table-bordered table-hover align-middle">
                     <thead class="table-light text-center fw-bold">
@@ -190,11 +181,11 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f4f6f9; }
                         <tr>
                             <td>{{ $loop->iteration }}</td>
                             <td>
-    <span class="date-pill">
-        <i class="bi bi-calendar3"></i>
-        {{ \Carbon\Carbon::parse($t->tanggal)->translatedFormat('d M Y') }}
-    </span>
-</td>
+                                <span class="date-pill">
+                                    <i class="bi bi-calendar3"></i>
+                                    {{ \Carbon\Carbon::parse($t->tanggal)->translatedFormat('d M Y') }}
+                                </span>
+                            </td>
                             <td class="text-start">{{ $t->pelanggan->nama ?? '-' }}</td>
                             <td>{{ $t->jenis_tagihan ?? '-' }}</td>
                             <td>{{ optional($t->layanan)->nama_paket ?? '-' }}</td>
@@ -231,7 +222,7 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f4f6f9; }
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="7" class="text-muted py-4">
+                            <td colspan="8" class="text-muted py-4">
                                 <i class="bi bi-inbox fs-4 d-block mb-1"></i>
                                 Tidak ada data tagihan
                             </td>
@@ -245,37 +236,20 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f4f6f9; }
             </div>
 
         </div>
-
     </div>
 </div>
 
-<!-- MODAL TAMBAH TAGIHAN -->
+{{-- MODAL TAMBAH --}}
 <div class="modal fade" id="modalTambahTagihan" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg" style="border-radius:20px; overflow:hidden;">
-
             <form action="{{ url('/tagihan') }}" method="POST">
                 @csrf
-
-                <!-- HEADER -->
-                <div style="
-                    background: linear-gradient(135deg,#16a34a,#22c55e,#4ade80);
-                    padding:22px;
-                    color:white;
-                ">
-                    <div class="d-flex align-items-center justify-content-between">
-                        <h5 class="fw-bold mb-0">
-                            <i class="bi bi-plus-circle me-2"></i>Tambah Tagihan
-                        </h5>
-
-                    </div>
+                <div style="background:linear-gradient(135deg,#16a34a,#22c55e,#4ade80); padding:22px; color:white;">
+                    <h5 class="fw-bold mb-0"><i class="bi bi-plus-circle me-2"></i>Tambah Tagihan</h5>
                     <small style="opacity:.85;">Isi data tagihan pelanggan</small>
                 </div>
-
-                <!-- BODY -->
                 <div class="p-4">
-
-                    <!-- Pelanggan -->
                     <div class="mb-3">
                         <label class="form-label fw-semibold">Pelanggan</label>
                         <select name="pelanggan_id" class="form-select rounded-3"
@@ -290,33 +264,22 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f4f6f9; }
                             @endforeach
                         </select>
                     </div>
-
                     <input type="hidden" name="layanan_id" id="inputLayananId">
-
-                    <!-- Tanggal -->
                     <div class="mb-3">
                         <label class="form-label fw-semibold">Tanggal</label>
                         <div class="input-group">
-                            <span class="input-group-text bg-white">
-                                <i class="bi bi-calendar3"></i>
-                            </span>
-                            <input type="date" name="tanggal"
-                                   class="form-control"
+                            <span class="input-group-text bg-white"><i class="bi bi-calendar3"></i></span>
+                            <input type="date" name="tanggal" class="form-control"
                                    value="{{ date('Y-m-d') }}" required>
                         </div>
                     </div>
-
-                    <!-- Jumlah -->
                     <div class="mb-3">
                         <label class="form-label fw-semibold">Jumlah Tagihan</label>
                         <div class="input-group">
                             <span class="input-group-text bg-white">Rp</span>
-                            <input type="number" name="total" id="inputTotal"
-                                   class="form-control" required>
+                            <input type="number" name="total" id="inputTotal" class="form-control" required>
                         </div>
                     </div>
-
-                    <!-- Jenis -->
                     <div class="mb-3">
                         <label class="form-label fw-semibold">Jenis Tagihan</label>
                         <select name="jenis_tagihan" class="form-select rounded-3" required>
@@ -327,33 +290,21 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f4f6f9; }
                             <option value="pendapatan jasa">Pendapatan Jasa</option>
                         </select>
                     </div>
-
-                    <!-- Keterangan -->
                     <div class="mb-3">
                         <label class="form-label fw-semibold">Keterangan</label>
                         <textarea name="keterangan" class="form-control rounded-3"
                                   rows="2" placeholder="Opsional..."></textarea>
                     </div>
-
                 </div>
-
-                <!-- FOOTER -->
                 <div class="px-4 pb-4 d-flex justify-content-end gap-2">
-                    <button type="button"
-                            class="btn btn-light border rounded-3 px-3"
-                            data-bs-dismiss="modal">
-                        Batal
-                    </button>
-
-                    <button type="submit"
-                            class="btn text-white px-4 rounded-3 fw-semibold"
+                    <button type="button" class="btn btn-light border rounded-3 px-3"
+                            data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn text-white px-4 rounded-3 fw-semibold"
                             style="background:linear-gradient(135deg,#16a34a,#22c55e);">
                         <i class="bi bi-save me-1"></i> Simpan
                     </button>
                 </div>
-
             </form>
-
         </div>
     </div>
 </div>
@@ -366,236 +317,143 @@ function updateLayanan(select) {
 }
 </script>
 
+{{-- MODAL DETAIL --}}
 @foreach($tagihan as $t)
 <div class="modal fade" id="detailTagihan{{ $t->id }}" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 overflow-hidden"
              style="border-radius:24px; box-shadow:0 25px 70px rgba(0,0,0,.18);">
-
-            {{-- HEADER --}}
-            <div style="
-                background:linear-gradient(135deg,#16a34a,#22c55e,#4ade80);
-                padding:28px;
-                position:relative;
-            ">
-
+            <div style="background:linear-gradient(135deg,#16a34a,#22c55e,#4ade80); padding:28px; position:relative;">
                 <div class="d-flex align-items-center gap-3">
-
-                    <div style="
-                        width:58px;
-                        height:58px;
-                        border-radius:50%;
-                        background:rgba(255,255,255,.18);
-                        border:2px solid rgba(255,255,255,.35);
-                        display:flex;
-                        align-items:center;
-                        justify-content:center;
-                        backdrop-filter:blur(6px);
-                    ">
+                    <div style="width:58px; height:58px; border-radius:50%; background:rgba(255,255,255,.18);
+                                border:2px solid rgba(255,255,255,.35); display:flex; align-items:center;
+                                justify-content:center; backdrop-filter:blur(6px);">
                         <i class="bi bi-person-fill text-white fs-4"></i>
                     </div>
-
                     <div>
-                        <div style="font-size:20px;font-weight:800;color:white;line-height:1.2;">
+                        <div style="font-size:20px; font-weight:800; color:white; line-height:1.2;">
                             {{ $t->pelanggan->nama ?? '-' }}
                         </div>
-
-                        <div style="font-size:12px;color:rgba(255,255,255,.8);">
+                        <div style="font-size:12px; color:rgba(255,255,255,.8);">
                             ID : {{ $t->pelanggan->id ?? '-' }}
                         </div>
                     </div>
                 </div>
-
                 <div class="mt-4 d-flex gap-2 flex-wrap">
-
-                    <span style="
-                        background:rgba(255,255,255,.18);
-                        color:white;
-                        padding:6px 12px;
-                        border-radius:50px;
-                        font-size:11px;
-                        font-weight:700;
-                    ">
+                    <span style="background:rgba(255,255,255,.18); color:white; padding:6px 12px;
+                                 border-radius:50px; font-size:11px; font-weight:700;">
                         {{ $t->pelanggan->alamat }}
                     </span>
-
                 </div>
             </div>
-
-            {{-- TOTAL --}}
-            <div style="
-                background:#f0fdf4;
-                padding:18px 28px;
-                border-bottom:1px solid #dcfce7;
-            ">
+            <div style="background:#f0fdf4; padding:18px 28px; border-bottom:1px solid #dcfce7;">
                 <div class="d-flex justify-content-between align-items-center">
-                    <span style="font-size:12px;color:#666;font-weight:700;">
-                        TOTAL TAGIHAN
-                    </span>
-
-                    <span style="
-                        font-size:26px;
-                        font-weight:900;
-                        color:#15803d;
-                    ">
-                        Rp {{ number_format($t->total,0,',','.') }}
+                    <span style="font-size:12px; color:#666; font-weight:700;">TOTAL TAGIHAN</span>
+                    <span style="font-size:26px; font-weight:900; color:#15803d;">
+                        Rp {{ number_format($t->total, 0, ',', '.') }}
                     </span>
                 </div>
             </div>
-
-            {{-- BODY --}}
             <div class="p-4">
-
                 <div class="row g-3">
-
                     <div class="col-12">
                         <div class="p-3 rounded-4 border bg-light">
                             <small class="text-muted d-block mb-1">Tanggal Tagihan</small>
-                            <div class="fw-bold">
-                                {{ \Carbon\Carbon::parse($t->tanggal)->format('d F Y') }}
-                            </div>
+                            <div class="fw-bold">{{ \Carbon\Carbon::parse($t->tanggal)->format('d F Y') }}</div>
                         </div>
                     </div>
-
                     <div class="col-12">
                         <div class="p-3 rounded-4 border bg-light">
                             <small class="text-muted d-block mb-1">Nama Paket</small>
-                            <div class="fw-bold">
-                                {{ $t->layanan->nama_paket ?? '-' }}
-                            </div>
+                            <div class="fw-bold">{{ $t->layanan->nama_paket ?? '-' }}</div>
                         </div>
                     </div>
-
                     <div class="col-12">
                         <div class="p-3 rounded-4 border bg-light">
                             <small class="text-muted d-block mb-1">Status Pembayaran</small>
-
                             @if($t->status == 'lunas')
-                                <span class="badge bg-success px-3 py-2 rounded-pill">
-                                    Sudah Dibayar
-                                </span>
+                                <span class="badge bg-success px-3 py-2 rounded-pill">Sudah Dibayar</span>
                             @else
-                                <span class="badge bg-danger px-3 py-2 rounded-pill">
-                                    Belum Dibayar
-                                </span>
+                                <span class="badge bg-danger px-3 py-2 rounded-pill">Belum Dibayar</span>
                             @endif
                         </div>
                     </div>
-
                 </div>
-
-                <button type="button"
-                        class="btn btn-success w-100 mt-4 py-2 rounded-4 fw-bold"
-                        data-bs-dismiss="modal">
-                    Tutup
-                </button>
-
+                <button type="button" class="btn btn-success w-100 mt-4 py-2 rounded-4 fw-bold"
+                        data-bs-dismiss="modal">Tutup</button>
             </div>
-
-        </div> 
-
+        </div>
     </div>
 </div>
 @endforeach
+
+{{-- MODAL EDIT --}}
 @foreach($tagihan as $t)
 <div class="modal fade" id="editTagihan{{ $t->id }}" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 overflow-hidden"
              style="border-radius:24px; box-shadow:0 25px 70px rgba(0,0,0,.18);">
-
             <form action="{{ url('/tagihan/'.$t->id) }}" method="POST">
                 @csrf
                 @method('PUT')
-
-                <!-- HEADER -->
-                <div style="
-                    background:linear-gradient(135deg,#16a34a,#22c55e,#4ade80);
-                    padding:24px;
-                    color:white;
-                ">
-                    <h5 class="fw-bold mb-0">
-                        <i class="bi bi-pencil-square me-2"></i> Edit Tagihan
-                    </h5>
+                <div style="background:linear-gradient(135deg,#16a34a,#22c55e,#4ade80);
+                            padding:24px; color:white;">
+                    <h5 class="fw-bold mb-0"><i class="bi bi-pencil-square me-2"></i> Edit Tagihan</h5>
                     <small style="opacity:.8;">Perbarui data tagihan pelanggan</small>
                 </div>
-
-                <!-- BODY -->
                 <div class="p-4">
-
                     <div class="mb-3">
                         <label class="form-label fw-semibold">Tanggal</label>
-                        <input type="date" name="tanggal"
-                               class="form-control rounded-3"
-                               value="{{ \Carbon\Carbon::parse($t->tanggal)->format('Y-m-d') }}">
+                        <input type="date" name="tanggal" class="form-control rounded-3"
+                               value="{{ \Carbon\Carbon::parse($t->tanggal)->format('Y-m-d') }}" required>
                     </div>
-
                     <div class="mb-3">
                         <label class="form-label fw-semibold">Jumlah Tagihan</label>
-                        <input type="number" name="total"
-                               class="form-control rounded-3"
-                               value="{{ $t->total }}">
+                        <div class="input-group">
+                            <span class="input-group-text bg-white">Rp</span>
+                            <input type="number" name="total" class="form-control rounded-3"
+                                   value="{{ $t->total }}" required>
+                        </div>
                     </div>
-
-    
-    <div class="mb-3">
-    <label class="form-label fw-semibold">Layanan</label>
-    <div class="position-relative">
-        <select name="layanan_id" class="form-control rounded-3 pe-5">
-            <option disabled>-- Pilih Layanan --</option>
-            @foreach($layanan as $l)
-                <option value="{{ $l->id }}"
-                    {{ $t->layanan_id == $l->id ? 'selected' : '' }}>
-                    {{ $l->nama_paket }} ({{ $l->kecepatan }})
-                </option>
-            @endforeach
-        </select>
-
-        <div class="mb-3">
-    <label class="form-label fw-semibold">Jenis Tagihan</label>
-    <input type="text"
-           class="form-control"
-           value="{{ $t->jenis_tagihan }}"
-           readonly>
-</div>
-
-        <i class="bi bi-chevron-down position-absolute"
-           style="right:14px; top:50%; transform:translateY(-50%); pointer-events:none; color:#888;">
-        </i>
-    </div>
-</div>
-
-<div class="mb-3">
-    <label class="form-label fw-semibold">Status Pembayaran</label>
-    <div class="position-relative">
-        <select name="status" class="form-control rounded-3 pe-5">
-            <option value="lunas"       {{ $t->status == 'lunas'       ? 'selected' : '' }}>Lunas</option>
-            <option value="belum bayar" {{ $t->status == 'belum bayar' ? 'selected' : '' }}>Belum Bayar</option>
-        </select>
-        <i class="bi bi-chevron-down position-absolute" style="right:14px; top:50%; transform:translateY(-50%); pointer-events:none; color:#888;"></i>
-    </div>
-</div>
-
-                <!-- FOOTER -->
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Layanan</label>
+                        <select name="layanan_id" class="form-select rounded-3">
+                            <option value="">-- Tanpa Layanan --</option>
+                            @foreach($layanan as $l)
+                                <option value="{{ $l->id }}"
+                                    {{ $t->layanan_id == $l->id ? 'selected' : '' }}>
+                                    {{ $l->nama_paket }} ({{ $l->kecepatan }})
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Jenis Tagihan</label>
+                        <input type="text" class="form-control rounded-3"
+                               value="{{ $t->jenis_tagihan }}" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Status Pembayaran</label>
+                        <select name="status" class="form-select rounded-3">
+                            <option value="lunas"       {{ $t->status == 'lunas'       ? 'selected' : '' }}>Lunas</option>
+                            <option value="belum bayar" {{ $t->status == 'belum bayar' ? 'selected' : '' }}>Belum Bayar</option>
+                        </select>
+                    </div>
+                </div>
                 <div class="px-4 pb-4 d-flex justify-content-end gap-2">
-                    <button type="button"
-                            class="btn btn-light border rounded-3"
-                            data-bs-dismiss="modal">
-                        Batal
-                    </button>
-
-                    <button type="submit"
-                            class="btn text-white rounded-3"
+                    <button type="button" class="btn btn-light border rounded-3"
+                            data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn text-white rounded-3"
                             style="background:linear-gradient(135deg,#16a34a,#22c55e);">
                         <i class="bi bi-check-circle me-1"></i> Simpan
                     </button>
                 </div>
-
             </form>
-
         </div>
     </div>
 </div>
 @endforeach
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
