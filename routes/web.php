@@ -9,6 +9,7 @@ use App\Http\Controllers\DetailController;
 use App\Http\Controllers\LayananController;
 use App\Http\Controllers\TagihanController;
 use App\Http\Controllers\KwitansiController;
+use App\Http\Controllers\ApprovePelangganController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -86,3 +87,15 @@ Route::get('/tagihan/{id}/kwitansi', [KwitansiController::class, 'cetak'])->name
 });
 Route::post('/layanan/{id}/bayar', [DetailController::class, 'bayar'])
     ->name('detail.bayar');
+
+/*--- APPROVE PELANGGAN ---*/
+Route::middleware('userakses:admin')->prefix('approve')->group(function () {
+
+    Route::get('/', [ApprovePelangganController::class, 'index']);
+
+    Route::post('/{id}/approve', [ApprovePelangganController::class, 'approve']);
+    Route::post('/{id}/reject',  [ApprovePelangganController::class, 'reject']);
+    Route::post('/bulk-approve', [ApprovePelangganController::class, 'bulkApprove']);
+    Route::post('/bulk-reject',  [ApprovePelangganController::class, 'bulkReject']);
+
+});

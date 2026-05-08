@@ -77,11 +77,12 @@ class PelangganController extends Controller
         return redirect('/pelanggan')->with('success', 'Berhasil tambah pelanggan');
     }
 
-    // 🔥 UPDATE DATA
+    //UPDATE DATA
     public function update(Request $request, $id)
     {
         $request->validate([
             'nama'       => 'required',
+            'nik'        => 'required',
             'site_id'    => 'required',
             'layanan_id' => 'required'
         ]);
@@ -90,11 +91,13 @@ class PelangganController extends Controller
 
         $pelanggan->update([
             'nama'       => $request->nama,
+            'nik'        => $request->nik,
             'alamat'     => $request->alamat,
             'no_hp'      => $request->no_hp,
             'site_id'    => $request->site_id,
             'layanan_id' => $request->layanan_id,
-            'lokasi_link'=> $request->lokasi_link
+            'lokasi_link'=> $request->lokasi_link,
+            'status'     => $request->status,
         ]);
 
         return redirect('/pelanggan')->with('success', 'Data berhasil diupdate');

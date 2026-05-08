@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Models;
-
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -35,5 +35,20 @@ class Pelanggan extends Model
     {
         return $this->belongsTo(Site::class, 'site_id');
     }
+
+    public function approvedBy()
+{
+    return $this->belongsTo(User::class, 'approved_by');
+}
+
+public function approvedAdmin()
+{
+    return $this->belongsTo(User::class, 'approved_admin_by');
+}
+
+public function rejectedBy()
+{
+    return $this->belongsTo(User::class, 'rejected_by');
+}
     
 }

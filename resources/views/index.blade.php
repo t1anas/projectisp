@@ -30,9 +30,18 @@
         <a href="{{ url('/layanan') }}" class="menu-item">
             <i class="bi bi-wifi"></i> Data Layanan
         </a>
-        <a href="{{ url('/instalasi') }}" class="menu-item">
-            <i class="bi bi-router"></i> Instalasi Baru
-        </a>
+        @php
+    $instalasiUrl = match(Auth::user()->role) {
+        'cs'    => '/instalasi',
+        'admin' => '/approve',
+        'noc'   => '/instalasi-noc',
+        default => '/instalasi'
+    };
+@endphp
+
+<a href="{{ url($instalasiUrl) }}" class="menu-item">
+    <i class="bi bi-router"></i> Instalasi Baru
+</a>
         @if(Auth::user()->role == 'admin')
         <a href="{{ url('/pemasukan') }}" class="menu-item">
             <i class="bi bi-wallet2"></i> Pemasukan
@@ -110,41 +119,64 @@
                 <table class="table table-bordered align-middle">
                     <thead class="table-light text-center fw-bold">
                         <tr>
+                            <th>No</th>
+                            <th>Tgl Aktivasi</th>
                             <th>Nama</th>
+                            <th>NIK</th>
                             <th>Site</th>
                             <th>Layanan</th>
                             <th>No. Telepon</th>
+                            <th>Status</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
                     <tbody class="text-center">
-                        @foreach($pelanggan as $p)
+                        @foreach($pelanggan as $index => $p)
                         <tr>
+                            <td>{{ $index + 1 }}</td>
+                            <td>{{ \Carbon\Carbon::parse($p->created_at)->format('d/m/Y') }}</td>
                             <td class="text-start">{{ $p->nama }}</td>
+                            <td>{{ $p->nik ?? '-' }}</td>
                             <td>{{ $p->site->nama_site ?? '-' }}</td>
                             <td>{{ $p->layanan->nama_paket ?? '-' }}</td>
                             <td>{{ $p->no_hp ?? '-' }}</td>
-                            <td>
-                                {{-- TOMBOL UPDATE: tidak pakai form, cukup buka modal --}}
-                                <button type="button"
-                                        class="btn btn-warning btn-sm"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#editModal{{ $p->id }}">
-                                    <i class="bi bi-pencil-square"></i> Update
-                                </button>
+                            @php
+    $aktif = strtolower($p->status) == 'aktif';
+@endphp
 
-                                {{-- FORM DELETE: berdiri sendiri, tidak bersarang --}}
-                                <form action="{{ url('/pelanggan/'.$p->id) }}"
-                                      method="POST"
-                                      style="display:inline-block;"
-                                      onsubmit="return confirm('Yakin hapus data ini?')">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-danger btn-sm">
-                                        <i class="bi bi-trash"></i> Delete
-                                    </button>
-                                </form>
-                            </td>
+<td>
+    <span class="badge rounded-pill {{ $aktif ? 'bg-success' : 'bg-danger' }}">
+        <i class="bi bi-{{ $aktif ? 'check' : 'x' }}-circle-fill"></i>
+        {{ $aktif ? 'Aktif' : 'Nonaktif' }}
+    </span>
+</td>
+                            <td class="text-center">
+    <div class="d-flex justify-content-center gap-2 flex-wrap">
+
+        <button type="button"
+                class="btn btn-warning btn-sm px-3"
+                data-bs-toggle="modal"
+                data-bs-target="#editModal{{ $p->id }}"
+                title="Update">
+            <i class="bi bi-pencil-square"></i>
+        </button>
+
+        <form action="{{ url('/pelanggan/'.$p->id) }}"
+              method="POST"
+              style="display:inline-block;"
+              onsubmit="return confirm('Yakin hapus data ini?')">
+            @csrf
+            @method('DELETE')
+
+            <button type="submit"
+                    class="btn btn-danger btn-sm px-3"
+                    title="Delete">
+                <i class="bi bi-trash"></i>
+            </button>
+        </form>
+
+    </div>
+</td>
                         </tr>
                         @endforeach
                     </tbody>
@@ -193,9 +225,24 @@
                         </div>
 
                         <div class="col-md-6">
+                            <label class="form-label">NIK</label>
+                            <input type="text" name="nik" class="form-control"
+                                   value="{{ $p->nik }}" maxlength="16"
+                                   placeholder="16 digit NIK">
+                        </div>
+
+                        <div class="col-md-6">
                             <label class="form-label">No Telepon</label>
                             <input type="text" name="no_hp" class="form-control"
                                    value="{{ $p->no_hp }}">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Status</label>
+                            <select name="status" class="form-select" required>
+                                <option value="aktif"    {{ $p->status == 'aktif'    ? 'selected' : '' }}>Aktif</option>
+                                <option value="nonaktif" {{ $p->status == 'nonaktif' ? 'selected' : '' }}>Non-Aktif</option>
+                            </select>
                         </div>
 
                         <div class="col-md-6">

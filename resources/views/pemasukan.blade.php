@@ -190,9 +190,18 @@ body {
             <i class="bi bi-wifi"></i> Data Layanan
         </a>
 
-        <a href="{{ url('/instalasi') }}" class="menu-item">
-            <i class="bi bi-router"></i> Instalasi Baru
-        </a>
+                @php
+    $instalasiUrl = match(Auth::user()->role) {
+        'cs'    => '/instalasi',
+        'admin' => '/approve',
+        'noc'   => '/instalasi-noc',
+        default => '/instalasi'
+    };
+@endphp
+
+<a href="{{ url($instalasiUrl) }}" class="menu-item">
+    <i class="bi bi-router"></i> Instalasi Baru
+</a>
 
         @if(Auth::user()->role == 'admin')
         <a href="{{ url('/pemasukan') }}" class="menu-item active">
