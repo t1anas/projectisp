@@ -8,7 +8,6 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-
     <link rel="stylesheet" href="{{ asset('inputform.css') }}">
 </head>
 <body>
@@ -30,18 +29,20 @@
         <a href="{{ url('/layanan') }}" class="menu-item">
             <i class="bi bi-wifi"></i> Data Layanan
         </a>
-        @php
-    $instalasiUrl = match(Auth::user()->role) {
-        'cs'    => '/instalasi',
-        'admin' => '/approve',
-        'noc'   => '/instalasi-noc',
-        default => '/instalasi'
-    };
-@endphp
 
-<a href="{{ url($instalasiUrl) }}" class="menu-item">
-    <i class="bi bi-router"></i> Instalasi Baru
-</a>
+        @php
+            $instalasiUrl = match(Auth::user()->role) {
+                'cs'    => '/instalasi',
+                'admin' => '/approve',
+                'noc'   => '/instalasi-noc',
+                default => '/instalasi'
+            };
+        @endphp
+
+        <a href="{{ url($instalasiUrl) }}" class="menu-item">
+            <i class="bi bi-router"></i> Instalasi Baru
+        </a>
+
         @if(Auth::user()->role == 'admin')
         <a href="{{ url('/pemasukan') }}" class="menu-item">
             <i class="bi bi-wallet2"></i> Pemasukan
@@ -114,74 +115,71 @@
                 </a>
             </div>
 
-            <!-- TABLE -->
-            <div class="table-responsive px-3 pb-4">
-                <table class="table table-bordered align-middle">
-                    <thead class="table-light text-center fw-bold">
-                        <tr>
-                            <th>No</th>
-                            <th>Tgl Aktivasi</th>
-                            <th>Nama</th>
-                            <th>NIK</th>
-                            <th>Site</th>
-                            <th>Layanan</th>
-                            <th>No. Telepon</th>
-                            <th>Status</th>
-                            <th>Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody class="text-center">
-                        @foreach($pelanggan as $index => $p)
-                        <tr>
-                            <td>{{ $index + 1 }}</td>
-                            <td>{{ \Carbon\Carbon::parse($p->created_at)->format('d/m/Y') }}</td>
-                            <td class="text-start">{{ $p->nama }}</td>
-                            <td>{{ $p->nik ?? '-' }}</td>
-                            <td>{{ $p->site->nama_site ?? '-' }}</td>
-                            <td>{{ $p->layanan->nama_paket ?? '-' }}</td>
-                            <td>{{ $p->no_hp ?? '-' }}</td>
-                            @php
-    $aktif = strtolower($p->status) == 'aktif';
-@endphp
+<!-- TABLE - VERSION 1: Menggunakan Bootstrap class -->
+<div class="table-responsive" style="margin: 0 0 20px; padding: 0 20px;">
+    <table class="table table-bordered align-middle custom-table" style="margin:0; min-width:1400px;">
+        <thead class="table-light text-center fw-bold">
+            <tr>
+                <th>No</th>
+                <th>Tgl Aktivasi</th>
+                <th>Nama</th>
+                <th>NIK</th>
+                <th>Site</th>
+                <th>Layanan</th>
+                <th>No. Telepon</th>
+                <th>Status</th>
+                <th>Aksi</th>
+            </tr>
+        </thead>
+        <tbody class="text-center">
+            @foreach($pelanggan as $index => $p)
+            <tr>
+                <td>{{ $index + 1 }}</td>
+                <td>{{ \Carbon\Carbon::parse($p->created_at)->format('d/m/Y') }}</td>
+                <td class="text-start">{{ $p->nama }}</td>
+                <td>{{ $p->nik ?? '-' }}</td>
+                <td>{{ $p->site->nama_site ?? '-' }}</td>
+                <td>{{ $p->layanan->nama_paket ?? '-' }}</td>
+                <td>{{ $p->no_hp ?? '-' }}</td>
+                
+                @php $aktif = strtolower($p->status) == 'aktif'; @endphp
+                
+                <td>
+                    <span class="badge rounded-pill {{ $aktif ? 'bg-success' : 'bg-danger' }}">
+                        <i class="bi bi-{{ $aktif ? 'check' : 'x' }}-circle-fill"></i>
+                        {{ $aktif ? 'Aktif' : 'Nonaktif' }}
+                    </span>
+                </td>
+                
+                <td class="text-center">
+                    <div class="d-flex justify-content-center gap-2 flex-wrap">
+                        <button type="button"
+                                class="btn btn-warning btn-sm px-3"
+                                data-bs-toggle="modal"
+                                data-bs-target="#editModal{{ $p->id }}"
+                                title="Update">
+                            <i class="bi bi-pencil-square"></i>
+                        </button>
 
-<td>
-    <span class="badge rounded-pill {{ $aktif ? 'bg-success' : 'bg-danger' }}">
-        <i class="bi bi-{{ $aktif ? 'check' : 'x' }}-circle-fill"></i>
-        {{ $aktif ? 'Aktif' : 'Nonaktif' }}
-    </span>
-</td>
-                            <td class="text-center">
-    <div class="d-flex justify-content-center gap-2 flex-wrap">
-
-        <button type="button"
-                class="btn btn-warning btn-sm px-3"
-                data-bs-toggle="modal"
-                data-bs-target="#editModal{{ $p->id }}"
-                title="Update">
-            <i class="bi bi-pencil-square"></i>
-        </button>
-
-        <form action="{{ url('/pelanggan/'.$p->id) }}"
-              method="POST"
-              style="display:inline-block;"
-              onsubmit="return confirm('Yakin hapus data ini?')">
-            @csrf
-            @method('DELETE')
-
-            <button type="submit"
-                    class="btn btn-danger btn-sm px-3"
-                    title="Delete">
-                <i class="bi bi-trash"></i>
-            </button>
-        </form>
-
-    </div>
-</td>
-                        </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
+                        <form action="{{ url('/pelanggan/'.$p->id) }}"
+                              method="POST"
+                              style="display:inline-block;"
+                              onsubmit="return confirm('Yakin hapus data ini?')">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit"
+                                    class="btn btn-danger btn-sm px-3"
+                                    title="Delete">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+            @endforeach
+        </tbody>
+    </table>
+</div>
             <!-- END TABLE -->
 
         </div>
@@ -196,8 +194,6 @@
 
 {{-- =============================================
      MODAL UPDATE
-     Wajib di luar wrapper agar tidak ada
-     form bersarang (form dalam form)
      ============================================= --}}
 @foreach($pelanggan as $p)
 <div class="modal fade" id="editModal{{ $p->id }}" tabindex="-1" aria-hidden="true">

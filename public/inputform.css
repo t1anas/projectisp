@@ -365,3 +365,72 @@ textarea.form-control {
     transform: translateY(-1px);
     box-shadow: 0 6px 18px rgba(9,151,59,0.35);
 }
+
+.custom-table{
+    min-width:1400px;
+}
+
+.custom-table th,
+.custom-table td{
+    white-space:nowrap;
+}
+
+/* ─── SCROLLBAR TABEL ─── */
+/* ─── SCROLLBAR TABEL ─── */
+.custom-scroll {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Hapus custom-scroll dari div luar, langsung ke tabel */
+.table-responsive {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.table-responsive::-webkit-scrollbar {
+    height: 8px;
+}
+
+.table-responsive::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb {
+    background: #09973B;
+    border-radius: 10px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb:hover {
+    background: #0ab844;
+}
+
+/* Atau gunakan class ini untuk container tabel */
+.table-wrapper {
+    position: relative;
+    width: 100%;
+    overflow-x: auto;
+    margin: 0 0 20px;
+    padding: 0 20px;
+}
+
+.table-wrapper::-webkit-scrollbar {
+    height: 8px;
+}
+
+.table-wrapper::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+.table-wrapper::-webkit-scrollbar-thumb {
+    background: #09973B;
+    border-radius: 10px;
+}
+
+.table-wrapper::-webkit-scrollbar-thumb:hover {
+    background: #0ab844;
+}
