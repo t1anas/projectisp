@@ -21,6 +21,16 @@ body {
     vertical-align: middle;
 }
 
+.clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    max-width: 200px;
+    line-height: 1.45;
+    word-break: break-word;
+}
+
 .status-pill {
     display: inline-flex;
     align-items: center;
@@ -229,18 +239,18 @@ body {
             <i class="bi bi-wifi"></i> Data Layanan
         </a>
 
-                @php
-    $instalasiUrl = match(Auth::user()->role) {
-        'cs'    => '/instalasi',
-        'admin' => '/approve',
-        'noc'   => '/instalasi-noc',
-        default => '/instalasi'
-    };
-@endphp
+        @php
+            $instalasiUrl = match(Auth::user()->role) {
+                'cs'    => '/instalasi',
+                'admin' => '/approve',
+                'noc'   => '/instalasi-noc',
+                default => '/instalasi'
+            };
+        @endphp
 
-<a href="{{ url($instalasiUrl) }}" class="menu-item">
-    <i class="bi bi-router"></i> Instalasi Baru
-</a>
+        <a href="{{ url($instalasiUrl) }}" class="menu-item">
+            <i class="bi bi-router"></i> Instalasi Baru
+        </a>
 
         @if(Auth::user()->role == 'admin')
         <a href="{{ url('/pemasukan') }}" class="menu-item">
@@ -308,111 +318,113 @@ body {
                 </div>
             </div>
 
-{{-- FILTER --}}
-<div style="padding:20px; border-bottom:1px solid #eee;">
-    <div class="row g-3 align-items-end">
+            {{-- FILTER --}}
+            <div style="padding:20px; border-bottom:1px solid #eee;">
+                <div class="row g-3 align-items-end">
 
-        <div class="col-md-auto">
-            <form method="POST" action="{{ route('pelanggan.generateTagihan') }}" style="margin:0;">
-                @csrf
-                <input type="hidden" name="pelanggan_id" id="selectedPelangganId">
-                <button type="submit" class="btn btn-success px-2" title="Generate Tagihan">
-                    <i class="bi bi-plus-lg me-1"></i> Generate Tagihan
-                </button>
-            </form>
-        </div>
+                    <div class="col-md-auto">
+                        <form method="POST" action="{{ route('pelanggan.generateTagihan') }}" style="margin:0;">
+                            @csrf
+                            <input type="hidden" name="pelanggan_id" id="selectedPelangganId">
+                            <button type="submit" class="btn btn-success px-2" title="Generate Tagihan">
+                                <i class="bi bi-plus-lg me-1"></i> Generate Tagihan
+                            </button>
+                        </form>
+                    </div>
 
-        <div class="col-md-3">
-            <input type="text" class="form-control" placeholder="Cari pelanggan...">
-        </div>
+                    <div class="col-md-3">
+                        <input type="text" class="form-control" placeholder="Cari pelanggan...">
+                    </div>
 
-        <div class="col-md-2">
-            <select class="form-select">
-                <option>Semua Status</option>
-                <option>AKTIF</option>
-                <option>NONAKTIF</option>
-            </select>
-        </div>
+                    <div class="col-md-2">
+                        <select class="form-select">
+                            <option>Semua Status</option>
+                            <option>AKTIF</option>
+                            <option>NONAKTIF</option>
+                        </select>
+                    </div>
 
-        <div class="col-md-2">
-            <input type="date" class="form-control">
-        </div>
+                    <div class="col-md-2">
+                        <input type="date" class="form-control">
+                    </div>
 
-        <div class="col-md-2">
-            <input type="date" class="form-control">
-        </div>
+                    <div class="col-md-2">
+                        <input type="date" class="form-control">
+                    </div>
 
-        <div class="col-md-1">
-            <button class="btn btn-success w-100">
-                <i class="bi bi-search"></i>
-            </button>
-        </div>
+                    <div class="col-md-1">
+                        <button class="btn btn-success w-100">
+                            <i class="bi bi-search"></i>
+                        </button>
+                    </div>
 
-    </div>
-</div>
+                </div>
+            </div>
 
             <!-- TABLE -->
             <div class="table-responsive px-3 pb-4">
                 <table class="table table-bordered table-hover align-middle">
 
-<thead class="table-light text-center fw-bold">
-    <tr>
-        <th style="width:40px;">
-            <input type="checkbox" id="checkAll"
-                   style="width:16px; height:16px; cursor:pointer;"
-                   onchange="toggleAll(this)">
-        </th>
-        <th>No</th>
-        <th>Aktivasi</th>
-        <th>Nama</th>
-        <th>Tagihan</th>
-        <th>Paket</th>
-        <th>Status</th>
-        <th>Aksi</th>
-    </tr>
-</thead>
+                    <thead class="table-light text-center fw-bold">
+                        <tr>
+                            <th style="width:40px;">
+                                <input type="checkbox" id="checkAll"
+                                       style="width:16px; height:16px; cursor:pointer;"
+                                       onchange="toggleAll(this)">
+                            </th>
+                            <th>No</th>
+                            <th>Aktivasi</th>
+                            <th>Nama</th>
+                            <th>Tagihan</th>
+                            <th>Paket</th>
+                            <th>Status</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
 
-<tbody class="text-center">
-    @foreach($pelanggan as $p)
-    <tr>
-        <td>
-            <input type="checkbox" name="pelanggan_ids[]"
-                   value="{{ $p->id }}"
-                   class="row-check"
-                   style="width:16px; height:16px; cursor:pointer;"
-                   onchange="updateSelected()">
-        </td>
-        <td>{{ $loop->iteration }}</td>
-        <td>{{ $p->created_at->format('d/m/Y') }}</td>
-        <td class="text-start">{{ $p->nama }}</td>
-        <td class="text-start">Rp {{ number_format($p->layanan->harga ?? 0, 0, ',', '.') }}</td>
-        <td>{{ $p->layanan->nama_paket ?? '-' }}</td>
-        <td>
-            @if(strtolower($p->status) == 'aktif')
-                <span class="status-pill status-active">
-                    <i class="bi bi-check-circle-fill"></i> Aktif
-                </span>
-            @else
-                <span class="status-pill status-nonactive">
-                    <i class="bi bi-x-circle-fill"></i> Nonaktif
-                </span>
-            @endif
-        </td>
-        <td>
-            <div class="action-group">
-                <a href="{{ route('layanan.detail', $p->id) }}" class="action-modern btn-detail">
-                    <i class="bi bi-eye-fill"></i>
-                </a>
-                <button class="action-modern btn-reminder" title="Reminder"
-                        data-bs-toggle="modal"
-                        data-bs-target="#modalNotif{{ $p->id }}">
-                    <i class="bi bi-bell-fill"></i>
-                </button>
-            </div>
-        </td>
-    </tr>
-    @endforeach
-</tbody>
+                    <tbody class="text-center">
+                        @foreach($pelanggan as $p)
+                        <tr>
+                            <td>
+                                <input type="checkbox" name="pelanggan_ids[]"
+                                       value="{{ $p->id }}"
+                                       class="row-check"
+                                       style="width:16px; height:16px; cursor:pointer;"
+                                       onchange="updateSelected()">
+                            </td>
+                            <td>{{ $loop->iteration }}</td>
+                            <td>{{ $p->created_at->format('d/m/Y') }}</td>
+                            <td class="text-start">
+                                <div class="clamp-2">{{ $p->nama }}</div>
+                            </td>
+                            <td class="text-start">Rp {{ number_format($p->layanan->harga ?? 0, 0, ',', '.') }}</td>
+                            <td>{{ $p->layanan->nama_paket ?? '-' }}</td>
+                            <td>
+                                @if(strtolower($p->status) == 'aktif')
+                                    <span class="status-pill status-active">
+                                        <i class="bi bi-check-circle-fill"></i> Aktif
+                                    </span>
+                                @else
+                                    <span class="status-pill status-nonactive">
+                                        <i class="bi bi-x-circle-fill"></i> Nonaktif
+                                    </span>
+                                @endif
+                            </td>
+                            <td>
+                                <div class="action-group">
+                                    <a href="{{ route('layanan.detail', $p->id) }}" class="action-modern btn-detail">
+                                        <i class="bi bi-eye-fill"></i>
+                                    </a>
+                                    <button class="action-modern btn-reminder" title="Reminder"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#modalNotif{{ $p->id }}">
+                                        <i class="bi bi-bell-fill"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        @endforeach
+                    </tbody>
 
                 </table>
             </div>
@@ -442,8 +454,7 @@ body {
                     <div class="notif-label">Tagihan Internet Bulanan</div>
                     <div class="notif-text">
                         Nama Pelanggan : {{ $p->nama }}<br>
-                        @php $periodeTagihan = \Carbon\Carbon::parse($p->created_at)->subDay(); 
-                        @endphp
+                        @php $periodeTagihan = \Carbon\Carbon::parse($p->created_at)->subDay(); @endphp
                         Periode Tagihan : {{ $periodeTagihan->translatedFormat('F Y') }}
                     </div>
                 </div>
@@ -481,65 +492,54 @@ body {
     </div>
 </div>
 @endforeach
+
 @foreach($tagihan as $t)
 <div class="modal fade" id="editTagihan{{ $t->id }}" tabindex="-1">
-<div class="modal-dialog">
-<div class="modal-content">
+    <div class="modal-dialog">
+        <div class="modal-content">
 
-<form action="{{ url('/tagihan/'.$t->id) }}" method="POST">
-@csrf
-@method('PUT')
+            <form action="{{ url('/tagihan/'.$t->id) }}" method="POST">
+                @csrf
+                @method('PUT')
 
-<div class="modal-header bg-warning">
-<h5 class="modal-title">Edit Tagihan</h5>
-<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-</div>
+                <div class="modal-header bg-warning">
+                    <h5 class="modal-title">Edit Tagihan</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
 
-<div class="modal-body">
+                <div class="modal-body">
 
-<div class="mb-3">
-<label>Periode</label>
-<input type="text" name="periode"
-class="form-control"
-value="{{ $t->periode }}">
-</div>
+                    <div class="mb-3">
+                        <label>Periode</label>
+                        <input type="text" name="periode" class="form-control" value="{{ $t->periode }}">
+                    </div>
 
-<div class="mb-3">
-<label>Jumlah</label>
-<input type="number" name="jumlah"
-class="form-control"
-value="{{ $t->jumlah }}">
-</div>
+                    <div class="mb-3">
+                        <label>Jumlah</label>
+                        <input type="number" name="jumlah" class="form-control" value="{{ $t->jumlah }}">
+                    </div>
 
-<div class="mb-3">
-<label>Status</label>
-<select name="status" class="form-control">
-<option value="Belum Bayar"
-{{ $t->status=='Belum Bayar' ? 'selected' : '' }}>
-Belum Bayar
-</option>
+                    <div class="mb-3">
+                        <label>Status</label>
+                        <select name="status" class="form-control">
+                            <option value="Belum Bayar" {{ $t->status == 'Belum Bayar' ? 'selected' : '' }}>Belum Bayar</option>
+                            <option value="Lunas"       {{ $t->status == 'Lunas'       ? 'selected' : '' }}>Lunas</option>
+                        </select>
+                    </div>
 
-<option value="Lunas"
-{{ $t->status=='Lunas' ? 'selected' : '' }}>
-Lunas
-</option>
-</select>
-</div>
+                </div>
 
-</div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success">Simpan</button>
+                </div>
 
-<div class="modal-footer">
-<button type="submit" class="btn btn-success">
-Simpan
-</button>
-</div>
+            </form>
 
-</form>
-
-</div>
-</div>
+        </div>
+    </div>
 </div>
 @endforeach
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

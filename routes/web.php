@@ -10,6 +10,7 @@ use App\Http\Controllers\LayananController;
 use App\Http\Controllers\TagihanController;
 use App\Http\Controllers\KwitansiController;
 use App\Http\Controllers\ApprovePelangganController;
+use App\Http\Controllers\PelangganDetailController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -28,67 +29,77 @@ Route::get('/home', fn() => redirect('/admin'));
 
 /*
 |--------------------------------------------------------------------------
-| Authenticated Routes
+| Auth Routes
 |--------------------------------------------------------------------------
 */
 Route::middleware('auth')->group(function () {
 
-    /*--- LOGOUT ---*/
+    /* LOGOUT */
     Route::post('/logout', [SesiController::class, 'logout'])->name('logout');
 
-    /*--- DASHBOARD ---*/
-    Route::get('/admin',       [AdminController::class, 'index']    )->middleware('userakses:admin');
-    Route::get('/admin/noc',   [AdminController::class, 'noc']      )->middleware('userakses:noc');
-    Route::get('/admin/admin', [AdminController::class, 'admin']    )->middleware('userakses:admin');
-    Route::get('/cs/cs',       [CSController::class,   'dashboard'] )->middleware('userakses:cs');
+    /* DASHBOARD */
+    Route::get('/admin',       [AdminController::class, 'index'])->middleware('userakses:admin');
+    Route::get('/admin/noc',   [AdminController::class, 'noc'])->middleware('userakses:noc');
+    Route::get('/admin/admin', [AdminController::class, 'admin'])->middleware('userakses:admin');
+    Route::get('/cs/cs',       [CSController::class, 'dashboard'])->middleware('userakses:cs');
 
-    /*--- PEMASUKAN ---*/
+    /* PEMASUKAN */
     Route::get('/pemasukan', [PemasukanController::class, 'menu'])
         ->middleware('userakses:admin')
         ->name('pemasukan');
 
-    /*--- PEMBAYARAN ---*/
+    /* PEMBAYARAN */
     Route::prefix('pembayaran')->group(function () {
-        Route::get('/',          [PemasukanController::class, 'index']  )->name('pembayaran');
-        Route::post('/store',    [PemasukanController::class, 'store']  )->name('pembayaran.store');
-        Route::get('/{id}/edit', [PemasukanController::class, 'edit']   )->name('pembayaran.edit');
-        Route::put('/{id}',      [PemasukanController::class, 'update'] )->name('pembayaran.update');
+        Route::get('/',          [PemasukanController::class, 'index'])->name('pembayaran');
+        Route::post('/store',    [PemasukanController::class, 'store'])->name('pembayaran.store');
+        Route::get('/{id}/edit', [PemasukanController::class, 'edit'])->name('pembayaran.edit');
+        Route::put('/{id}',      [PemasukanController::class, 'update'])->name('pembayaran.update');
         Route::delete('/{id}',   [PemasukanController::class, 'destroy'])->name('pembayaran.destroy');
     });
 
-    /*--- CS ---*/
+    /* CS */
     Route::middleware('userakses:cs')->prefix('cs')->group(function () {
-        Route::get('/scan',              fn() => view('scan_cs'));
+        Route::get('/scan', fn() => view('scan_cs'));
         Route::post('/pembayaran/store', [PemasukanController::class, 'store']);
     });
 
-    /*--- PELANGGAN ---*/
+    /* PELANGGAN */
     Route::prefix('pelanggan')->group(function () {
         Route::get('/',                  [PelangganController::class, 'index']);
-        Route::get('/{id}',              [PelangganController::class, 'show']);
         Route::post('/store',            [PelangganController::class, 'store']);
         Route::put('/{id}',              [PelangganController::class, 'update']);
         Route::delete('/{id}',           [PelangganController::class, 'destroy']);
         Route::post('/generate-tagihan', [PelangganController::class, 'generateTagihan'])
             ->name('pelanggan.generateTagihan');
+
+        /* DETAIL PELANGGAN (DIAMANKAN DI DALAM PREFIX) */
+        Route::get('/detail/{id}', [PelangganDetailController::class, 'show']);
     });
 
     Route::get('/instalasi', [PelangganController::class, 'create']);
 
-    /*--- LAYANAN ---*/
+    /* LAYANAN */
     Route::resource('layanan', LayananController::class);
-    Route::get('/layanan/{id}/detail', [DetailController::class, 'index'])->name('layanan.detail');
+    Route::get('/layanan/{id}/detail', [DetailController::class, 'index'])
+        ->name('layanan.detail');
 
-    /*--- TAGIHAN ---*/
+    /* TAGIHAN */
     Route::resource('tagihan', TagihanController::class);
-Route::post('/tagihan/{id}/bayar', [TagihanController::class, 'bayar'])->name('tagihan.bayar');
-Route::get('/tagihan/{id}/kwitansi', [KwitansiController::class, 'cetak'])->name('kwitansi');
-
+    Route::post('/tagihan/{id}/bayar', [TagihanController::class, 'bayar'])
+        ->name('tagihan.bayar');
+    Route::get('/tagihan/{id}/kwitansi', [KwitansiController::class, 'cetak'])
+        ->name('kwitansi');
 });
+
+/* BAYAR LAYANAN */
 Route::post('/layanan/{id}/bayar', [DetailController::class, 'bayar'])
     ->name('detail.bayar');
 
-/*--- APPROVE PELANGGAN ---*/
+/*
+|--------------------------------------------------------------------------
+| APPROVE PELANGGAN (ADMIN ONLY)
+|--------------------------------------------------------------------------
+*/
 Route::middleware('userakses:admin')->prefix('approve')->group(function () {
 
     Route::get('/', [ApprovePelangganController::class, 'index']);
@@ -98,4 +109,5 @@ Route::middleware('userakses:admin')->prefix('approve')->group(function () {
     Route::post('/bulk-approve', [ApprovePelangganController::class, 'bulkApprove']);
     Route::post('/bulk-reject',  [ApprovePelangganController::class, 'bulkReject']);
 
+    Route::get('/pelanggan/{id}', [PelangganController::class, 'show']);
 });

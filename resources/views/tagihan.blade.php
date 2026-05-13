@@ -9,13 +9,14 @@
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="{{ asset('inputform.css') }}">
 <style>
+
 .date-pill {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    padding: 6px 12px;
+    padding: 4px 10px;
     border-radius: 50px;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 600;
     background: #eef2ff;
     color: #0c0b28;
@@ -33,8 +34,11 @@
 }
 body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f4f6f9; }
 .table td, .table th { vertical-align: middle; }
-.status-pill { display: inline-flex; align-items: center; gap: 7px; padding: 7px 14px; border-radius: 50px; font-size: 12px; font-weight: 700; border: 1px solid transparent; }
-.status-pill i { font-size: 10px; }
+        .status-pill {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 4px 10px; border-radius: 50px;
+            font-size: 11px; font-weight: 700; border: 1px solid transparent;
+        }.status-pill i { font-size: 10px; }
 .status-lunas { background: linear-gradient(135deg, #e8fff1, #d8ffe8); color: #0f9d58; border-color: #b7f3cd; }
 .status-belum { background: linear-gradient(135deg, #fff1f1, #ffe1e1); color: #dc3545; border-color: #ffc4c4; }
 .action-group { display: flex; align-items: center; gap: 8px; justify-content: center; }
@@ -48,6 +52,7 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f4f6f9; }
 .btn-hapus { background: linear-gradient(135deg, #fff1f1, #ffe1e1); color: #dc3545; }
 .btn-hapus:hover { background: #dc3545; color: #fff; }
 .filter-box { padding: 20px; border-bottom: 1px solid #eee; }
+
 </style>
 </head>
 <body>
@@ -178,7 +183,7 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f4f6f9; }
                         <tr>
                             <th>No</th>
                             <th>Tanggal</th>
-                            <th>Pelanggan</th>
+                            <th style="min-width:180px;">Nama</th>
                             <th>Jenis Tagihan</th>
                             <th>Layanan</th>
                             <th>Total</th>
@@ -196,7 +201,8 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f4f6f9; }
                                     {{ \Carbon\Carbon::parse($t->tanggal)->translatedFormat('d M Y') }}
                                 </span>
                             </td>
-                            <td class="text-start">{{ $t->pelanggan->nama ?? '-' }}</td>
+                            <td class="text-start" style="min-width:180px;">
+                                <div class="clamp-2">{{ $t->pelanggan->nama ?? '-' }}</div></td>
                             <td>{{ $t->jenis_tagihan ?? '-' }}</td>
                             <td>{{ optional($t->layanan)->nama_paket ?? '-' }}</td>
                             <td class="text-start fw-semibold">Rp {{ number_format($t->total, 0, ',', '.') }}</td>
