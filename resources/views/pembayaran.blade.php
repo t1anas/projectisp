@@ -259,7 +259,6 @@ body{
             </div>
         </form>
 
-        <!-- Tombol tambah bayar dan export data -->
         <div style="padding:20px 20px 15px;">
 
             <button type="button" class="btn btn-success btn-sm"
@@ -274,7 +273,6 @@ body{
 
         </div>
 
-        <!-- TABEL -->
         <div class="table-responsive px-3 pb-4">
 
             <table class="table table-bordered table-hover align-middle">
@@ -391,9 +389,6 @@ body{
 </div>
 </div>
 
-<!-- ============================================================
-     MODAL TAMBAH PEMBAYARAN
-     ============================================================ -->
 <div class="modal fade" id="modalPembayaran" tabindex="-1">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
@@ -429,7 +424,6 @@ body{
                             </select>
                         </div>
 
-                        {{-- Tanggal Bayar (default hari ini) --}}
                         <div class="col-md-6">
                             <label class="form-label fw-semibold">Tanggal Bayar</label>
                             <input type="date" name="tanggal_bayar" id="tanggal_bayar"
@@ -437,7 +431,6 @@ body{
                                    value="{{ date('Y-m-d') }}">
                         </div>
 
-                        {{-- Paket (readonly, auto-fill) --}}
                         <div class="col-md-6">
                             <label class="form-label fw-semibold">Paket</label>
                             <input type="hidden" name="layanan_id" id="layanan_id">
@@ -445,7 +438,6 @@ body{
                                    placeholder="Otomatis terisi saat pilih pelanggan">
                         </div>
 
-                        {{-- Jumlah Bayar (readonly, auto-fill dari tagihan dipilih) --}}
                         <div class="col-md-6">
                             <label class="form-label fw-semibold">Jumlah Bayar</label>
                             <div class="input-group">
@@ -456,7 +448,6 @@ body{
                             </div>
                         </div>
 
-                        {{-- Pilih Tagihan --}}
                         <div class="col-12">
                             <label class="form-label fw-semibold">
                                 Pilih Tagihan
@@ -464,7 +455,6 @@ body{
                             </label>
                             <input type="hidden" name="tagihan_id" id="tagihan_id">
 
-                            {{-- Placeholder sebelum pilih pelanggan --}}
                             <div id="tagihan_placeholder"
                                  style="border:2px dashed #cbd5e1; border-radius:12px;
                                         padding:20px; text-align:center; color:#94a3b8;">
@@ -472,10 +462,8 @@ body{
                                 Pilih pelanggan terlebih dahulu untuk melihat daftar tagihan
                             </div>
 
-                            {{-- List kartu tagihan --}}
                             <div id="tagihan_list" class="row g-2" style="display:none;"></div>
 
-                            {{-- Tidak ada tagihan --}}
                             <div id="tagihan_empty"
                                  style="display:none; border:2px dashed #fca5a5; border-radius:12px;
                                         padding:20px; text-align:center; color:#ef4444;">
@@ -484,7 +472,6 @@ body{
                             </div>
                         </div>
 
-                        {{-- Metode --}}
                         <div class="col-md-6">
                             <label class="form-label fw-semibold">Metode Pembayaran</label>
                             <select name="metode_id" class="form-select" required>
@@ -495,7 +482,6 @@ body{
                             </select>
                         </div>
 
-                        {{-- Status --}}
                         <div class="col-md-6">
                             <label class="form-label fw-semibold">Status</label>
                             <select name="status" class="form-select">
@@ -519,9 +505,6 @@ body{
     </div>
 </div>
 
-<!-- ============================================================
-     MODAL EDIT PEMBAYARAN
-     ============================================================ -->
 <div class="modal fade" id="modalEditPembayaran" tabindex="-1">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
@@ -597,9 +580,6 @@ body{
 <script>
 document.addEventListener('DOMContentLoaded', function () {
 
-    // ============================================================
-    // MODAL TAMBAH — Pilih Pelanggan → render kartu tagihan
-    // ============================================================
     const selPelanggan   = document.getElementById('pelanggan');
     const tagihanList    = document.getElementById('tagihan_list');
     const tagihanPH      = document.getElementById('tagihan_placeholder');
@@ -616,17 +596,14 @@ document.addEventListener('DOMContentLoaded', function () {
             try { tagihans = JSON.parse(opt.getAttribute('data-tagihan') || '[]'); }
             catch(e) { tagihans = []; }
 
-            // isi paket & layanan
             document.getElementById('layanan_id').value  = layanan;
             document.getElementById('paket_view').value  = paket;
 
-            // reset tagihan
             document.getElementById('tagihan_id').value    = '';
             document.getElementById('jumlah_bayar').value  = '';
             tagihanList.innerHTML = '';
 
             if (!this.value) {
-                // belum pilih pelanggan
                 tagihanPH.style.display    = '';
                 tagihanList.style.display  = 'none';
                 tagihanEmpty.style.display = 'none';
@@ -644,7 +621,6 @@ document.addEventListener('DOMContentLoaded', function () {
             tagihanList.style.display  = '';
             tagihanEmpty.style.display = 'none';
 
-            // render kartu per tagihan
             tagihans.forEach(function(t) {
                 const col = document.createElement('div');
                 col.className = 'col-12 col-md-6';
@@ -666,9 +642,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         <i class="bi bi-check-circle-fill tag-check"></i>
                     </div>`;
 
-                // klik kartu → pilih
                 col.querySelector('.tagihan-card').addEventListener('click', function () {
-                    // hapus selected dari semua kartu
                     document.querySelectorAll('.tagihan-card').forEach(c => c.classList.remove('selected'));
                     this.classList.add('selected');
 
@@ -681,9 +655,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // ============================================================
-    // Reset modal tambah saat ditutup
-    // ============================================================
     const modalTambah = document.getElementById('modalPembayaran');
     if (modalTambah) {
         modalTambah.addEventListener('hidden.bs.modal', function () {
@@ -696,14 +667,10 @@ document.addEventListener('DOMContentLoaded', function () {
             tagihanList.style.display  = 'none';
             tagihanEmpty.style.display = 'none';
             tagihanPH.style.display    = '';
-            // kembalikan default tanggal ke hari ini
             document.getElementById('tanggal_bayar').value = new Date().toISOString().split('T')[0];
         });
     }
 
-    // ============================================================
-    // MODAL EDIT — isi field dari data-* tombol
-    // ============================================================
     const modalEdit = document.getElementById('modalEditPembayaran');
     if (modalEdit) {
         modalEdit.addEventListener('show.bs.modal', function (e) {

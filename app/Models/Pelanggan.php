@@ -12,15 +12,23 @@ class Pelanggan extends Model
     protected $fillable = [
         'kode_pelanggan',
         'nama',
+        'status',
         'alamat',
         'no_hp',
         'site_id',
         'layanan_id',
         'nik',
-        'lokasi_link'
+        'lokasi_link',
+        'qr_code',
+        'nama_layanan',
+        'catatan_noc',
+        'approved_by',
+        'approved_at',
+        'approved_noc_by',
+        'approved_noc_at',
+        'created_by',
     ];
 
-    // Relasi
     public function tagihan()
     {
         return $this->hasMany(Tagihan::class, 'pelanggan_id');

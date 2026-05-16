@@ -16,7 +16,6 @@ body {
     background: #f4f6f9;
 }
 
-/* ---- NAV BOX ---- */
 .nav-box-wrapper {
     display: flex;
     gap: 24px;

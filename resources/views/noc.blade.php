@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dashboard CS - Jagonet</title>
+<title>Dashboard NOC - Jagonet</title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
 <link rel="stylesheet" href="{{ asset('inputform.css') }}">
@@ -116,10 +116,10 @@
       <div class="stat-card">
         <div class="stat-icon red"><i class="bi bi-person-x-fill"></i></div>
         <div>
-          <div class="stat-label">Pelanggan Nonaktif</div>
+          <div class="stat-label">Pelanggan Isolir</div>
           <div class="stat-value">34</div>
         </div>
-        <span class="stat-badge down">Nonaktif</span>
+        <span class="stat-badge down">Isolir</span>
       </div>
       <div class="stat-card">
         <div class="stat-icon blue"><i class="bi bi-people-fill"></i></div>

@@ -13,7 +13,6 @@ class KwitansiController extends Controller
             'pembayaran.metode'
         ])->findOrFail($id);
 
-        // Pastikan status valid
         if (!in_array($tagihan->status, ['lunas', 'belum'])) {
             $tagihan->status = 'belum';
         }

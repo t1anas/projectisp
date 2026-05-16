@@ -6,85 +6,16 @@
     <title>Dashboard Jagonet</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ asset('inputform.css') }}">
+
     <style>
-        :root {
-            --jago-orange: #faf8f7;
-            --jago-orange-dark: #ffffff;
-            --jago-sidebar: linear-gradient(180deg, #09973B 0%, #FAE59E 100%);
-            --jago-sidebar-hover: rgba(192,96,26,0.15);
-            --jago-sidebar-active: rgba(192,96,26,0.25);
-        }
-
-        body { background: #f0f2f5; font-family: 'Segoe UI', sans-serif; margin: 0; min-height: 100vh; }
-
-        .sidebar {
-            width: 240px;
-            min-height: 100vh;
-            background: var(--jago-sidebar);
-            display: flex;
-            flex-direction: column;
-            position: fixed;
-            top: 0; left: 0; bottom: 0;
-            z-index: 100;
-        }
-
-        .sidebar-header {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 20px 20px 16px;
-            border-bottom: 1px solid rgba(255,255,255,0.08);
-        }
-
-        .logo-text { font-size: 20px; font-weight: 700; color: var(--jago-orange); letter-spacing: 2px; }
-        .hamburger { cursor: pointer; display: flex; flex-direction: column; gap: 4px; }
-        .hamburger span { width: 20px; height: 2px; background: white; border-radius: 2px; display: block; }
-
-        .section-label {
-            font-size: 10px; font-weight: 600; letter-spacing: 1.5px;
-            color: rgba(255,255,255,0.35); text-transform: uppercase;
-            padding: 16px 20px 6px;
-        }
-
-        .menu-item {
-            display: flex; align-items: center; gap: 12px;
-            padding: 11px 20px; color: rgba(255,255,255,0.7);
-            font-size: 13.5px; cursor: pointer;
-            transition: all 0.18s; margin: 2px 10px; border-radius: 8px;
-            text-decoration: none;
-        }
-        .menu-item:hover { background: var(--jago-sidebar-hover); color: white; }
-        .menu-item.active { background: var(--jago-sidebar-active); color: white; border-left: 3px solid var(--jago-orange); }
-        .menu-item i { font-size: 16px; width: 20px; flex-shrink: 0; }
-
-        .profile-section { margin-top: auto; padding: 16px 12px 12px; border-top: 1px solid rgba(255,255,255,0.08); }
-
-        .admin-card {
-            display: flex; align-items: center;
-            gap: 10px; padding: 10px; background: rgb(216, 138, 49);
-            border-radius: 10px; margin-bottom: 10px;
-            border: 1px solid #333;
-        }
-
-        .admin-avatar {
-            width: 36px; height: 36px; background: var(--jago-orange);
-            border-radius: 50%; color: #09973B;
-            display: flex; align-items: center; justify-content: center; flex-shrink: 0;
-        }
-
-        .admin-role { font-size: 10px; color: var(--jago-orange); font-weight: 700; letter-spacing: 1px; }
-        .admin-name { font-size: 13px; color: white; font-weight: 500; }
-
-        .logout-btn {
-            width: 100%; background: rgba(192,96,26,0.15);
-            border: 1px solid rgba(192,96,26,0.4); color: #e8855a;
-            font-size: 12px; font-weight: 600; letter-spacing: 1px;
-            padding: 8px; border-radius: 8px;
-            display: flex; align-items: center; justify-content: center; gap: 8px;
-            cursor: pointer; transition: all 0.18s;
-        }
-        .logout-btn:hover { background: rgba(192,96,26,0.3); color: white; }
-
+            :root {
+                --jago-orange: #faf8f7;
+                --jago-orange-dark: #ffffff;
+                --jago-sidebar: linear-gradient(180deg, #09973B 0%, #FAE59E 100%);
+                --jago-sidebar-hover: rgba(192,96,26,0.15);
+                --jago-sidebar-active: rgba(192,96,26,0.25);
+            }
         .main-content { margin-left: 240px; padding: 32px 28px; min-height: 100vh; }
 
         .topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 28px; }
@@ -220,7 +151,7 @@
             <div>
                 <div class="scan-title">Scan QR Pelanggan</div>
                 <div class="scan-desc">Klik tombol berikut untuk memulai proses pembayaran pelanggan</div>
-                <button class="scan-btn">
+                <button class="scan-btn" onclick="window.location.href='{{ url('/scan') }}'">
                     <i class="bi bi-qr-code-scan"></i> Scan Sekarang
                 </button>
             </div>

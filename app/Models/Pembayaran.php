@@ -21,13 +21,11 @@ protected $fillable = [
     'status',
 ];
 
-    // Relasi ke Tagihan
     public function tagihan()
     {
         return $this->belongsTo(Tagihan::class, 'tagihan_id');
     }
 
-    // Relasi ke Metode Pembayaran
     public function metode()
     {
         return $this->belongsTo(MetodePembayaran::class, 'metode_id');

@@ -7,13 +7,8 @@
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('inputform.css') }}">
 
-    <style>
-        .custom-table th:last-child,
-        .custom-table td:last-child { min-width: 110px; white-space: nowrap; }
-    </style>
 </head>
 <body>
 
@@ -112,41 +107,43 @@
                 </div>
             </div>
 
-            {{-- TOOLBAR + FILTER --}}
-<div class="card-toolbar">
+            <div class="card-toolbar">
     <form method="GET" action="{{ url('/pelanggan') }}">
-        <div class="d-flex align-items-end gap-2 flex-wrap">
+        <div class="d-flex align-items-center gap-2 flex-wrap">
 
-            <a href="/instalasi" class="btn btn-primary btn-sm">
+            <a href="/instalasi" class="btn btn-sm" style="height:34px; display:inline-flex; align-items:center; gap:5px; white-space:nowrap; background:linear-gradient(135deg,#09973B,#0ab844); color:#fff; border:none;">
                 <i class="bi bi-plus-lg"></i> Tambah Pelanggan
             </a>
 
-            <input type="text" name="search" class="form-control form-control-sm"
-                   style="width:180px;"
+            <input type="text" name="search"
+                   class="form-control form-control-sm"
+                   style="width:180px; height:40px;"
                    placeholder="Cari nama..."
                    value="{{ request('search') }}">
 
-            <select name="status" class="form-select form-select-sm" style="width:140px;">
+            <select name="status" class="form-select form-select-sm" style="width:140px; height:40px;">
                 <option value="">Semua Status</option>
                 <option value="aktif"    {{ request('status') === 'aktif'    ? 'selected' : '' }}>Aktif</option>
                 <option value="nonaktif" {{ request('status') === 'nonaktif' ? 'selected' : '' }}>Nonaktif</option>
-                 <option value="pending" {{ request('status') === 'pending' ? 'selected' : '' }}>Pending</option>
+                <option value="pending"  {{ request('status') === 'pending'  ? 'selected' : '' }}>Pending</option>
             </select>
 
-            <input type="date" name="dari" class="form-control form-control-sm"
-                   style="width:145px;"
+            <input type="date" name="dari"
+                   class="form-control form-control-sm"
+                   style="width:145px; height:40px;"
                    value="{{ request('dari') }}">
 
-            <input type="date" name="sampai" class="form-control form-control-sm"
-                   style="width:145px;"
+            <input type="date" name="sampai"
+                   class="form-control form-control-sm"
+                   style="width:145px; height:40px;"
                    value="{{ request('sampai') }}">
 
-            <button type="submit" class="btn btn-success btn-sm px-3">
+            <button type="submit" class="btn btn-success btn-sm px-3" style="height:40px;">
                 <i class="bi bi-search"></i>
             </button>
 
             @if(request()->hasAny(['search','status','dari','sampai']))
-                <a href="{{ url('/pelanggan') }}" class="btn btn-outline-secondary btn-sm px-3">
+                <a href="{{ url('/pelanggan') }}" class="btn btn-outline-secondary btn-sm px-3" style="height:40px; display:inline-flex; align-items:center;">
                     <i class="bi bi-x-lg"></i>
                 </a>
             @endif
@@ -154,8 +151,6 @@
         </div>
     </form>
 </div>
-{{-- END TOOLBAR + FILTER --}}
-            {{-- END FILTER --}}
 
             {{-- INNER CARD --}}
             <div class="table-card">
@@ -188,20 +183,20 @@
                                 </td>
 
                                 <td>
-    @if(strtolower($p->status) === 'aktif')
-        <span class="badge rounded-pill bg-success">
-            <i class="bi bi-check-circle-fill"></i> Aktif
-        </span>
-    @elseif(strtolower($p->status) === 'pending')
-        <span class="badge rounded-pill bg-warning text-dark">
-            <i class="bi bi-hourglass-split"></i> Pending
-        </span>
-    @else
-        <span class="badge rounded-pill bg-danger">
-            <i class="bi bi-x-circle-fill"></i> Nonaktif
-        </span>
-    @endif
-</td>
+                                    @if(strtolower($p->status) === 'aktif')
+                                    <span class="badge rounded-pill bg-success">
+                                        <i class="bi bi-check-circle-fill"></i> Aktif
+                                    </span>
+                                    @elseif(strtolower($p->status) === 'pending')
+                                    <span class="badge rounded-pill bg-warning text-dark">
+                                        <i class="bi bi-hourglass-split"></i> Pending
+                                    </span>
+                                    @else
+                                    <span class="badge rounded-pill bg-danger">
+                                        <i class="bi bi-x-circle-fill"></i> Nonaktif
+                                    </span>
+                                    @endif
+                                </td>
 
                                 <td class="text-center">
                                     <div class="d-flex justify-content-center gap-1 flex-nowrap">
@@ -256,12 +251,13 @@
 
 
 {{-- MODAL UPDATE --}}
-@foreach($pelanggan as $p)
-<div class="modal fade" id="editModal{{ $p->id }}" tabindex="-1" aria-hidden="true">
+{{-- MODAL UPDATE --}}
+@foreach($pelanggan as $pel)
+<div class="modal fade" id="editModal{{ $pel->id }}" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
 
-            <form action="{{ url('/pelanggan/'.$p->id) }}" method="POST">
+            <form action="{{ url('/pelanggan/'.$pel->id) }}" method="POST">
                 @csrf
                 @method('PUT')
 
@@ -276,21 +272,20 @@
 
                         <div class="col-md-6">
                             <label class="form-label">Nama</label>
-                            <input type="text" name="nama" class="form-control" value="{{ $p->nama }}" required>
+                            <input type="text" name="nama" class="form-control" value="{{ $pel->nama }}" required>
                         </div>
 
                         <div class="col-md-6">
                             <label class="form-label">No Telepon</label>
-                            <input type="text" name="no_hp" class="form-control" value="{{ $p->no_hp }}">
+                            <input type="text" name="no_hp" class="form-control" value="{{ $pel->no_hp }}">
                         </div>
 
                         <div class="col-md-6">
                             <label class="form-label">Status</label>
                             <select name="status" class="form-select" required>
-                                <option value="aktif"    {{ $p->status == 'aktif'    ? 'selected' : '' }}>Aktif</option>
-                                <option value="nonaktif" {{ $p->status == 'nonaktif' ? 'selected' : '' }}>Non-Aktif</option>
-                                <option value="pending" {{ $p->status == 'pending' ? 'selected' : '' }}>Pending</option>
-
+                                <option value="aktif"    @selected(strtolower($pel->status) == 'aktif')>Aktif</option>
+                                <option value="nonaktif" @selected(strtolower($pel->status) == 'nonaktif')>Non-Aktif</option>
+                                <option value="pending"  @selected(strtolower($pel->status) == 'pending')>Pending</option>
                             </select>
                         </div>
 
@@ -298,7 +293,7 @@
                             <label class="form-label">Site</label>
                             <select name="site_id" class="form-select" required>
                                 @foreach($site as $s)
-                                <option value="{{ $s->id }}" {{ $p->site_id == $s->id ? 'selected' : '' }}>
+                                <option value="{{ $s->id }}" {{ $pel->site_id == $s->id ? 'selected' : '' }}>
                                     {{ $s->nama_site }}
                                 </option>
                                 @endforeach
@@ -309,7 +304,7 @@
                             <label class="form-label">Layanan</label>
                             <select name="layanan_id" class="form-select" required>
                                 @foreach($layanan as $l)
-                                <option value="{{ $l->id }}" {{ $p->layanan_id == $l->id ? 'selected' : '' }}>
+                                <option value="{{ $l->id }}" {{ $pel->layanan_id == $l->id ? 'selected' : '' }}>
                                     {{ $l->nama_paket }}
                                 </option>
                                 @endforeach
@@ -319,7 +314,7 @@
                         <div class="col-md-12">
                             <label class="form-label">Alamat</label>
                             <textarea name="alamat" class="form-control" rows="3"
-                                      placeholder="Masukkan alamat lengkap">{{ $p->alamat }}</textarea>
+                                      placeholder="Masukkan alamat lengkap">{{ $pel->alamat }}</textarea>
                         </div>
 
                     </div>
@@ -331,7 +326,6 @@
                 </div>
 
             </form>
-
         </div>
     </div>
 </div>

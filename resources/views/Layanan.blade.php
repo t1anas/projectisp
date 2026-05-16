@@ -319,48 +319,43 @@ body {
             </div>
 
             {{-- FILTER --}}
-            <div style="padding:20px; border-bottom:1px solid #eee;">
-                <div class="row g-3 align-items-end">
+            {{-- FILTER --}}
+<div style="padding:20px; border-bottom:1px solid #eee;">
+    <div class="d-flex gap-3 align-items-end flex-wrap">
 
-                    <div class="col-md-auto">
-                        <form method="POST" action="{{ route('pelanggan.generateTagihan') }}" style="margin:0;">
-                            @csrf
-                            <input type="hidden" name="pelanggan_id" id="selectedPelangganId">
-                            <button type="submit" class="btn btn-success px-2" title="Generate Tagihan">
-                                <i class="bi bi-plus-lg me-1"></i> Generate Tagihan
-                            </button>
-                        </form>
-                    </div>
+        {{-- Generate Tagihan — form terpisah --}}
+        <form method="POST" action="{{ route('pelanggan.generateTagihan') }}" style="margin:0;">
+            @csrf
+            <button type="submit" class="btn btn-success" title="Generate Tagihan">
+                <i class="bi bi-plus-lg me-1"></i> Generate Tagihan
+            </button>
+        </form>
 
-                    <div class="col-md-3">
-                        <input type="text" class="form-control" placeholder="Cari pelanggan...">
-                    </div>
+        {{-- Filter Search — form GET terpisah --}}
+        <form method="GET" action="{{ url('/layanan') }}" class="d-flex gap-2 align-items-end flex-wrap flex-grow-1">
+            <input type="text" name="search" class="form-control" style="max-width:220px;"
+                   placeholder="Cari pelanggan..."
+                   value="{{ request('search') }}">
 
-                    <div class="col-md-2">
-                        <select class="form-select">
-                            <option>Semua Status</option>
-                            <option>AKTIF</option>
-                            <option>NONAKTIF</option>
-                        </select>
-                    </div>
+            <select name="status" class="form-select" style="max-width:160px;">
+                <option value="">Semua Status</option>
+                <option value="aktif"    {{ request('status') === 'aktif'    ? 'selected' : '' }}>AKTIF</option>
+                <option value="nonaktif" {{ request('status') === 'nonaktif' ? 'selected' : '' }}>NONAKTIF</option>
+            </select>
 
-                    <div class="col-md-2">
-                        <input type="date" class="form-control">
-                    </div>
+            <input type="date" name="dari" class="form-control" style="max-width:160px;"
+                   value="{{ request('dari') }}">
 
-                    <div class="col-md-2">
-                        <input type="date" class="form-control">
-                    </div>
+            <input type="date" name="sampai" class="form-control" style="max-width:160px;"
+                   value="{{ request('sampai') }}">
 
-                    <div class="col-md-1">
-                        <button class="btn btn-success w-100">
-                            <i class="bi bi-search"></i>
-                        </button>
-                    </div>
+            <button type="submit" class="btn btn-success">
+                <i class="bi bi-search"></i>
+            </button>
+        </form>
 
-                </div>
-            </div>
-
+    </div>
+</div>
             <!-- TABLE -->
             <div class="table-responsive px-3 pb-4">
                 <table class="table table-bordered table-hover align-middle">

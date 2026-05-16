@@ -41,7 +41,6 @@ public function bayar(Request $request, $id)
         return back()->with('error', 'Tidak ada tagihan yang perlu dibayar');
     }
 
-    // Buat record pembayaran
     \App\Models\Pembayaran::create([
         'tagihan_id'    => $tagihan->id,
         'pelanggan_id'  => $tagihan->pelanggan_id,
@@ -52,7 +51,6 @@ public function bayar(Request $request, $id)
         'status'        => 'lunas',
     ]);
 
-    // Update status tagihan
     $tagihan->update(['status' => 'lunas']);
 
     return back()->with('success', 'Pembayaran berhasil dikonfirmasi');

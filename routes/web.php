@@ -11,6 +11,8 @@ use App\Http\Controllers\TagihanController;
 use App\Http\Controllers\KwitansiController;
 use App\Http\Controllers\ApprovePelangganController;
 use App\Http\Controllers\PelangganDetailController;
+use App\Http\Controllers\InstalasinocController;
+use App\Http\Controllers\ScanController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -39,7 +41,7 @@ Route::middleware('auth')->group(function () {
 
     /* DASHBOARD */
     Route::get('/admin',       [AdminController::class, 'index'])->middleware('userakses:admin');
-    Route::get('/admin/noc',   [AdminController::class, 'noc'])->middleware('userakses:noc');
+    Route::get('/noc/noc',   [AdminController::class, 'noc'])->middleware('userakses:noc');
     Route::get('/admin/admin', [AdminController::class, 'admin'])->middleware('userakses:admin');
     Route::get('/cs/cs',       [CSController::class, 'dashboard'])->middleware('userakses:cs');
 
@@ -71,15 +73,15 @@ Route::middleware('auth')->group(function () {
         Route::delete('/{id}',           [PelangganController::class, 'destroy']);
         Route::post('/generate-tagihan', [PelangganController::class, 'generateTagihan'])
             ->name('pelanggan.generateTagihan');
-
-        /* DETAIL PELANGGAN (DIAMANKAN DI DALAM PREFIX) */
         Route::get('/detail/{id}', [PelangganDetailController::class, 'show']);
     });
 
     Route::get('/instalasi', [PelangganController::class, 'create']);
 
     /* LAYANAN */
-    Route::resource('layanan', LayananController::class);
+    Route::get('/layanan',          [LayananController::class, 'index']);
+Route::get('/layanan/{id}',     [DetailController::class, 'index'])->name('layanan.detail');
+Route::post('/layanan/{id}/bayar', [DetailController::class, 'bayar'])->name('tagihan.bayar');
     Route::get('/layanan/{id}/detail', [DetailController::class, 'index'])
         ->name('layanan.detail');
 
@@ -95,11 +97,6 @@ Route::middleware('auth')->group(function () {
 Route::post('/layanan/{id}/bayar', [DetailController::class, 'bayar'])
     ->name('detail.bayar');
 
-/*
-|--------------------------------------------------------------------------
-| APPROVE PELANGGAN (ADMIN ONLY)
-|--------------------------------------------------------------------------
-*/
 Route::middleware('userakses:admin')->prefix('approve')->group(function () {
 
     Route::get('/', [ApprovePelangganController::class, 'index']);
@@ -111,3 +108,18 @@ Route::middleware('userakses:admin')->prefix('approve')->group(function () {
 
     Route::get('/pelanggan/{id}', [PelangganController::class, 'show']);
 });
+            Route::get('/instalasi-noc', [InstalasiNocController::class, 'index'])->name('instalasi-noc');
+
+Route::prefix('instalasi-noc')
+    ->name('instalasi-noc.')
+    ->middleware(['auth', 'userakses:noc'])
+    ->group(function () {
+            Route::get('/{id}',           [InstalasiNocController::class, 'show'])->name('show');
+            Route::post('/{id}/approve',  [InstalasiNocController::class, 'approve'])->name('approve');
+            Route::post('/{id}/reject',   [InstalasiNocController::class, 'reject'])->name('reject');
+ 
+    });
+Route::get('/pelanggan/{kode}', [PelangganController::class, 'detail']);
+
+Route::get('/scan',       [ScanController::class, 'index']);
+Route::get('/scan/{kode}', [ScanController::class, 'result']);

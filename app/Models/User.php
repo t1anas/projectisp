@@ -47,7 +47,7 @@ class User extends Authenticatable
     return match($this->role) {
         'admin' => url('/admin'),
         'cs' => url('/cs/cs'),
-        'noc' => url('/noc'),
+        'noc' => url('/noc/noc'),
         default => url('/'),
     };
 }

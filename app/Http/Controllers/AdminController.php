@@ -10,7 +10,7 @@ class AdminController extends Controller
         return view('admin');
 }
     function noc() {
-        return view('admin');
+        return view('noc');
 }
     function cs() {
         return view('cs');

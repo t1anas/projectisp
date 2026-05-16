@@ -29,7 +29,7 @@ class SesiController extends Controller
           if(Auth::user()->role == 'admin') {
                 return redirect('/admin');
             } elseif(Auth::user()->role == 'noc') {
-                return redirect('/admin/noc');
+                return redirect('/noc/noc');
             } elseif(Auth::user()->role == 'cs') {
                 return redirect('/cs/cs');
             } else {
@@ -46,7 +46,7 @@ public function logout(Request $request)
     $request->session()->invalidate();
     $request->session()->regenerateToken();
 
-    return redirect('/login'); // aman kalau route GET ada
+    return redirect('/login'); 
 }
 
 }

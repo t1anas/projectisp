@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Pelanggan;
 use App\Models\Layanan;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class ApprovePelangganController extends Controller
 {
@@ -13,17 +14,14 @@ class ApprovePelangganController extends Controller
         $query = Pelanggan::with(['layanan', 'site', 'approvedBy'])
             ->orderBy('created_at', 'desc');
 
-        // FILTER STATUS
         if ($request->filled('status')) {
             $query->where('status', $request->status);
         }
 
-        // FILTER LAYANAN
         if ($request->filled('layanan_id')) {
             $query->where('layanan_id', $request->layanan_id);
         }
 
-        // FILTER TANGGAL
         if ($request->filled('dari')) {
             $query->whereDate('created_at', '>=', $request->dari);
         }
@@ -32,7 +30,6 @@ class ApprovePelangganController extends Controller
             $query->whereDate('created_at', '<=', $request->sampai);
         }
 
-        // SEARCH
         if ($request->filled('search')) {
             $q = $request->search;
 
@@ -54,35 +51,30 @@ class ApprovePelangganController extends Controller
         return view('approve', compact('pelanggan', 'layanan'));
     }
 
-    public function approve($id)
-    {
-        $pelanggan = Pelanggan::findOrFail($id);
+public function approve($id)
+{
+    $pelanggan = Pelanggan::findOrFail($id);
 
-        // CEK SUDAH DIPROSES / BELUM
-        if ($pelanggan->status !== 'pending') {
-            return back()->with(
-                'error',
-                'Pelanggan ini sudah pernah diproses.'
-            );
-        }
-
-        $pelanggan->update([
-            'status'             => 'aktif',
-            'approved_admin_at'  => now(),
-            'approved_admin_by'  => auth()->id(),
-        ]);
-
-        return back()->with(
-            'success',
-            "Pelanggan {$pelanggan->nama} berhasil di-approve."
-        );
+    if ($pelanggan->status !== 'pending') {
+        return back()->with('error', 'Pelanggan ini sudah pernah diproses.');
     }
+
+    $url = url('/scan/' . $pelanggan->kode_pelanggan);
+    $qr  = QrCode::size(300)->generate($url); 
+    $pelanggan->update([
+        'status'            => 'aktif',
+        'approved_admin_at' => now(),
+        'approved_admin_by' => auth()->id(),
+        'qr_code'           => $qr, 
+    ]);
+
+    return back()->with('success', "Pelanggan {$pelanggan->nama} berhasil di-approve + QR dibuat.");
+}
 
     public function reject(Request $request, $id)
     {
         $pelanggan = Pelanggan::findOrFail($id);
 
-        // VALIDASI
         $request->validate([
             'alasan' => 'nullable|string|max:255',
         ]);
@@ -101,29 +93,30 @@ class ApprovePelangganController extends Controller
     }
 
     public function bulkApprove(Request $request)
-    {
-        if (!$request->filled('ids')) {
-            return back()->with(
-                'error',
-                'Tidak ada pelanggan yang dipilih.'
-            );
-        }
-
-        $ids = explode(',', $request->ids);
-
-        $updated = Pelanggan::whereIn('id', $ids)
-            ->where('status', 'pending')
-            ->update([
-                'status'             => 'aktif',
-                'approved_admin_at'  => now(),
-                'approved_admin_by'  => auth()->id(),
-            ]);
-
-        return back()->with(
-            'success',
-            $updated . ' pelanggan berhasil di-approve.'
-        );
+{
+    if (!$request->filled('ids')) {
+        return back()->with('error', 'Tidak ada pelanggan yang dipilih.');
     }
+
+    $ids       = explode(',', $request->ids);
+    $pelanggan = Pelanggan::whereIn('id', $ids)->where('status', 'pending')->get();
+    $count     = 0;
+
+    foreach ($pelanggan as $p) {
+    $url = url('/pelanggan/' . $p->kode_pelanggan);
+    $qr  = QrCode::size(300)->generate($url);
+
+    $p->update([
+        'status'            => 'aktif',
+        'approved_admin_at' => now(),
+        'approved_admin_by' => auth()->id(),
+        'qr_code'           => $qr,
+    ]);
+    $count++;
+}
+    
+    return back()->with('success', "{$count} pelanggan berhasil di-approve + QR dibuat.");
+}
 
     public function bulkReject(Request $request)
     {

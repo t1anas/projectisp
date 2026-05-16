@@ -11,7 +11,6 @@ use App\Models\Layanan;
 
 class PemasukanController extends Controller
 {
-    //index=menampilkan data
 public function index(Request $request)
 {
     $query = Pembayaran::with('pelanggan', 'layanan', 'metode');
@@ -47,7 +46,6 @@ public function index(Request $request)
     ));
 }
 
-    //untuk form tambah data
     public function create()
     {
         $tagihan = Tagihan::all();
@@ -59,7 +57,6 @@ public function index(Request $request)
         ));
     }
 
-    //store=menyimpan data
 public function store(Request $request)
 {
     $request->validate([
@@ -90,7 +87,6 @@ public function store(Request $request)
     $totalBayar = Pembayaran::where('tagihan_id', $tagihan->id)
         ->sum('jumlah_bayar');
 
-    // ← FIX: 'jumlah' → 'total'
     $tagihan->status = ($totalBayar >= $tagihan->total) ? 'lunas' : 'belum bayar';
     $tagihan->save();
 
@@ -98,7 +94,6 @@ public function store(Request $request)
         ->with('success', 'Data pembayaran berhasil ditambahkan');
 }
 
-    //untuk edit data
     public function edit($id)
     {
         $pembayaran = Pembayaran::findOrFail($id);
@@ -112,10 +107,8 @@ public function store(Request $request)
         ));
     }
 
-    // UPDATE
 public function update(Request $request, $id)
 {
-    // VALIDASI (sesuai input di form edit)
     $request->validate([
         'tanggal_bayar' => 'required|date',
         'jumlah_bayar'  => 'required|numeric',
@@ -123,10 +116,8 @@ public function update(Request $request, $id)
         'status'        => 'required|in:lunas,belum bayar',
     ]);
 
-    // AMBIL DATA
     $pembayaran = Pembayaran::findOrFail($id);
 
-    // UPDATE DATA
     $pembayaran->update([
         'tanggal_bayar' => $request->tanggal_bayar,
         'jumlah_bayar'  => $request->jumlah_bayar,
@@ -134,21 +125,17 @@ public function update(Request $request, $id)
         'status'        => $request->status,
     ]);
 
-    // REDIRECT
     return redirect()->route('pembayaran')
         ->with('success', 'Data pembayaran berhasil diupdate');
 }
 
-    //fungsi untuk hapus data
     public function destroy($id)
 {
     $pembayaran = Pembayaran::findOrFail($id);
     $tagihan = Tagihan::findOrFail($pembayaran->tagihan_id);
 
-    // hapus pembayaran
     $pembayaran->delete();
 
-    // hitung ulang total bayar
     $totalBayar = Pembayaran::where('tagihan_id', $tagihan->id)
     ->sum('jumlah_bayar');
 
