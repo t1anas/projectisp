@@ -127,9 +127,9 @@
                         <div class="stat-value">{{ $pelanggan->layanan->nama_paket ?? '-' }}</div>
                     </div>
                     <div class="stat-item">
-                        <div class="stat-label">Tanggal Aktivasi</div>
+                        <div class="stat-label">Nama Layanan</div>
                         <div class="stat-value">
-                            {{ \Carbon\Carbon::parse($pelanggan->created_at)->format('d M Y') }}
+                            {{ $pelanggan->nama_layanan ?? '-' }}
                         </div>
                     </div>
                 </div>

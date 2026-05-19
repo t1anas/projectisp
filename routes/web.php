@@ -41,7 +41,7 @@ Route::middleware('auth')->group(function () {
 
     /* DASHBOARD */
     Route::get('/admin',       [AdminController::class, 'index'])->middleware('userakses:admin');
-    Route::get('/noc/noc',   [AdminController::class, 'noc'])->middleware('userakses:noc');
+    Route::get('/noc/noc',     [AdminController::class, 'noc'])->middleware('userakses:noc');
     Route::get('/admin/admin', [AdminController::class, 'admin'])->middleware('userakses:admin');
     Route::get('/cs/cs',       [CSController::class, 'dashboard'])->middleware('userakses:cs');
 
@@ -61,7 +61,7 @@ Route::middleware('auth')->group(function () {
 
     /* CS */
     Route::middleware('userakses:cs')->prefix('cs')->group(function () {
-        Route::get('/scan', fn() => view('scan_cs'));
+        Route::get('/scan',              fn() => view('scan_cs'));
         Route::post('/pembayaran/store', [PemasukanController::class, 'store']);
     });
 
@@ -71,55 +71,63 @@ Route::middleware('auth')->group(function () {
         Route::post('/store',            [PelangganController::class, 'store']);
         Route::put('/{id}',              [PelangganController::class, 'update']);
         Route::delete('/{id}',           [PelangganController::class, 'destroy']);
-        Route::post('/generate-tagihan', [PelangganController::class, 'generateTagihan'])
-            ->name('pelanggan.generateTagihan');
-        Route::get('/detail/{id}', [PelangganDetailController::class, 'show']);
+        Route::post('/generate-tagihan', [PelangganController::class, 'generateTagihan'])->name('pelanggan.generateTagihan');
+        Route::get('/detail/{id}',       [PelangganDetailController::class, 'show']);
     });
 
     Route::get('/instalasi', [PelangganController::class, 'create']);
 
     /* LAYANAN */
-    Route::get('/layanan',          [LayananController::class, 'index']);
-Route::get('/layanan/{id}',     [DetailController::class, 'index'])->name('layanan.detail');
-Route::post('/layanan/{id}/bayar', [DetailController::class, 'bayar'])->name('tagihan.bayar');
-    Route::get('/layanan/{id}/detail', [DetailController::class, 'index'])
-        ->name('layanan.detail');
+    Route::get('/layanan',              [LayananController::class, 'index']);
+    Route::get('/layanan/export',       [LayananController::class, 'export'])->name('layanan.export');
+    Route::get('/layanan/cetak',        [LayananController::class, 'cetak'])->name('layanan.cetak');
+    Route::post('/layanan/bulk-delete', [LayananController::class, 'bulkDelete'])->name('layanan.bulkDelete');
+    Route::post('/layanan/bulk-status', [LayananController::class, 'bulkStatus'])->name('layanan.bulkStatus');
+    Route::put('/layanan/{id}',         [LayananController::class, 'update']);
+    Route::post('/layanan/{id}/bayar',  [DetailController::class, 'bayar'])->name('tagihan.bayar');
+    Route::get('/layanan/{id}',         [DetailController::class, 'index'])->name('layanan.detail');
 
     /* TAGIHAN */
     Route::resource('tagihan', TagihanController::class);
-    Route::post('/tagihan/{id}/bayar', [TagihanController::class, 'bayar'])
-        ->name('tagihan.bayar');
-    Route::get('/tagihan/{id}/kwitansi', [KwitansiController::class, 'cetak'])
-        ->name('kwitansi');
+    Route::post('/tagihan/{id}/bayar',    [TagihanController::class, 'bayar'])->name('tagihan.bayar');
+    Route::get('/tagihan/{id}/kwitansi',  [KwitansiController::class, 'cetak'])->name('kwitansi');
+
 });
+
+/*
+|--------------------------------------------------------------------------
+| Public Routes (No Auth)
+|--------------------------------------------------------------------------
+*/
 
 /* BAYAR LAYANAN */
-Route::post('/layanan/{id}/bayar', [DetailController::class, 'bayar'])
-    ->name('detail.bayar');
+Route::post('/layanan/{id}/bayar', [DetailController::class, 'bayar'])->name('detail.bayar');
 
+/* APPROVE */
 Route::middleware('userakses:admin')->prefix('approve')->group(function () {
-
-    Route::get('/', [ApprovePelangganController::class, 'index']);
-
-    Route::post('/{id}/approve', [ApprovePelangganController::class, 'approve']);
-    Route::post('/{id}/reject',  [ApprovePelangganController::class, 'reject']);
-    Route::post('/bulk-approve', [ApprovePelangganController::class, 'bulkApprove']);
-    Route::post('/bulk-reject',  [ApprovePelangganController::class, 'bulkReject']);
-
-    Route::get('/pelanggan/{id}', [PelangganController::class, 'show']);
+    Route::get('/',                   [ApprovePelangganController::class, 'index']);
+    Route::post('/{id}/approve',      [ApprovePelangganController::class, 'approve']);
+    Route::post('/{id}/reject',       [ApprovePelangganController::class, 'reject']);
+    Route::post('/bulk-approve',      [ApprovePelangganController::class, 'bulkApprove']);
+    Route::post('/bulk-reject',       [ApprovePelangganController::class, 'bulkReject']);
+    Route::get('/pelanggan/{id}',     [PelangganController::class, 'show']);
 });
-            Route::get('/instalasi-noc', [InstalasiNocController::class, 'index'])->name('instalasi-noc');
+
+/* INSTALASI NOC */
+Route::get('/instalasi-noc', [InstalasiNocController::class, 'index'])->name('instalasi-noc');
 
 Route::prefix('instalasi-noc')
     ->name('instalasi-noc.')
     ->middleware(['auth', 'userakses:noc'])
     ->group(function () {
-            Route::get('/{id}',           [InstalasiNocController::class, 'show'])->name('show');
-            Route::post('/{id}/approve',  [InstalasiNocController::class, 'approve'])->name('approve');
-            Route::post('/{id}/reject',   [InstalasiNocController::class, 'reject'])->name('reject');
- 
+        Route::get('/{id}',          [InstalasiNocController::class, 'show'])->name('show');
+        Route::post('/{id}/approve', [InstalasiNocController::class, 'approve'])->name('approve');
+        Route::post('/{id}/reject',  [InstalasiNocController::class, 'reject'])->name('reject');
     });
+
+/* PELANGGAN PUBLIK */
 Route::get('/pelanggan/{kode}', [PelangganController::class, 'detail']);
 
-Route::get('/scan',       [ScanController::class, 'index']);
+/* SCAN */
+Route::get('/scan',        [ScanController::class, 'index']);
 Route::get('/scan/{kode}', [ScanController::class, 'result']);

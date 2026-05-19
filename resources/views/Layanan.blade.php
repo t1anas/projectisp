@@ -7,225 +7,183 @@
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-
 <link rel="stylesheet" href="{{ asset('inputform.css') }}">
 
 <style>
-body {
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    background: #f4f6f9;
-}
-
-.table td, .table th {
-    vertical-align: middle;
-}
-
-.clamp-2 {
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    max-width: 200px;
-    line-height: 1.45;
-    word-break: break-word;
-}
-
-.status-pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
-    padding: 7px 14px;
-    border-radius: 50px;
-    font-size: 12px;
-    font-weight: 700;
-    border: 1px solid transparent;
-}
-
-.status-pill i {
-    font-size: 10px;
-}
-
-.status-active {
-    background: linear-gradient(135deg, #e8fff1, #d8ffe8);
-    color: #0f9d58;
-    border-color: #b7f3cd;
-}
-
-.status-nonactive {
-    background: linear-gradient(135deg, #fff1f1, #ffe1e1);
-    color: #dc3545;
-    border-color: #ffc4c4;
-}
-
+/* ── Action Buttons – Soft Pastel Style ── */
 .action-group {
     display: flex;
     align-items: center;
-    gap: 8px;
     justify-content: center;
+    gap: 6px;
 }
 
-.action-modern {
-    width: 38px;
-    height: 38px;
+.btn-action {
+    width: 34px;
+    height: 34px;
     border: none;
-    border-radius: 12px;
-    display: flex;
+    border-radius: 10px;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
-    transition: .25s;
-    box-shadow: 0 6px 14px rgba(0, 0, 0, .06);
+    font-size: 15px;
     cursor: pointer;
     text-decoration: none;
+    transition: transform .18s, box-shadow .18s;
+    position: relative;
+    flex-shrink: 0;
 }
 
-.action-modern i {
+.btn-action:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,.12);
+}
+
+.btn-action:active {
+    transform: translateY(0);
+    box-shadow: none;
+}
+
+/* Detail – biru soft */
+.btn-action-detail {
+    background: #e0f2fe;
+    color: #0284c7;
+}
+
+/* Edit – amber/oranye soft */
+.btn-action-edit {
+    background: #fff3e0;
+    color: #f59e0b;
+}
+
+/* Notifikasi – kuning soft */
+.btn-action-notif {
+    background: #fef3c7;
+    color: #d97706;
+}
+
+/* Tooltip kecil di atas */
+.btn-action::after {
+    content: attr(data-tip);
+    position: absolute;
+    bottom: calc(100% + 7px);
+    left: 50%;
+    transform: translateX(-50%) scale(.85);
+    background: #1e293b;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    white-space: nowrap;
+    padding: 3px 9px;
+    border-radius: 6px;
+    pointer-events: none;
+    letter-spacing: .4px;
+    opacity: 0;
+    transition: opacity .15s, transform .15s;
+}
+
+.btn-action:hover::after {
+    opacity: 1;
+    transform: translateX(-50%) scale(1);
+}
+
+/* ── Dropdown Data Terpilih & Menu ── */
+.btn-data-terpilih {
+    height: 40px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: .3px;
+    background: #dc3545;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 0 14px;
+    transition: background .18s, box-shadow .18s;
+}
+.btn-data-terpilih:hover {
+    background: #bb2d3b;
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(220,53,69,.35);
+}
+
+.btn-menu {
+    height: 40px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: .3px;
+    background: #7c3aed;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 0 14px;
+    transition: background .18s, box-shadow .18s;
+}
+.btn-menu:hover {
+    background: #6d28d9;
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(124,58,237,.35);
+}
+
+.dropdown-menu {
+    border-radius: 10px;
+    border: 1px solid #e5e7eb;
+    padding: 6px;
+    min-width: 200px;
+    box-shadow: 0 8px 24px rgba(0,0,0,.10);
+}
+.dropdown-menu .dropdown-item {
+    border-radius: 7px;
+    padding: 8px 12px;
+    font-size: 13.5px;
+    font-weight: 500;
+    transition: background .15s;
+}
+.dropdown-menu .dropdown-item:hover {
+    background: #f3f4f6;
+}
+.dropdown-menu .dropdown-item.text-danger:hover {
+    background: #fff1f2;
+}
+.dropdown-menu .dropdown-item .bi {
     font-size: 15px;
 }
 
-.action-modern:hover {
-    transform: translateY(-3px);
-}
-
-.btn-detail {
-    background: linear-gradient(135deg, #eef4ff, #dfeaff);
-    color: #0d6efd;
-}
-
-.btn-detail:hover {
-    background: #0d6efd;
-    color: #fff;
-}
-
-.btn-reminder {
-    background: linear-gradient(135deg, #fff7e6, #ffecc2);
-    color: #ff9800;
-}
-
-.btn-reminder:hover {
-    background: #ff9800;
-    color: #fff;
-}
-
-.btn-tambah {
-    width: 38px;
-    height: 38px;
-    border: none;
-    border-radius: 12px;
+/* Toggle switch style untuk Ubah Status */
+.item-switch {
     display: flex;
     align-items: center;
-    justify-content: center;
-    background: linear-gradient(135deg, #d1fae5, #a7f3d0);
-    color: #059669;
+    gap: 10px;
+    padding: 8px 12px;
+    border-radius: 7px;
+    cursor: pointer;
+    font-size: 13.5px;
+    font-weight: 500;
+    color: #0284c7;
+    transition: background .15s;
+}
+.item-switch:hover {
+    background: #eff6ff;
+}
+.item-switch .bi {
     font-size: 18px;
-    font-weight: 800;
-    cursor: pointer;
-    transition: .25s;
-    box-shadow: 0 6px 14px rgba(0,0,0,.06);
-    padding: 0;
-}
-
-.btn-tambah:hover {
-    background: #22c55e;
-    color: #fff;
-    transform: translateY(-3px);
-}
-
-.modal-notif .modal-content {
-    border-radius: 18px;
-    border: none;
-    overflow: hidden;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.15);
-}
-
-.notif-header {
-    background: #fff;
-    color: #111;
-    padding: 22px 28px 16px;
-    font-size: 22px;
-    font-weight: 800;
-    text-align: center;
-    letter-spacing: 1px;
-    border-bottom: 1px solid #eee;
-}
-
-.notif-body {
-    padding: 22px 28px 28px;
-    background: #fff;
-}
-
-.notif-box {
-    border: 1.5px solid #d4d4d4;
-    border-radius: 10px;
-    padding: 14px 16px;
-    margin-bottom: 14px;
-    background: #fff;
-}
-
-.notif-label {
-    font-size: 11px;
-    font-weight: 800;
-    color: #222;
-    margin-bottom: 8px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.notif-text {
-    font-size: 13.5px;
-    color: #444;
-    line-height: 1.75;
-}
-
-.notif-preview-box {
-    border: 1.5px solid #d4d4d4;
-    border-radius: 10px;
-    padding: 16px 18px;
-    margin-bottom: 22px;
-    background: #fff;
-    font-size: 13.5px;
-    color: #333;
-    line-height: 1.8;
-}
-
-.notif-preview-box b {
-    font-size: 13px;
-    font-weight: 800;
-    color: #111;
-}
-
-.btn-kirim {
-    background: #22c55e;
-    color: #fff;
-    border: none;
-    border-radius: 10px;
-    padding: 13px 0;
-    font-weight: 800;
-    font-size: 14px;
-    letter-spacing: 1px;
-    cursor: pointer;
-    width: 100%;
-    display: block;
-    transition: background 0.2s;
-}
-
-.btn-kirim:hover {
-    background: #16a34a;
-    color: #fff;
 }
 </style>
+
 </head>
 <body>
 
 <div style="display:flex; min-height:100vh;">
 
-    <!-- SIDEBAR -->
+    {{-- SIDEBAR --}}
     <div class="sidebar">
-
         <div class="sidebar-header">
-            <div class="hamburger">
-                <span></span><span></span><span></span>
-            </div>
+            <div class="hamburger"><span></span><span></span><span></span></div>
             <span class="logo-text">JAGONET</span>
         </div>
 
@@ -234,7 +192,6 @@ body {
         <a href="{{ Auth::user()->dashboard_url }}" class="menu-item">
             <i class="bi bi-speedometer2"></i> Dashboard
         </a>
-
         <a href="{{ url('/layanan') }}" class="menu-item active">
             <i class="bi bi-wifi"></i> Data Layanan
         </a>
@@ -264,7 +221,6 @@ body {
             <i class="bi bi-people"></i> Data Pelanggan
         </a>
 
-        <!-- PROFILE -->
         <div class="profile-section">
             <div class="admin-card">
                 <div class="admin-avatar">
@@ -282,14 +238,13 @@ body {
                 </button>
             </form>
         </div>
-
     </div>
-    <!-- END SIDEBAR -->
+    {{-- END SIDEBAR --}}
 
-    <!-- MAIN CONTENT -->
-    <div class="main-content" style="flex:1;">
+    {{-- MAIN CONTENT --}}
+    <div class="main-content">
 
-        <!-- TOPBAR -->
+        {{-- TOPBAR --}}
         <div class="topbar">
             <div>
                 <div class="page-title">Data Layanan</div>
@@ -304,10 +259,10 @@ body {
             </div>
         </div>
 
-        <!-- CARD -->
+        {{-- OUTER CARD --}}
         <div class="form-card">
 
-            <!-- CARD HEADER -->
+            {{-- HEADER CARD --}}
             <div class="form-card-header">
                 <div class="icon-wrap">
                     <i class="bi bi-wifi"></i>
@@ -318,158 +273,345 @@ body {
                 </div>
             </div>
 
-            {{-- FILTER --}}
-            {{-- FILTER --}}
-<div style="padding:20px; border-bottom:1px solid #eee;">
-    <div class="d-flex gap-3 align-items-end flex-wrap">
+            {{-- TOOLBAR / FILTER --}}
+            <div class="card-toolbar">
+                <div class="d-flex align-items-center gap-2 flex-wrap">
 
-        {{-- Generate Tagihan — form terpisah --}}
-        <form method="POST" action="{{ route('pelanggan.generateTagihan') }}" style="margin:0;">
-            @csrf
-            <button type="submit" class="btn btn-success" title="Generate Tagihan">
-                <i class="bi bi-plus-lg me-1"></i> Generate Tagihan
-            </button>
-        </form>
-
-        {{-- Filter Search — form GET terpisah --}}
-        <form method="GET" action="{{ url('/layanan') }}" class="d-flex gap-2 align-items-end flex-wrap flex-grow-1">
-            <input type="text" name="search" class="form-control" style="max-width:220px;"
-                   placeholder="Cari pelanggan..."
-                   value="{{ request('search') }}">
-
-            <select name="status" class="form-select" style="max-width:160px;">
-                <option value="">Semua Status</option>
-                <option value="aktif"    {{ request('status') === 'aktif'    ? 'selected' : '' }}>AKTIF</option>
-                <option value="nonaktif" {{ request('status') === 'nonaktif' ? 'selected' : '' }}>NONAKTIF</option>
-            </select>
-
-            <input type="date" name="dari" class="form-control" style="max-width:160px;"
-                   value="{{ request('dari') }}">
-
-            <input type="date" name="sampai" class="form-control" style="max-width:160px;"
-                   value="{{ request('sampai') }}">
-
-            <button type="submit" class="btn btn-success">
-                <i class="bi bi-search"></i>
-            </button>
-        </form>
-
-    </div>
-</div>
-            <!-- TABLE -->
-            <div class="table-responsive px-3 pb-4">
-                <table class="table table-bordered table-hover align-middle">
-
-                    <thead class="table-light text-center fw-bold">
-                        <tr>
-                            <th style="width:40px;">
-                                <input type="checkbox" id="checkAll"
-                                       style="width:16px; height:16px; cursor:pointer;"
-                                       onchange="toggleAll(this)">
-                            </th>
-                            <th>No</th>
-                            <th>Aktivasi</th>
-                            <th>Nama</th>
-                            <th>Tagihan</th>
-                            <th>Paket</th>
-                            <th>Status</th>
-                            <th>Aksi</th>
-                        </tr>
-                    </thead>
-
-                    <tbody class="text-center">
-                        @foreach($pelanggan as $p)
-                        <tr>
-                            <td>
-                                <input type="checkbox" name="pelanggan_ids[]"
-                                       value="{{ $p->id }}"
-                                       class="row-check"
-                                       style="width:16px; height:16px; cursor:pointer;"
-                                       onchange="updateSelected()">
-                            </td>
-                            <td>{{ $loop->iteration }}</td>
-                            <td>{{ $p->created_at->format('d/m/Y') }}</td>
-                            <td class="text-start">
-                                <div class="clamp-2">{{ $p->nama }}</div>
-                            </td>
-                            <td class="text-start">Rp {{ number_format($p->layanan->harga ?? 0, 0, ',', '.') }}</td>
-                            <td>{{ $p->layanan->nama_paket ?? '-' }}</td>
-                            <td>
-                                @if(strtolower($p->status) == 'aktif')
-                                    <span class="status-pill status-active">
-                                        <i class="bi bi-check-circle-fill"></i> Aktif
-                                    </span>
-                                @else
-                                    <span class="status-pill status-nonactive">
-                                        <i class="bi bi-x-circle-fill"></i> Nonaktif
-                                    </span>
-                                @endif
-                            </td>
-                            <td>
-                                <div class="action-group">
-                                    <a href="{{ route('layanan.detail', $p->id) }}" class="action-modern btn-detail">
-                                        <i class="bi bi-eye-fill"></i>
-                                    </a>
-                                    <button class="action-modern btn-reminder" title="Reminder"
-                                            data-bs-toggle="modal"
-                                            data-bs-target="#modalNotif{{ $p->id }}">
-                                        <i class="bi bi-bell-fill"></i>
-                                    </button>
+                    {{-- ── Tombol Data Terpilih ── --}}
+                    <div class="dropdown">
+                        <button class="btn-data-terpilih dropdown-toggle"
+                                type="button"
+                                data-bs-toggle="dropdown"
+                                aria-expanded="false">
+                            Data Terpilih
+                        </button>
+                        <ul class="dropdown-menu shadow">
+                            <li>
+                                <button type="button"
+                                        class="dropdown-item text-danger"
+                                        onclick="hapusDataTerpilih()">
+                                    <i class="bi bi-trash-fill me-2"></i> Hapus Data Terpilih
+                                </button>
+                            </li>
+                            <li>
+                                <div class="item-switch" onclick="ubahStatusTerpilih()">
+                                    <i class="bi bi-toggles2"></i>
+                                    Ubah Status Terpilih
                                 </div>
-                            </td>
-                        </tr>
-                        @endforeach
-                    </tbody>
+                            </li>
+                        </ul>
+                    </div>
 
-                </table>
+                  {{-- ── Tombol Menu ── --}}
+<div class="dropdown">
+    <button class="btn-menu dropdown-toggle"
+            type="button"
+            data-bs-toggle="dropdown"
+            aria-expanded="false">
+        Menu
+    </button>
+    <ul class="dropdown-menu shadow">
+        <li>
+            <a class="dropdown-item" href="{{ route('layanan.export') }}">
+                <i class="bi bi-file-earmark-excel me-2 text-success"></i> Export Data
+            </a>
+        </li>
+        <li>
+            <a class="dropdown-item" href="#"
+               data-bs-toggle="modal" data-bs-target="#modalImport">
+                <i class="bi bi-file-earmark-excel me-2 text-danger"></i> Import Data
+            </a>
+        </li>
+        <li>
+            <a class="dropdown-item" href="{{ route('layanan.cetak') }}" target="_blank">
+                <i class="bi bi-printer me-2 text-secondary"></i> Cetak
+            </a>
+        </li>
+    </ul>
+</div>
+
+                    {{-- Generate Tagihan --}}
+                    <form method="POST" action="{{ route('pelanggan.generateTagihan') }}" style="margin:0;">
+                        @csrf
+                        <button type="submit" class="btn btn-sm"
+                                style="height:40px; display:inline-flex; align-items:center; gap:5px; white-space:nowrap; background:linear-gradient(135deg,#09973B,#0ab844); color:#fff; border:none;">
+                            <i class="bi bi-plus-lg"></i> Generate Tagihan
+                        </button>
+                    </form>
+
+                    {{-- Filter Form --}}
+                    <form method="GET" action="{{ url('/layanan') }}" class="d-flex align-items-center gap-2 flex-wrap">
+
+                        <input type="text" name="search"
+                               class="form-control form-control-sm"
+                               style="width:180px; height:40px;"
+                               placeholder="Cari pelanggan..."
+                               value="{{ request('search') }}">
+
+                        <select name="status" class="form-select form-select-sm" style="width:160px; height:40px;">
+                            <option value="">Semua Status</option>
+                            <option value="aktif"    {{ request('status') === 'aktif'    ? 'selected' : '' }}>Aktif</option>
+                            <option value="isolir"    {{ request('status') === 'isolir'    ? 'selected' : '' }}>Isolir</option>
+                            <option value="nonaktif" {{ request('status') === 'nonaktif' ? 'selected' : '' }}>Nonaktif</option>
+                        </select>
+
+                        <input type="date" name="dari"
+                               class="form-control form-control-sm"
+                               style="width:145px; height:40px;"
+                               value="{{ request('dari') }}">
+
+                        <input type="date" name="sampai"
+                               class="form-control form-control-sm"
+                               style="width:145px; height:40px;"
+                               value="{{ request('sampai') }}">
+
+                        <button type="submit" class="btn btn-success btn-sm px-3" style="height:40px;">
+                            <i class="bi bi-search"></i>
+                        </button>
+
+                        @if(request()->hasAny(['search','status','dari','sampai']))
+                            <a href="{{ url('/layanan') }}" class="btn btn-outline-secondary btn-sm px-3"
+                               style="height:40px; display:inline-flex; align-items:center;">
+                                <i class="bi bi-x-lg"></i>
+                            </a>
+                        @endif
+
+                    </form>
+                </div>
             </div>
-            <!-- END TABLE -->
+
+            {{-- INNER CARD / TABLE --}}
+            <div class="table-card">
+                <div class="table-card-scroll">
+                    <table class="table table-bordered align-middle custom-table mb-0">
+                        <thead class="table-light text-center fw-bold">
+                            <tr>
+                                <th style="width:40px;">
+                                    <input type="checkbox" id="checkAll"
+                                           style="width:16px;height:16px;cursor:pointer;"
+                                           onchange="toggleAll(this)">
+                                </th>
+                                <th>No</th>
+                                <th>Aktivasi</th>
+                                <th>Nama</th>
+                                <th>Nama Layanan</th>
+                                <th>Tagihan</th>
+                                <th>Paket</th>
+                                <th>Status</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-center">
+                            @forelse($pelanggan as $p)
+                            <tr>
+                                <td>
+                                    <input type="checkbox" name="pelanggan_ids[]"
+                                           value="{{ $p->id }}" class="row-check"
+                                           style="width:16px;height:16px;cursor:pointer;"
+                                           onchange="updateSelected()">
+                                </td>
+                                <td>{{ $loop->iteration }}</td>
+                                <td>{{ $p->created_at->format('d/m/Y') }}</td>
+                                <td class="text-start">
+                                    <div class="clamp-2">{{ $p->nama }}</div>
+                                </td>
+                                <td class="text-start">
+                                    <div class="clamp-2">{{ $p->nama_layanan ?? '-' }}</div>
+                                </td>
+                                <td class="text-start">
+                                    Rp {{ number_format($p->layanan->harga ?? 0, 0, ',', '.') }}
+                                </td>
+                                <td>{{ $p->layanan->nama_paket ?? '-' }}</td>
+                                <td>
+                                    @if(strtolower($p->status) == 'aktif')
+                                        <span class="badge rounded-pill bg-success">
+                                            <i class="bi bi-check-circle-fill"></i> Aktif
+                                        </span>
+                                       @elseif(strtolower($p->status) == 'isolir')
+                                        <span class="badge rounded-pill bg-warning">
+                                            <i class="bi bi-x-circle-fill"></i> Isolir
+                                        </span>
+                                    @else
+                                        <span class="badge rounded-pill bg-danger">
+                                            <i class="bi bi-x-circle-fill"></i> Nonaktif
+                                        </span>
+                                    @endif
+                                </td>
+                                <td class="text-center">
+                                    <div class="action-group">
+
+                                        {{-- Detail --}}
+                                        <a href="{{ route('layanan.detail', $p->id) }}"
+                                           class="btn-action btn-action-detail"
+                                           data-tip="Detail">
+                                            <i class="bi bi-eye-fill"></i>
+                                        </a>
+
+                                        {{-- Edit --}}
+                                        <button type="button"
+                                                class="btn-action btn-action-edit"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#modalEditPelanggan{{ $p->id }}"
+                                                data-tip="Edit">
+                                            <i class="bi bi-pencil-fill"></i>
+                                        </button>
+
+                                        {{-- Notifikasi --}}
+                                        <button type="button"
+                                                class="btn-action btn-action-notif"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#modalNotif{{ $p->id }}"
+                                                data-tip="Notifikasi">
+                                            <i class="bi bi-bell-fill"></i>
+                                        </button>
+
+                                    </div>
+                                </td>
+                            </tr>
+                            @empty
+                            <tr>
+                                <td colspan="9" class="text-center py-5" style="color:#9ca3af; font-size:14px;">
+                                    <i class="bi bi-inbox" style="font-size:30px; display:block; margin-bottom:8px;"></i>
+                                    Tidak ada data yang ditemukan
+                                </td>
+                            </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {{-- END INNER CARD --}}
 
         </div>
-        <!-- END CARD -->
+        {{-- END OUTER CARD --}}
 
     </div>
-    <!-- END MAIN CONTENT -->
+    {{-- END MAIN CONTENT --}}
 
 </div>
-<!-- END WRAPPER -->
 
+
+{{-- ============================================================
+     MODAL EDIT LAYANAN
+     ============================================================ --}}
 @foreach($pelanggan as $p)
-<div class="modal fade modal-notif" id="modalNotif{{ $p->id }}" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-md modal-dialog-centered">
+<div class="modal fade" id="modalEditPelanggan{{ $p->id }}" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
 
-            <div class="notif-header">
-                NOTIFIKASI
+            <form action="{{ url('/layanan/' . $p->id) }}" method="POST">
+                @csrf
+                @method('PUT')
+
+                <div class="modal-header"
+                     style="background:linear-gradient(135deg,#28a745,#20c157); color:#fff;">
+                    <h5 class="modal-title">
+                        <i class="bi bi-pencil-fill me-2"></i> Edit Data Layanan
+                    </h5>
+                </div>
+
+                <div class="modal-body">
+                    <div class="row g-3">
+
+                        <div class="col-md-6">
+                            <label class="form-label">Nama Lengkap</label>
+                            <input type="text" name="nama" class="form-control"
+                                   value="{{ $p->nama }}" placeholder="Nama pelanggan" required>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">No. HP / WhatsApp</label>
+                            <input type="text" name="no_hp" class="form-control"
+                                   value="{{ $p->no_hp }}" placeholder="08xxxxxxxxxx">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Nama Layanan</label>
+                            <input type="text" name="nama_layanan" class="form-control"
+                                   value="{{ $p->nama_layanan }}" placeholder="Nama layanan internet">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Status Pelanggan</label>
+                            <select name="status" class="form-select">
+                                <option value="aktif"    {{ strtolower($p->status) == 'aktif'    ? 'selected' : '' }}>Aktif</option>
+                                <option value="nonaktif" {{ strtolower($p->status) == 'nonaktif' ? 'selected' : '' }}>Nonaktif</option>
+                                <option value="isolir"    {{ strtolower($p->status) == 'isolir'    ? 'selected' : '' }}>Isolir</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-12">
+                            <label class="form-label">Alamat Lengkap</label>
+                            <textarea name="alamat" class="form-control" rows="3"
+                                      placeholder="Masukkan alamat lengkap pelanggan...">{{ $p->alamat }}</textarea>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-success fw-bold">
+                        <i class="bi bi-check-lg me-1"></i> Simpan Perubahan
+                    </button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+@endforeach
+
+
+{{-- ============================================================
+     MODAL NOTIFIKASI
+     ============================================================ --}}
+@foreach($pelanggan as $p)
+<div class="modal fade" id="modalNotif{{ $p->id }}" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-md modal-dialog-centered">
+        <div class="modal-content" style="border-radius:12px; overflow:hidden;">
+
+            <div class="modal-header" style="background:linear-gradient(135deg,#28a745,#20c157); color:#fff;">
+                <h5 class="modal-title fw-bold">
+                    <i class="bi bi-bell-fill me-2"></i> Notifikasi
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
 
-            <div class="notif-body">
+            <div class="modal-body">
+                @php $periodeTagihan = \Carbon\Carbon::parse($p->created_at)->subDay(); @endphp
 
-                <div class="notif-box">
-                    <div class="notif-label">Tagihan Internet Bulanan</div>
-                    <div class="notif-text">
+                <div class="border rounded p-3 mb-3">
+                    <div class="fw-bold text-uppercase mb-2" style="font-size:11px; letter-spacing:.5px; color:#555;">
+                        Tagihan Internet Bulanan
+                    </div>
+                    <div style="font-size:13.5px; color:#444; line-height:1.75;">
                         Nama Pelanggan : {{ $p->nama }}<br>
-                        @php $periodeTagihan = \Carbon\Carbon::parse($p->created_at)->subDay(); @endphp
                         Periode Tagihan : {{ $periodeTagihan->translatedFormat('F Y') }}
                     </div>
                 </div>
 
-                <div class="notif-box">
-                    <div class="notif-label">Isolir Layanan</div>
-                    <div class="notif-text">
+                <div class="border rounded p-3 mb-3">
+                    <div class="fw-bold text-uppercase mb-2" style="font-size:11px; letter-spacing:.5px; color:#555;">
+                        Isolir Layanan
+                    </div>
+                    <div style="font-size:13.5px; color:#444; line-height:1.75;">
                         Yth. {{ $p->nama }},<br>
                         Kami informasikan bahwa layanan internet Anda saat ini
-                        <b>diisolir</b> dikarenakan tagihan {{ $periodeTagihan->translatedFormat('F Y') }} telah
-                        melebihi batas jatuh tempo pembayaran.
+                        <strong>diisolir</strong> dikarenakan tagihan
+                        {{ $periodeTagihan->translatedFormat('F Y') }}
+                        telah melebihi batas jatuh tempo pembayaran.
                     </div>
                 </div>
 
-                <div class="notif-label" style="margin-bottom:8px;">Preview Pesan</div>
-                <div class="notif-preview-box">
-                    <b>TAGIHAN INTERNET BULANAN</b><br><br>
+                <div class="fw-bold text-uppercase mb-2" style="font-size:11px; letter-spacing:.5px; color:#555;">
+                    Preview Pesan
+                </div>
+                <div class="border rounded p-3 mb-3" style="font-size:13.5px; color:#333; line-height:1.8; background:#f9f9f9;">
+                    <strong>TAGIHAN INTERNET BULANAN</strong><br><br>
                     Nama Pelanggan : {{ $p->nama }}<br>
                     Periode Tagihan : {{ $periodeTagihan->translatedFormat('F Y') }}<br>
-                    Total Tagihan : Rp {{ number_format($p->layanan->harga ?? 0, 0, ',', '.') }}<br><br>
+                    Total Tagihan   : Rp {{ number_format($p->layanan->harga ?? 0, 0, ',', '.') }}<br><br>
                     Silakan lakukan pembayaran sebelum tanggal [Jatuh Tempo] ke rekening berikut:<br>
                     BCA : [No Rekening] a/n [Nama]<br>
                     BRI : [No Rekening] a/n [Nama]<br><br>
@@ -477,10 +619,10 @@ body {
                     Terima Kasih 😊🙏
                 </div>
 
-                <button class="btn-kirim" data-bs-dismiss="modal">
+                <button class="btn btn-success fw-bold w-100" data-bs-dismiss="modal"
+                        style="letter-spacing:1px;">
                     KIRIM
                 </button>
-
             </div>
 
         </div>
@@ -488,53 +630,208 @@ body {
 </div>
 @endforeach
 
-@foreach($tagihan as $t)
-<div class="modal fade" id="editTagihan{{ $t->id }}" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
+{{-- ============================================================
+     MODAL UBAH STATUS TERPILIH
+     ============================================================ --}}
+<style>
+.status-option {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 11px 14px;
+    border: 2px solid #e5e7eb;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: border-color .18s, background .18s, box-shadow .18s;
+    margin-bottom: 8px;
+    user-select: none;
+}
+.status-option:last-child { margin-bottom: 0; }
+.status-option .so-icon {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 17px; flex-shrink: 0;
+}
+.status-option .so-label { font-size: 14px; font-weight: 700; line-height: 1.2; }
+.status-option .so-desc  { font-size: 11.5px; color: #9ca3af; margin-top: 2px; }
+.status-option .so-dot {
+    width: 18px; height: 18px; border-radius: 50%;
+    border: 2px solid #d1d5db;
+    margin-left: auto; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    transition: border-color .18s, background .18s;
+}
+.status-option .so-dot::after {
+    content: \'\'; width: 8px; height: 8px;
+    border-radius: 50%; background: #fff; opacity: 0;
+    transition: opacity .15s;
+}
+.status-option.opt-aktif:hover     { border-color:#22c55e; background:#f0fdf4; }
+.status-option.opt-aktif.selected  { border-color:#16a34a; background:#f0fdf4; box-shadow:0 0 0 3px rgba(34,197,94,.15); }
+.status-option.opt-aktif.selected .so-dot { border-color:#16a34a; background:#16a34a; }
+.status-option.opt-aktif.selected .so-dot::after { opacity:1; }
+.status-option.opt-aktif .so-icon  { background:#dcfce7; color:#16a34a; }
+.status-option.opt-isolir:hover    { border-color:#f59e0b; background:#fffbeb; }
+.status-option.opt-isolir.selected { border-color:#d97706; background:#fffbeb; box-shadow:0 0 0 3px rgba(245,158,11,.15); }
+.status-option.opt-isolir.selected .so-dot { border-color:#d97706; background:#d97706; }
+.status-option.opt-isolir.selected .so-dot::after { opacity:1; }
+.status-option.opt-isolir .so-icon { background:#fef3c7; color:#d97706; }
+.status-option.opt-nonaktif:hover    { border-color:#ef4444; background:#fff1f2; }
+.status-option.opt-nonaktif.selected { border-color:#dc2626; background:#fff1f2; box-shadow:0 0 0 3px rgba(239,68,68,.15); }
+.status-option.opt-nonaktif.selected .so-dot { border-color:#dc2626; background:#dc2626; }
+.status-option.opt-nonaktif.selected .so-dot::after { opacity:1; }
+.status-option.opt-nonaktif .so-icon { background:#fee2e2; color:#dc2626; }
+</style>
 
-            <form action="{{ url('/tagihan/'.$t->id) }}" method="POST">
+<div class="modal fade" id="modalUbahStatus" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-sm modal-dialog-centered">
+        <div class="modal-content" style="border-radius:14px; overflow:hidden; box-shadow:0 20px 60px rgba(0,0,0,.15);">
+            <form id="formUbahStatus" method="POST" action="{{ url('/layanan/bulk-status') }}">
                 @csrf
-                @method('PUT')
+                <input type="hidden" name="status" id="selectedStatusValue" value="aktif">
+                <div id="hiddenIdsStatus"></div>
 
-                <div class="modal-header bg-warning">
-                    <h5 class="modal-title">Edit Tagihan</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <div class="modal-header"
+                     style="background:linear-gradient(135deg,#09973B,#0ab844); color:#fff; padding:16px 20px; border:none;">
+                    <div class="d-flex align-items-center gap-2">
+                        <div style="width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.2);
+                                    display:flex;align-items:center;justify-content:center;font-size:17px;">
+                            <i class="bi bi-toggles2"></i>
+                        </div>
+                        <div>
+                            <div style="font-weight:700;font-size:15px;line-height:1.2;">Ubah Status Terpilih</div>
+                            <div style="font-size:11.5px;opacity:.85;">
+                                <i class="bi bi-people-fill me-1"></i>
+                                <span id="jumlahTerpilih">0</span> data dipilih
+                            </div>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-close btn-close-white ms-auto" data-bs-dismiss="modal"></button>
                 </div>
 
-                <div class="modal-body">
+                <div class="modal-body" style="padding:18px 20px;">
+                    <p style="font-size:12.5px;color:#6b7280;margin-bottom:14px;">
+                        Pilih status baru yang akan diterapkan pada data terpilih:
+                    </p>
 
-                    <div class="mb-3">
-                        <label>Periode</label>
-                        <input type="text" name="periode" class="form-control" value="{{ $t->periode }}">
+                    <div class="status-option opt-aktif selected" onclick="pilihStatus(this,'aktif')">
+                        <div class="so-icon"><i class="bi bi-check-circle-fill"></i></div>
+                        <div>
+                            <div class="so-label text-success">Aktif</div>
+                            <div class="so-desc">Layanan berjalan normal</div>
+                        </div>
+                        <div class="so-dot"></div>
                     </div>
 
-                    <div class="mb-3">
-                        <label>Jumlah</label>
-                        <input type="number" name="jumlah" class="form-control" value="{{ $t->jumlah }}">
+                    <div class="status-option opt-isolir" onclick="pilihStatus(this,'isolir')">
+                        <div class="so-icon"><i class="bi bi-slash-circle-fill"></i></div>
+                        <div>
+                            <div class="so-label" style="color:#d97706;">Isolir</div>
+                            <div class="so-desc">Layanan diisolir sementara</div>
+                        </div>
+                        <div class="so-dot"></div>
                     </div>
 
-                    <div class="mb-3">
-                        <label>Status</label>
-                        <select name="status" class="form-control">
-                            <option value="Belum Bayar" {{ $t->status == 'Belum Bayar' ? 'selected' : '' }}>Belum Bayar</option>
-                            <option value="Lunas"       {{ $t->status == 'Lunas'       ? 'selected' : '' }}>Lunas</option>
-                        </select>
+                    <div class="status-option opt-nonaktif" onclick="pilihStatus(this,'nonaktif')">
+                        <div class="so-icon"><i class="bi bi-x-circle-fill"></i></div>
+                        <div>
+                            <div class="so-label text-danger">Nonaktif</div>
+                            <div class="so-desc">Layanan dinonaktifkan</div>
+                        </div>
+                        <div class="so-dot"></div>
                     </div>
-
                 </div>
 
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-success">Simpan</button>
+                <div class="modal-footer" style="padding:12px 20px; border-top:1px solid #f3f4f6;">
+                    <button type="button" class="btn btn-secondary btn-sm px-4" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-sm px-4 fw-bold"
+                            style="background:linear-gradient(135deg,#09973B,#0ab844);color:#fff;border:none;">
+                        <i class="bi bi-check-lg me-1"></i> Simpan
+                    </button>
                 </div>
-
             </form>
-
         </div>
     </div>
 </div>
-@endforeach
+
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+/* ── Checkbox helpers ── */
+function toggleAll(master) {
+    document.querySelectorAll('.row-check').forEach(cb => cb.checked = master.checked);
+    updateSelected();
+}
+function updateSelected() {
+    const total   = document.querySelectorAll('.row-check').length;
+    const checked = document.querySelectorAll('.row-check:checked').length;
+    const master  = document.getElementById('checkAll');
+    master.checked       = (checked === total && total > 0);
+    master.indeterminate = (checked > 0 && checked < total);
+}
+
+function getSelectedIds() {
+    return [...document.querySelectorAll('.row-check:checked')].map(cb => cb.value);
+}
+
+function hapusDataTerpilih() {
+    const ids = getSelectedIds();
+    if (ids.length === 0) {
+        alert('Pilih minimal satu data terlebih dahulu.');
+        return;
+    }
+    if (!confirm(`Yakin ingin menghapus ${ids.length} data terpilih? Tindakan ini tidak dapat dibatalkan.`)) return;
+
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = '{{ url("/layanan/bulk-delete") }}';
+    form.innerHTML = `
+        <input type="hidden" name="_token" value="{{ csrf_token() }}">
+    `;
+    ids.forEach(id => {
+        const input = document.createElement('input');
+        input.type  = 'hidden';
+        input.name  = 'ids[]';
+        input.value = id;
+        form.appendChild(input);
+    });
+    document.body.appendChild(form);
+    form.submit();
+}
+
+function pilihStatus(el, value) {
+    document.querySelectorAll('.status-option').forEach(o => o.classList.remove('selected'));
+    el.classList.add('selected');
+    document.getElementById('selectedStatusValue').value = value;
+}
+
+function ubahStatusTerpilih() {
+    const ids = getSelectedIds();
+    if (ids.length === 0) {
+        alert('Pilih minimal satu data terlebih dahulu.');
+        return;
+    }
+
+    document.getElementById('jumlahTerpilih').textContent = ids.length;
+
+    document.querySelectorAll('.status-option').forEach(o => o.classList.remove('selected'));
+    document.querySelector('.opt-aktif').classList.add('selected');
+    document.getElementById('selectedStatusValue').value = 'aktif';
+
+    const container = document.getElementById('hiddenIdsStatus');
+    container.innerHTML = '';
+    ids.forEach(id => {
+        const input = document.createElement('input');
+        input.type  = 'hidden';
+        input.name  = 'ids[]';
+        input.value = id;
+        container.appendChild(input);
+    });
+
+    const modal = new bootstrap.Modal(document.getElementById('modalUbahStatus'));
+    modal.show();
+}
+</script>
 </body>
 </html>

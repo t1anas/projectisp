@@ -10,7 +10,8 @@ class Layanan extends Model
 
     protected $fillable = [
         'nama_paket',
-        'harga'
+        'harga',
+        'nama_layanan'
     ];
 
     public function pelanggan()

@@ -489,7 +489,7 @@ body {
                                 <div>
                                     <div class="profil-nama">{{ $pelanggan->nama }}</div>
                                     <div class="profil-kode">
-                                        {{ $pelanggan->kode ?? 'CSR'.str_pad($pelanggan->id, 12, '0', STR_PAD_LEFT) }}
+                                        {{ $pelanggan->kode_pelanggan ?? '-' }}
                                     </div>
                                 </div>
                             </div>
