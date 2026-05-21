@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use App\Models\Tagihan;
@@ -65,96 +66,106 @@ class TagihanController extends Controller
         return back()->with('success', 'Tagihan berhasil ditambahkan');
     }
 
-public function update(Request $request, $id)
-{
-    $request->validate([
-        'tanggal'    => 'required|date',
-        'total'      => 'required|numeric',
-        'layanan_id' => 'nullable|exists:layanan,id',
-    ]);
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'tanggal'      => 'required|date',
+            'total'        => 'required|numeric',
+            'layanan_id'   => 'nullable|exists:layanan,id',
+            'jumlah_bayar' => 'nullable|numeric',
+        ]);
 
-    $tagihan    = Tagihan::findOrFail($id);
-    $statusLama = $tagihan->status;
-    $statusBaru = $request->status ?? $tagihan->status;
-    $jatuhTempo = \Carbon\Carbon::parse($request->tanggal)->addDays(3);
+        $tagihan    = Tagihan::findOrFail($id);
+        $statusLama = $tagihan->status;
+        $statusBaru = $request->status ?? $tagihan->status;
+        $jatuhTempo = \Carbon\Carbon::parse($request->tanggal)->addDays(3);
 
-    $tagihan->update([
-        'tanggal'     => $request->tanggal,
-        'bulan'       => date('m', strtotime($request->tanggal)),
-        'tahun'       => date('Y', strtotime($request->tanggal)),
-        'keterangan'  => $request->keterangan,
-        'jatuh_tempo' => $jatuhTempo,
-        'layanan_id'  => $request->layanan_id ?? $tagihan->layanan_id,
-        'status'      => $statusBaru,
-        'total'       => $request->total,
-    ]);
+        $tagihan->update([
+            'tanggal'      => $request->tanggal,
+            'bulan'        => date('m', strtotime($request->tanggal)),
+            'tahun'        => date('Y', strtotime($request->tanggal)),
+            'keterangan'   => $request->keterangan,
+            'jatuh_tempo'  => $jatuhTempo,
+            'jumlah_bayar' => $request->jumlah_bayar ?? $tagihan->jumlah_bayar,
+            'layanan_id'   => $request->layanan_id ?? $tagihan->layanan_id,
+            'status'       => $statusBaru,
+            'total'        => $request->total,
+        ]);
 
-    if ($statusLama !== 'lunas' && $statusBaru === 'lunas') {
-        $sudahAdaPembayaran = Pembayaran::where('tagihan_id', $tagihan->id)->exists();
+        if ($statusLama !== 'lunas' && $statusBaru === 'lunas') {
+            $sudahAdaPembayaran = Pembayaran::where('tagihan_id', $tagihan->id)->exists();
 
-        if (!$sudahAdaPembayaran) {
-            Pembayaran::create([
-                'pelanggan_id'  => $tagihan->pelanggan_id,
-                'layanan_id'    => $tagihan->layanan_id,
-                'tagihan_id'    => $tagihan->id,
-                'metode_id'     => null, // tidak diketahui, bisa diisi default
-                'tanggal_bayar' => now(),
-                'jumlah_bayar'  => $tagihan->total,
-                'status'        => 'lunas',
-            ]);
+            if (!$sudahAdaPembayaran) {
+                // CATATAN: metode_id null karena update manual tidak melewati form bayar.
+                // Pertimbangkan menambahkan field metode_id pada form edit tagihan
+                // jika ingin data pembayaran lebih lengkap.
+                Pembayaran::create([
+                    'pelanggan_id'  => $tagihan->pelanggan_id,
+                    'layanan_id'    => $tagihan->layanan_id,
+                    'tagihan_id'    => $tagihan->id,
+                    'metode_id'     => null,
+                    'tanggal_bayar' => now(),
+                    'jumlah_bayar'  => $tagihan->total,
+                    'status'        => 'lunas',
+                ]);
+            }
         }
-    }
 
-    if ($statusLama === 'lunas' && $statusBaru !== 'lunas') {
-        Pembayaran::where('tagihan_id', $tagihan->id)->delete();
-    }
+        if ($statusLama === 'lunas' && $statusBaru !== 'lunas') {
+            Pembayaran::where('tagihan_id', $tagihan->id)->delete();
+        }
 
-    return back()->with('success', 'Tagihan berhasil diupdate');
-}
+        return back()->with('success', 'Tagihan berhasil diupdate');
+    }
 
     public function destroy($id)
     {
         $tagihan = Tagihan::findOrFail($id);
+
+        // BUG FIX: Hapus semua pembayaran terkait sebelum menghapus tagihan,
+        // agar tidak ada data orphan di tabel pembayaran.
+        Pembayaran::where('tagihan_id', $tagihan->id)->delete();
+
         $tagihan->delete();
 
         return redirect()->back()->with('success', 'Tagihan berhasil dihapus');
     }
 
-public function bayar(Request $request, $id)
-{
-    $request->validate([
-        'tanggal_bayar' => 'required|date',
-        'metode_id'     => 'required',
-        'total'         => 'required|numeric',
-    ]);
+    public function bayar(Request $request, $id)
+    {
+        $request->validate([
+            'tanggal_bayar' => 'required|date',
+            'metode_id'     => 'required',
+            'total'         => 'required|numeric',
+        ]);
 
-    $tagihan = Tagihan::findOrFail($id);
+        $tagihan = Tagihan::findOrFail($id);
 
-    \App\Models\Pembayaran::create([
-        'tagihan_id'    => $tagihan->id,
-        'pelanggan_id'  => $tagihan->pelanggan_id,
-        'layanan_id'    => $tagihan->layanan_id,
-        'jumlah_bayar'  => $request->total,
-        'tanggal_bayar' => $request->tanggal_bayar,
-        'metode_id'     => $request->metode_id,
-        'status'        => 'lunas',
-    ]);
+        Pembayaran::create([
+            'tagihan_id'    => $tagihan->id,
+            'pelanggan_id'  => $tagihan->pelanggan_id,
+            'layanan_id'    => $tagihan->layanan_id,
+            'jumlah_bayar'  => $request->total,
+            'tanggal_bayar' => $request->tanggal_bayar,
+            'metode_id'     => $request->metode_id,
+            'status'        => 'lunas',
+        ]);
 
-    $totalBayar = \App\Models\Pembayaran::where('tagihan_id', $tagihan->id)
-        ->sum('jumlah_bayar');
+        $totalBayar = Pembayaran::where('tagihan_id', $tagihan->id)
+            ->sum('jumlah_bayar');
 
-    if ($totalBayar <= 0) {
-        $tagihan->status = 'belum bayar';
-    } elseif ($totalBayar < $tagihan->total) {
-        $tagihan->status = 'belum lunas';
-    } else {
-        $tagihan->status = 'lunas';
+        if ($totalBayar <= 0) {
+            $tagihan->status = 'belum bayar';
+        } elseif ($totalBayar < $tagihan->total) {
+            $tagihan->status = 'belum lunas';
+        } else {
+            $tagihan->status = 'lunas';
+        }
+
+        $tagihan->save();
+
+        return back()->with('success', 'Pembayaran berhasil dikonfirmasi');
     }
-
-    $tagihan->save();
-
-    return back()->with('success', 'Pembayaran berhasil dikonfirmasi');
-}
 
     public function kwitansi($id)
     {
@@ -163,15 +174,19 @@ public function bayar(Request $request, $id)
     }
 
     public function bulkDelete(Request $request)
-{
-    $ids = $request->input('ids', []);
+    {
+        $ids = $request->input('ids', []);
 
-    if (empty($ids)) {
-        return back()->with('error', 'Tidak ada data yang dipilih.');
+        if (empty($ids)) {
+            return back()->with('error', 'Tidak ada data yang dipilih.');
+        }
+
+        // BUG FIX: Sebelumnya langsung menghapus tagihan tanpa menghapus
+        // pembayaran terkait, menyebabkan data orphan di tabel pembayaran.
+        Pembayaran::whereIn('tagihan_id', $ids)->delete();
+
+        Tagihan::whereIn('id', $ids)->delete();
+
+        return back()->with('success', count($ids) . ' tagihan berhasil dihapus.');
     }
-
-    Tagihan::whereIn('id', $ids)->delete();
-
-    return back()->with('success', count($ids) . ' tagihan berhasil dihapus.');
 }
-    }

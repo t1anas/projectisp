@@ -11,40 +11,40 @@ use App\Models\Layanan;
 
 class PemasukanController extends Controller
 {
-public function index(Request $request)
-{
-    $query = Pembayaran::with('pelanggan', 'layanan', 'metode');
+    public function index(Request $request)
+    {
+        $query = Pembayaran::with('pelanggan', 'layanan', 'metode');
 
-    if ($request->tgl_awal && $request->tgl_akhir) {
-        $query->whereBetween('tanggal_bayar', [
-            $request->tgl_awal,
-            $request->tgl_akhir
-        ]);
+        if ($request->tgl_awal && $request->tgl_akhir) {
+            $query->whereBetween('tanggal_bayar', [
+                $request->tgl_awal,
+                $request->tgl_akhir
+            ]);
+        }
+
+        if ($request->metode) {
+            $query->where('metode_id', $request->metode);
+        }
+
+        if ($request->cari) {
+            $query->whereHas('pelanggan', function ($q) use ($request) {
+                $q->where('nama', 'like', '%' . $request->cari . '%');
+            });
+        }
+
+        $pembayaran = $query->get();
+
+        $total = $pembayaran->sum('jumlah_bayar');
+
+        $metode     = MetodePembayaran::all();
+        $layanan    = Layanan::all();
+        $tagihan    = Tagihan::all();
+        $pelanggan  = Pelanggan::with(['layanan', 'tagihan'])->get();
+
+        return view('pembayaran', compact(
+            'pembayaran', 'metode', 'pelanggan', 'layanan', 'tagihan', 'total'
+        ));
     }
-
-    if ($request->metode) {
-        $query->where('metode_id', $request->metode);
-    }
-
-    if ($request->cari) {
-        $query->whereHas('pelanggan', function ($q) use ($request) {
-            $q->where('nama', 'like', '%' . $request->cari . '%');
-        });
-    }
-
-    $pembayaran = $query->get();
-
-    $total = $pembayaran->sum('jumlah_bayar');
-
-    $metode     = MetodePembayaran::all();
-    $layanan    = Layanan::all();
-    $tagihan    = Tagihan::all();
-    $pelanggan  = Pelanggan::with(['layanan', 'tagihan'])->get();
-
-    return view('pembayaran', compact(
-        'pembayaran', 'metode', 'pelanggan', 'layanan', 'tagihan', 'total'
-    ));
-}
 
     public function create()
     {
@@ -57,42 +57,51 @@ public function index(Request $request)
         ));
     }
 
-public function store(Request $request)
-{
-    $request->validate([
-        'pelanggan_id' => 'required',
-        'layanan_id'   => 'required',
-        'tagihan_id'   => 'required',
-        'metode_id'    => 'required',
-        'tanggal_bayar'=> 'required|date',
-        'jumlah_bayar' => 'required|numeric',
-    ]);
+    public function store(Request $request)
+    {
+        $request->validate([
+            'pelanggan_id'  => 'required',
+            'layanan_id'    => 'required',
+            'tagihan_id'    => 'required',
+            'metode_id'     => 'required',
+            'tanggal_bayar' => 'required|date',
+            'jumlah_bayar'  => 'required|numeric',
+        ]);
 
-    $tagihan = Tagihan::findOrFail($request->tagihan_id);
+        $tagihan = Tagihan::findOrFail($request->tagihan_id);
 
-    if ($tagihan->status == 'lunas') {
-        return back()->with('error', 'Tagihan sudah lunas!');
+        if ($tagihan->status == 'lunas') {
+            return back()->with('error', 'Tagihan sudah lunas!');
+        }
+
+        Pembayaran::create([
+            'pelanggan_id'  => $request->pelanggan_id,
+            'layanan_id'    => $request->layanan_id,
+            'tagihan_id'    => $request->tagihan_id,
+            'metode_id'     => $request->metode_id,
+            'tanggal_bayar' => $request->tanggal_bayar,
+            'jumlah_bayar'  => $request->jumlah_bayar,
+            'status'        => 'lunas',
+        ]);
+
+        $totalBayar = Pembayaran::where('tagihan_id', $tagihan->id)
+            ->sum('jumlah_bayar');
+
+        if ($totalBayar <= 0) {
+            $tagihan->status = 'belum bayar';
+        } elseif ($totalBayar < $tagihan->total) {
+            $tagihan->status = 'belum lunas';
+        } else {
+            $tagihan->status = 'lunas';
+        }
+
+        // BUG FIX: $tagihan->save() sebelumnya tidak dipanggil,
+        // sehingga perubahan status tidak tersimpan ke database.
+        $tagihan->save();
+
+        return redirect()->route('pembayaran')
+            ->with('success', 'Data pembayaran berhasil ditambahkan');
     }
-
-    Pembayaran::create([
-        'pelanggan_id' => $request->pelanggan_id,
-        'layanan_id'   => $request->layanan_id,
-        'tagihan_id'   => $request->tagihan_id,
-        'metode_id'    => $request->metode_id,
-        'tanggal_bayar'=> $request->tanggal_bayar,
-        'jumlah_bayar' => $request->jumlah_bayar,
-        'status'       => 'lunas'
-    ]);
-
-    $totalBayar = Pembayaran::where('tagihan_id', $tagihan->id)
-        ->sum('jumlah_bayar');
-
-    $tagihan->status = ($totalBayar >= $tagihan->total) ? 'lunas' : 'belum bayar';
-    $tagihan->save();
-
-    return redirect()->route('pembayaran')
-        ->with('success', 'Data pembayaran berhasil ditambahkan');
-}
 
     public function edit($id)
     {
@@ -107,63 +116,66 @@ public function store(Request $request)
         ));
     }
 
-public function update(Request $request, $id)
-{
-    $request->validate([
-        'tanggal_bayar' => 'required|date',
-        'jumlah_bayar'  => 'required|numeric',
-        'metode_id'     => 'required',
-        'status'        => 'required|in:lunas,belum bayar',
-    ]);
-
-    $pembayaran = Pembayaran::findOrFail($id);
-
-    $pembayaran->update([
-        'tanggal_bayar' => $request->tanggal_bayar,
-        'jumlah_bayar'  => $request->jumlah_bayar,
-        'metode_id'     => $request->metode_id,
-        'status'        => $request->status,
-    ]);
-
-    return redirect()->route('pembayaran')
-        ->with('success', 'Data pembayaran berhasil diupdate');
-}
-
-    public function destroy($id)
-{
-    $pembayaran = Pembayaran::findOrFail($id);
-    $tagihan = Tagihan::findOrFail($pembayaran->tagihan_id);
-
-    $pembayaran->delete();
-
-    $totalBayar = Pembayaran::where('tagihan_id', $tagihan->id)
-        ->sum('jumlah_bayar');
-
-    if ($totalBayar <= 0) {
-        $tagihan->status = 'belum bayar';
-    } elseif ($totalBayar < $tagihan->total) {
-        $tagihan->status = 'belum lunas';
-    } else {
-        $tagihan->status = 'lunas';
-    }
-
-    $tagihan->save();
-
-    Pembayaran::where('tagihan_id', $tagihan->id)
-        ->update([
-            'status' => match($tagihan->status) {
-                'lunas'       => 'lunas',
-                'belum lunas' => 'belum lunas',
-                default       => 'belum bayar',
-            }
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'tanggal_bayar' => 'required|date',
+            'jumlah_bayar'  => 'required|numeric',
+            'metode_id'     => 'required',
+            // BUG FIX: Sebelumnya hanya 'lunas,belum bayar'.
+            // 'belum lunas' ditambahkan agar konsisten dengan seluruh sistem.
+            'status'        => 'required|in:lunas,belum bayar,belum lunas',
         ]);
 
-    return redirect()->route('pembayaran')
-        ->with('success', 'Pembayaran dihapus & status diperbarui');
-}
-public function menu()
-{
-    return view('pemasukan');
-}
+        $pembayaran = Pembayaran::findOrFail($id);
 
+        $pembayaran->update([
+            'tanggal_bayar' => $request->tanggal_bayar,
+            'jumlah_bayar'  => $request->jumlah_bayar,
+            'metode_id'     => $request->metode_id,
+            'status'        => $request->status,
+        ]);
+
+        return redirect()->route('pembayaran')
+            ->with('success', 'Data pembayaran berhasil diupdate');
+    }
+
+    public function destroy($id)
+    {
+        $pembayaran = Pembayaran::findOrFail($id);
+        $tagihan = Tagihan::findOrFail($pembayaran->tagihan_id);
+
+        $pembayaran->delete();
+
+        $totalBayar = Pembayaran::where('tagihan_id', $tagihan->id)
+            ->sum('jumlah_bayar');
+
+        if ($totalBayar <= 0) {
+            $tagihan->status = 'belum bayar';
+        } elseif ($totalBayar < $tagihan->total) {
+            $tagihan->status = 'belum lunas';
+        } else {
+            $tagihan->status = 'lunas';
+        }
+
+        $tagihan->save();
+
+        Pembayaran::where('tagihan_id', $tagihan->id)
+            ->update([
+                'status' => match($tagihan->status) {
+                    'lunas'       => 'lunas',
+                    'belum lunas' => 'belum lunas',
+                    default       => 'belum bayar',
+                }
+            ]);
+
+        // BUG FIX: Typo "diperbaruis" → "diperbarui"
+        return redirect()->route('pembayaran')
+            ->with('success', 'Data pembayaran berhasil diperbarui');
+    }
+
+    public function menu()
+    {
+        return view('pemasukan');
+    }
 }

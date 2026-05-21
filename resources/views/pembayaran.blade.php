@@ -88,30 +88,6 @@ body{
     display: none;
 }
 .tagihan-card.selected .tag-check { display: inline; }
-.badge-status {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    padding: 5px 12px;
-    border-radius: 50px;
-    font-size: 12px;
-    font-weight: 700;
-}
-.badge-lunas {
-    background: linear-gradient(135deg,#e8fff1,#d8ffe8);
-    color: #0f9d58;
-    border: 1px solid #b7f3cd;
-}
-.badge-belum-lunas {
-    background: linear-gradient(135deg,#fffbeb,#fef3c7);
-    color: #d97706;
-    border: 1px solid #fde68a;
-}
-.badge-belum-bayar {
-    background: linear-gradient(135deg,#fff1f1,#ffe1e1);
-    color: #dc3545;
-    border: 1px solid #ffc4c4;
-}
 </style>
 </head>
 
@@ -139,22 +115,23 @@ body{
     </a>
 
     @php
-        $instalasiUrl = match(Auth::user()->role) {
-            'cs'    => '/instalasi',
-            'admin' => '/approve',
-            'noc'   => '/instalasi-noc',
-            default => '/instalasi'
-        };
+    $instalasiUrl = match(Auth::user()->role) {
+        'cs'    => '/instalasi',
+        'admin' => '/approve',
+        'noc'   => '/instalasi-noc',
+        default => '/instalasi'
+    };
     @endphp
 
     <a href="{{ url($instalasiUrl) }}" class="menu-item">
-    <i class="bi bi-router"></i> Instalasi Baru</a>
+        <i class="bi bi-router"></i> Instalasi Baru
+    </a>
 
-        @if(Auth::user()->role == 'admin')
-            <a href="{{ url('/pemasukan') }}" class="menu-item active">
-                <i class="bi bi-wallet2"></i> Pemasukan
-            </a>
-        @endif
+    @if(Auth::user()->role == 'admin')
+    <a href="{{ url('/pemasukan') }}" class="menu-item">
+        <i class="bi bi-wallet2"></i> Pemasukan
+    </a>
+    @endif
 
     <div class="section-label">Pelanggan</div>
 
@@ -345,20 +322,29 @@ body{
                         </td>
                         <td class="text-center">{{ $item->metode->nama_metode ?? '-' }}</td>
                         <td class="text-center">
-    @if ($item->status == 'lunas')
-        <span class="badge-status badge-lunas">
-            <i class="bi bi-check-circle-fill" style="font-size:10px;"></i> Lunas
-        </span>
-    @elseif ($item->status == 'belum lunas')
-        <span class="badge-status badge-belum-lunas">
-            <i class="bi bi-clock-fill" style="font-size:10px;"></i> Belum Lunas
-        </span>
-    @else
-        <span class="badge-status badge-belum-bayar">
-            <i class="bi bi-x-circle-fill" style="font-size:10px;"></i> Belum Bayar
-        </span>
-    @endif
-</td>
+                            @if ($item->status == 'lunas')
+                                <span style="display:inline-flex; align-items:center; gap:5px;
+                                             background:linear-gradient(135deg,#e8fff1,#d8ffe8);
+                                             color:#0f9d58; padding:5px 12px; border-radius:50px;
+                                             font-size:12px; font-weight:700; border:1px solid #b7f3cd;">
+                                    <i class="bi bi-check-circle-fill" style="font-size:10px;"></i> Lunas
+                                </span>
+                            @elseif ($item->status == 'belum lunas')
+                                <span style="display:inline-flex; align-items:center; gap:5px;
+                                             background:linear-gradient(135deg,#fff7e6,#ffecc2);
+                                             color:#b45309; padding:5px 12px; border-radius:50px;
+                                             font-size:12px; font-weight:700; border:1px solid #fde68a;">
+                                    <i class="bi bi-clock-fill" style="font-size:10px;"></i> Belum Lunas
+                                </span>
+                            @else
+                                <span style="display:inline-flex; align-items:center; gap:5px;
+                                             background:linear-gradient(135deg,#fff1f1,#ffe1e1);
+                                             color:#dc3545; padding:5px 12px; border-radius:50px;
+                                             font-size:12px; font-weight:700; border:1px solid #ffc4c4;">
+                                    <i class="bi bi-x-circle-fill" style="font-size:10px;"></i> Belum Bayar
+                                </span>
+                            @endif
+                        </td>
                         <td class="text-center">
                             <div style="display:flex; align-items:center; gap:8px; justify-content:center;">
                                 <button class="action-btn btn-warning"
@@ -410,6 +396,7 @@ body{
 </div>
 </div>
 
+<!-- ===== MODAL TAMBAH ===== -->
 <div class="modal fade" id="modalPembayaran" tabindex="-1">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
@@ -433,12 +420,26 @@ body{
                             <select name="pelanggan_id" id="pelanggan" class="form-select" required>
                                 <option value="">-- Pilih Pelanggan --</option>
                                 @foreach($pelanggan as $p)
+                                    @php
+                                        $tagihanData = $p->tagihan
+                                            ->where('status', '!=', 'lunas')
+                                            ->values()
+                                            ->map(function($t) use ($p) {
+                                                return [
+                                                    'id'      => $t->id,
+                                                    'jenis'   => $t->jenis ?? $t->keterangan ?? 'Bulanan',
+                                                    'tanggal' => $t->tanggal ?? $t->created_at,
+                                                    'nominal' => $t->total,
+                                                    'status'  => $t->status,
+                                                ];
+                                            });
+                                    @endphp
                                     <option
                                         value="{{ $p->id }}"
                                         data-layanan="{{ $p->layanan_id }}"
                                         data-paket="{{ $p->layanan->nama_paket ?? '' }}"
                                         data-harga="{{ $p->layanan->harga ?? 0 }}"
-                                        data-tagihan="{{ htmlspecialchars($p->tagihan->map(function($t) use ($p) { return ['id' => $t->id, 'jenis' => $t->jenis ?? 'Bulanan', 'tanggal' => $t->tanggal, 'nominal' => $t->nominal ?? ($p->layanan->harga ?? 0)]; })->toJson(), ENT_QUOTES) }}">
+                                        data-tagihan="{{ e(json_encode($tagihanData)) }}">
                                         {{ $p->nama }}
                                     </option>
                                 @endforeach
@@ -476,6 +477,7 @@ body{
                             </label>
                             <input type="hidden" name="tagihan_id" id="tagihan_id">
 
+                            {{-- State: belum pilih pelanggan --}}
                             <div id="tagihan_placeholder"
                                  style="border:2px dashed #cbd5e1; border-radius:12px;
                                         padding:20px; text-align:center; color:#94a3b8;">
@@ -483,8 +485,10 @@ body{
                                 Pilih pelanggan terlebih dahulu untuk melihat daftar tagihan
                             </div>
 
+                            {{-- State: ada tagihan --}}
                             <div id="tagihan_list" class="row g-2" style="display:none;"></div>
 
+                            {{-- State: tidak ada tagihan --}}
                             <div id="tagihan_empty"
                                  style="display:none; border:2px dashed #fca5a5; border-radius:12px;
                                         padding:20px; text-align:center; color:#ef4444;">
@@ -507,7 +511,8 @@ body{
                             <label class="form-label fw-semibold">Status</label>
                             <select name="status" class="form-select">
                                 <option value="lunas">Lunas</option>
-                                <option value="belum">Belum</option>
+                                <option value="belum bayar">Belum Bayar</option>
+                                <option value="belum lunas">Belum Lunas</option>
                             </select>
                         </div>
 
@@ -526,6 +531,7 @@ body{
     </div>
 </div>
 
+<!-- ===== MODAL EDIT ===== -->
 <div class="modal fade" id="modalEditPembayaran" tabindex="-1">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
@@ -574,11 +580,17 @@ body{
                             </select>
                         </div>
 
+                        {{--
+                            BUG FIX: Sebelumnya hanya ada satu opsi "belum" dengan value="belum"
+                            yang tidak cocok dengan validasi controller (in:lunas,belum bayar,belum lunas).
+                            Diperbaiki menjadi tiga opsi dengan value yang benar.
+                        --}}
                         <div class="col-md-6">
                             <label class="form-label">Status</label>
                             <select name="status" id="edit_status" class="form-select">
                                 <option value="lunas">Lunas</option>
-                                <option value="belum">Belum</option>
+                                <option value="belum bayar">Belum Bayar</option>
+                                <option value="belum lunas">Belum Lunas</option>
                             </select>
                         </div>
 
@@ -601,24 +613,20 @@ body{
 <script>
 document.addEventListener('DOMContentLoaded', function () {
 
-    const selPelanggan   = document.getElementById('pelanggan');
-    const tagihanList    = document.getElementById('tagihan_list');
-    const tagihanPH      = document.getElementById('tagihan_placeholder');
-    const tagihanEmpty   = document.getElementById('tagihan_empty');
+    const selPelanggan  = document.getElementById('pelanggan');
+    const tagihanList   = document.getElementById('tagihan_list');
+    const tagihanPH     = document.getElementById('tagihan_placeholder');
+    const tagihanEmpty  = document.getElementById('tagihan_empty');
 
     if (selPelanggan) {
         selPelanggan.addEventListener('change', function () {
-            const opt      = this.options[this.selectedIndex];
-            const layanan  = opt.getAttribute('data-layanan') || '';
-            const paket    = opt.getAttribute('data-paket')   || '';
-            const harga    = opt.getAttribute('data-harga')   || 0;
-            let   tagihans = [];
 
-            try { tagihans = JSON.parse(opt.getAttribute('data-tagihan') || '[]'); }
-            catch(e) { tagihans = []; }
+            const opt     = this.options[this.selectedIndex];
+            const layanan = opt.getAttribute('data-layanan') || '';
+            const paket   = opt.getAttribute('data-paket')   || '';
 
-            document.getElementById('layanan_id').value  = layanan;
-            document.getElementById('paket_view').value  = paket;
+            document.getElementById('layanan_id').value = layanan;
+            document.getElementById('paket_view').value = paket;
 
             document.getElementById('tagihan_id').value    = '';
             document.getElementById('jumlah_bayar').value  = '';
@@ -631,9 +639,16 @@ document.addEventListener('DOMContentLoaded', function () {
                 return;
             }
 
+            let tagihans = [];
+            try {
+                tagihans = JSON.parse(opt.getAttribute('data-tagihan') || '[]');
+            } catch (e) {
+                tagihans = [];
+            }
+
             tagihanPH.style.display = 'none';
 
-            if (tagihans.length === 0) {
+            if (!tagihans || tagihans.length === 0) {
                 tagihanList.style.display  = 'none';
                 tagihanEmpty.style.display = '';
                 return;
@@ -642,29 +657,44 @@ document.addEventListener('DOMContentLoaded', function () {
             tagihanList.style.display  = '';
             tagihanEmpty.style.display = 'none';
 
-            tagihans.forEach(function(t) {
+            tagihans.forEach(function (t) {
+
                 const col = document.createElement('div');
                 col.className = 'col-12 col-md-6';
 
-                const tgl = t.tanggal
-                    ? new Date(t.tanggal).toLocaleDateString('id-ID', {day:'2-digit',month:'long',year:'numeric'})
-                    : '-';
+                let tglText = '-';
+                if (t.tanggal) {
+                    try {
+                        tglText = new Date(t.tanggal).toLocaleDateString('id-ID', {
+                            day: '2-digit', month: 'long', year: 'numeric'
+                        });
+                    } catch(e) { tglText = t.tanggal; }
+                }
 
-                const nominal = parseInt(t.nominal || 0).toLocaleString('id-ID');
+                const nominalRaw       = parseInt(t.nominal) || 0;
+                const nominalFormatted = nominalRaw.toLocaleString('id-ID');
 
                 col.innerHTML = `
-                    <div class="tagihan-card" data-id="${t.id}" data-nominal="${t.nominal || 0}">
-                        <div class="tag-icon"><i class="bi bi-receipt-cutoff"></i></div>
+                    <div class="tagihan-card"
+                         data-id="${t.id}"
+                         data-nominal="${nominalRaw}">
+                        <div class="tag-icon">
+                            <i class="bi bi-receipt-cutoff"></i>
+                        </div>
                         <div>
                             <div class="tag-jenis">${t.jenis || 'Tagihan'}</div>
-                            <div class="tag-tanggal"><i class="bi bi-calendar3 me-1" style="font-size:11px;"></i>${tgl}</div>
+                            <div class="tag-tanggal">
+                                <i class="bi bi-calendar3 me-1" style="font-size:11px;"></i>${tglText}
+                            </div>
                         </div>
-                        <div class="tag-nominal">Rp ${nominal}</div>
+                        <div class="tag-nominal">Rp ${nominalFormatted}</div>
                         <i class="bi bi-check-circle-fill tag-check"></i>
                     </div>`;
 
                 col.querySelector('.tagihan-card').addEventListener('click', function () {
-                    document.querySelectorAll('.tagihan-card').forEach(c => c.classList.remove('selected'));
+                    document.querySelectorAll('#tagihan_list .tagihan-card')
+                        .forEach(function (c) { c.classList.remove('selected'); });
+
                     this.classList.add('selected');
 
                     document.getElementById('tagihan_id').value   = this.getAttribute('data-id');
@@ -684,10 +714,10 @@ document.addEventListener('DOMContentLoaded', function () {
             document.getElementById('tagihan_id').value   = '';
             document.getElementById('paket_view').value   = '';
             document.getElementById('jumlah_bayar').value = '';
-            tagihanList.innerHTML = '';
-            tagihanList.style.display  = 'none';
-            tagihanEmpty.style.display = 'none';
-            tagihanPH.style.display    = '';
+            tagihanList.innerHTML              = '';
+            tagihanList.style.display          = 'none';
+            tagihanEmpty.style.display         = 'none';
+            tagihanPH.style.display            = '';
             document.getElementById('tanggal_bayar').value = new Date().toISOString().split('T')[0];
         });
     }
