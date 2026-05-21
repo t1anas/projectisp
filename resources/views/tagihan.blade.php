@@ -76,10 +76,13 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f4f6f9; }
     };
 @endphp
 
-<a href="{{ url($instalasiUrl) }}" class="menu-item">
-    <i class="bi bi-router"></i> Instalasi Baru
-</a>        @if(Auth::user()->role == 'admin')
-        <a href="{{ url('/pemasukan') }}" class="menu-item"><i class="bi bi-wallet2"></i> Pemasukan</a>
+        <a href="{{ url($instalasiUrl) }}" class="menu-item">
+            <i class="bi bi-router"></i> Instalasi Baru
+        </a>
+        @if(Auth::user()->role == 'admin')
+            <a href="{{ url('/pemasukan') }}" class="menu-item active">
+                <i class="bi bi-wallet2"></i> Pemasukan
+            </a>
         @endif
         <div class="section-label">Pelanggan</div>
         <a href="{{ url('/pelanggan') }}" class="menu-item"><i class="bi bi-people"></i> Data Pelanggan</a>
@@ -148,6 +151,22 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f4f6f9; }
                             <i class="bi bi-plus-lg me-1"></i> Tambah
                         </button>
                     </div>
+                    <div class="col-md-auto">
+    <div class="dropdown">
+        <button class="btn-data-terpilih dropdown-toggle"
+                type="button" data-bs-toggle="dropdown">
+            Data Terpilih
+        </button>
+        <ul class="dropdown-menu shadow">
+            <li>
+                <button type="button" class="dropdown-item text-danger"
+                        onclick="hapusTagihanTerpilih()">
+                    <i class="bi bi-trash-fill me-2"></i> Hapus Data Terpilih
+                </button>
+            </li>
+        </ul>
+    </div>
+</div>
                     <form method="GET" action="{{ url('/tagihan') }}" class="col">
                         <div class="row g-3">
                             <div class="col-md-4">
@@ -160,6 +179,7 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f4f6f9; }
                                     <option value="">Semua Status</option>
                                     <option value="lunas"       {{ request('status') == 'lunas'       ? 'selected' : '' }}>Lunas</option>
                                     <option value="belum bayar" {{ request('status') == 'belum bayar' ? 'selected' : '' }}>Belum Bayar</option>
+                                    <option value="belum lunas" {{ request('status') == 'belum lunas' ? 'selected' : '' }}>Belum Lunas</option>
                                 </select>
                             </div>
                             <div class="col-md-3">
@@ -181,6 +201,12 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f4f6f9; }
                 <table class="table table-bordered table-hover align-middle">
                     <thead class="table-light text-center fw-bold">
                         <tr>
+                            <th>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="checkAll" onchange="toggleAll(this)">
+                                    <label class="form-check-label" for="checkAll"></label>
+                                </div>
+                            </th>
                             <th>No</th>
                             <th>Tanggal</th>
                             <th style="min-width:180px;">Nama</th>
@@ -194,6 +220,13 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f4f6f9; }
                     <tbody class="text-center">
                         @forelse($tagihan as $t)
                         <tr>
+                            <td>
+                                <div class="form-check">
+                                    <input class="form-check-input row-check" type="checkbox" value="{{ $t->id }}" 
+                                        id="check{{ $t->id }}" onchange="updateSelected()">
+                                    <label class="form-check-label" for="check{{ $t->id }}"></label>
+                                </div>
+                            </td>
                             <td>{{ $loop->iteration }}</td>
                             <td>
                                 <span class="date-pill">
@@ -209,8 +242,11 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f4f6f9; }
                             <td>
                                 @if($t->status == 'lunas')
                                     <span class="status-pill status-lunas"><i class="bi bi-check-circle-fill"></i> Lunas</span>
+                                @elseif($t->status == 'belum lunas')
+                                    <span class="status-pill status-belum"><i class="bi bi-exclamation-triangle-fill"></i> Belum Lunas</span>
                                 @else
                                     <span class="status-pill status-belum"><i class="bi bi-x-circle-fill"></i> Belum Bayar</span>
+
                                 @endif
                             </td>
                             <td>
@@ -389,7 +425,9 @@ function updateLayanan(select) {
                             <small class="text-muted d-block mb-1">Status Pembayaran</small>
                             @if($t->status == 'lunas')
                                 <span class="badge bg-success px-3 py-2 rounded-pill">Sudah Dibayar</span>
-                            @else
+                            @elseif($t->status == 'belum lunas')
+                                <span class="badge bg-warning text-dark px-3 py-2 rounded-pill">Belum Lunas</span>
+                            @else   
                                 <span class="badge bg-danger px-3 py-2 rounded-pill">Belum Dibayar</span>
                             @endif
                         </div>
@@ -452,6 +490,7 @@ function updateLayanan(select) {
                         <label class="form-label fw-semibold">Status Pembayaran</label>
                         <select name="status" class="form-select rounded-3">
                             <option value="lunas"       {{ $t->status == 'lunas'       ? 'selected' : '' }}>Lunas</option>
+                            <option value="belum lunas" {{ $t->status == 'belum lunas' ? 'selected' : '' }}>Belum Lunas</option>
                             <option value="belum bayar" {{ $t->status == 'belum bayar' ? 'selected' : '' }}>Belum Bayar</option>
                         </select>
                     </div>
@@ -471,5 +510,48 @@ function updateLayanan(select) {
 @endforeach
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+function toggleAll(master) {
+    document.querySelectorAll('.row-check').forEach(cb => cb.checked = master.checked);
+    updateSelected();
+}
+
+function updateSelected() {
+    const total   = document.querySelectorAll('.row-check').length;
+    const checked = document.querySelectorAll('.row-check:checked').length;
+    const master  = document.getElementById('checkAll');
+    master.checked       = (checked === total && total > 0);
+    master.indeterminate = (checked > 0 && checked < total);
+}
+
+function getSelectedIds() {
+    return [...document.querySelectorAll('.row-check:checked')].map(cb => cb.value);
+}
+
+function hapusTagihanTerpilih() {
+    const ids = getSelectedIds();
+    if (ids.length === 0) {
+        alert('Pilih minimal satu data terlebih dahulu.');
+        return;
+    }
+    if (!confirm(`Yakin ingin menghapus ${ids.length} tagihan terpilih? Tindakan ini tidak dapat dibatalkan.`)) return;
+
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = '{{ url("/tagihan/bulk-delete") }}';
+    form.innerHTML = `<input type="hidden" name="_token" value="{{ csrf_token() }}">`;
+
+    ids.forEach(id => {
+        const input = document.createElement('input');
+        input.type  = 'hidden';
+        input.name  = 'ids[]';
+        input.value = id;
+        form.appendChild(input);
+    });
+
+    document.body.appendChild(form);
+    form.submit();
+}
+</script>
 </body>
 </html>

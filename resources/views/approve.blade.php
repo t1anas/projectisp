@@ -33,16 +33,7 @@
         .date-main { font-size: 12px; font-weight: 600; color: #111827; }
         .date-rel   { font-size: 11px; color: #9ca3af; margin-top: 2px; }
 
-        .status-pill {
-            display: inline-flex; align-items: center; gap: 6px;
-            padding: 4px 10px; border-radius: 50px;
-            font-size: 11px; font-weight: 700; border: 1px solid transparent;
-        }
-        .status-pill i { font-size: 8px; }
-        .status-active   { background: #e8fff1; color: #0f9d58; border-color: #b7f3cd; }
-        .status-nonactive{ background: #fff1f1; color: #dc3545; border-color: #ffc4c4; }
-        .status-pending  { background: #fffbeb; color: #b45309; border-color: #fcd34d; }
-
+        
         .paket-badge {
             background: #e8fff1; color: #0f9d58; border-radius: 50px;
             padding: 4px 12px; font-size: 11px; font-weight: 700;

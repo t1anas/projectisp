@@ -104,32 +104,57 @@ class PelangganController extends Controller
         return redirect('/pelanggan')->with('success', 'Data berhasil dihapus');
     }
 
-    public function generateTagihan()
-    {
-        $pelanggan = Pelanggan::with('layanan')->get();
+public function generateTagihanTerpilih(Request $request)
+{
+    $ids = $request->ids ?? [];
 
-        foreach ($pelanggan as $p) {
-            if (!$p->layanan) continue;
+    if (empty($ids)) {
+        return back()->with('error', 'Tidak ada pelanggan yang dipilih.');
+    }
 
-            $sudahAda = Tagihan::where('pelanggan_id', $p->id)
-                ->whereMonth('tanggal', now()->month)
-                ->whereYear('tanggal', now()->year)
-                ->exists();
+    $pelanggan = Pelanggan::with('layanan')
+        ->whereIn('id', $ids)
+        ->where('status', 'aktif')
+        ->get();
 
-            if (!$sudahAda) {
-                Tagihan::create([
-                    'pelanggan_id' => $p->id,
-                    'layanan_id'   => $p->layanan->id,
-                    'tanggal'      => now(),
-                    'jatuh_tempo'   => now()->addDays(3), 
-                    'bulan'        => now()->month,
-                    'tahun'        => now()->year,
-                    'total'        => $p->layanan->harga,
-                    'status'       => 'belum bayar',
-                ]);
-            }
+    foreach ($pelanggan as $p) {
+        if (!$p->layanan) continue;
+
+        $tagihanTerakhir = Tagihan::where('pelanggan_id', $p->id)
+            ->orderByDesc('tahun')
+            ->orderByDesc('bulan')
+            ->first();
+
+        if ($tagihanTerakhir) {
+            $bulanBaru = \Carbon\Carbon::create(
+                $tagihanTerakhir->tahun,
+                $tagihanTerakhir->bulan,
+                1
+            )->addMonth();
+        } else {
+            $bulanBaru = now();
         }
 
-        return back()->with('success', 'Tagihan berhasil digenerate');
+        $sudahAda = Tagihan::where('pelanggan_id', $p->id)
+            ->whereMonth('tanggal', $bulanBaru->month)
+            ->whereYear('tanggal', $bulanBaru->year)
+            ->exists();
+
+        if (!$sudahAda) {
+            Tagihan::create([
+                'pelanggan_id'  => $p->id,
+                'layanan_id'    => $p->layanan->id,
+                'jenis_tagihan' => 'tagihan internet bulanan',
+                'tanggal'       => $bulanBaru->startOfMonth(),
+                'bulan'         => $bulanBaru->month,
+                'tahun'         => $bulanBaru->year,
+                'jatuh_tempo'   => $bulanBaru->copy()->addDays(3),
+                'total'         => $p->layanan->harga,
+                'status'        => 'belum bayar',
+            ]);
+        }
     }
+
+    return back()->with('success', 'Tagihan berhasil digenerate.');
+}
 }

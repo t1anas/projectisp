@@ -45,7 +45,6 @@ body {
     text-decoration: none;
 }
 
-/* Box 1 — Pembayaran (hijau) */
 .nav-box-green {
     background: linear-gradient(135deg, #22c55e, #16a34a);
     box-shadow: 0 12px 32px rgba(34,197,94,0.25);
@@ -74,7 +73,6 @@ body {
     right: 60px;
 }
 
-/* Box 2 — Tagihan (biru) */
 .nav-box-blue {
     background: linear-gradient(135deg, #f6ca3b, #e57b34);
     box-shadow: 0 12px 32px rgba(59,130,246,0.25);

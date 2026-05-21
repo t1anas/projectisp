@@ -88,6 +88,30 @@ body{
     display: none;
 }
 .tagihan-card.selected .tag-check { display: inline; }
+.badge-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 12px;
+    border-radius: 50px;
+    font-size: 12px;
+    font-weight: 700;
+}
+.badge-lunas {
+    background: linear-gradient(135deg,#e8fff1,#d8ffe8);
+    color: #0f9d58;
+    border: 1px solid #b7f3cd;
+}
+.badge-belum-lunas {
+    background: linear-gradient(135deg,#fffbeb,#fef3c7);
+    color: #d97706;
+    border: 1px solid #fde68a;
+}
+.badge-belum-bayar {
+    background: linear-gradient(135deg,#fff1f1,#ffe1e1);
+    color: #dc3545;
+    border: 1px solid #ffc4c4;
+}
 </style>
 </head>
 
@@ -114,24 +138,23 @@ body{
         <i class="bi bi-wifi"></i> Data Layanan
     </a>
 
-            @php
-    $instalasiUrl = match(Auth::user()->role) {
-        'cs'    => '/instalasi',
-        'admin' => '/approve',
-        'noc'   => '/instalasi-noc',
-        default => '/instalasi'
-    };
-@endphp
+    @php
+        $instalasiUrl = match(Auth::user()->role) {
+            'cs'    => '/instalasi',
+            'admin' => '/approve',
+            'noc'   => '/instalasi-noc',
+            default => '/instalasi'
+        };
+    @endphp
 
-<a href="{{ url($instalasiUrl) }}" class="menu-item">
-    <i class="bi bi-router"></i> Instalasi Baru
-</a>
+    <a href="{{ url($instalasiUrl) }}" class="menu-item">
+    <i class="bi bi-router"></i> Instalasi Baru</a>
 
-    @if(Auth::user()->role == 'admin')
-    <a href="{{ url('/pemasukan') }}" class="menu-item">
-        <i class="bi bi-wallet2"></i> Pemasukan
-    </a>
-    @endif
+        @if(Auth::user()->role == 'admin')
+            <a href="{{ url('/pemasukan') }}" class="menu-item active">
+                <i class="bi bi-wallet2"></i> Pemasukan
+            </a>
+        @endif
 
     <div class="section-label">Pelanggan</div>
 
@@ -322,22 +345,20 @@ body{
                         </td>
                         <td class="text-center">{{ $item->metode->nama_metode ?? '-' }}</td>
                         <td class="text-center">
-                            @if ($item->status == 'lunas')
-                                <span style="display:inline-flex; align-items:center; gap:5px;
-                                             background:linear-gradient(135deg,#e8fff1,#d8ffe8);
-                                             color:#0f9d58; padding:5px 12px; border-radius:50px;
-                                             font-size:12px; font-weight:700; border:1px solid #b7f3cd;">
-                                    <i class="bi bi-check-circle-fill" style="font-size:10px;"></i> Lunas
-                                </span>
-                            @else
-                                <span style="display:inline-flex; align-items:center; gap:5px;
-                                             background:linear-gradient(135deg,#fff1f1,#ffe1e1);
-                                             color:#dc3545; padding:5px 12px; border-radius:50px;
-                                             font-size:12px; font-weight:700; border:1px solid #ffc4c4;">
-                                    <i class="bi bi-x-circle-fill" style="font-size:10px;"></i> Belum
-                                </span>
-                            @endif
-                        </td>
+    @if ($item->status == 'lunas')
+        <span class="badge-status badge-lunas">
+            <i class="bi bi-check-circle-fill" style="font-size:10px;"></i> Lunas
+        </span>
+    @elseif ($item->status == 'belum lunas')
+        <span class="badge-status badge-belum-lunas">
+            <i class="bi bi-clock-fill" style="font-size:10px;"></i> Belum Lunas
+        </span>
+    @else
+        <span class="badge-status badge-belum-bayar">
+            <i class="bi bi-x-circle-fill" style="font-size:10px;"></i> Belum Bayar
+        </span>
+    @endif
+</td>
                         <td class="text-center">
                             <div style="display:flex; align-items:center; gap:8px; justify-content:center;">
                                 <button class="action-btn btn-warning"

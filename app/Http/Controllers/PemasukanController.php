@@ -137,20 +137,25 @@ public function update(Request $request, $id)
     $pembayaran->delete();
 
     $totalBayar = Pembayaran::where('tagihan_id', $tagihan->id)
-    ->sum('jumlah_bayar');
+        ->sum('jumlah_bayar');
 
-if ($totalBayar == 0) {
-    $tagihan->status = 'belum bayar';
-} elseif ($totalBayar < $tagihan->jumlah) {
-    $tagihan->status = 'belum bayar';
-} else {
-    $tagihan->status = 'lunas';
-}
+    if ($totalBayar <= 0) {
+        $tagihan->status = 'belum bayar';
+    } elseif ($totalBayar < $tagihan->total) {
+        $tagihan->status = 'belum lunas';
+    } else {
+        $tagihan->status = 'lunas';
+    }
 
     $tagihan->save();
+
     Pembayaran::where('tagihan_id', $tagihan->id)
         ->update([
-            'status' => $tagihan->status == 'lunas' ? 'lunas' : 'belum bayar'
+            'status' => match($tagihan->status) {
+                'lunas'       => 'lunas',
+                'belum lunas' => 'belum lunas',
+                default       => 'belum bayar',
+            }
         ]);
 
     return redirect()->route('pembayaran')

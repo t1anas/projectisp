@@ -31,10 +31,10 @@ protected $fillable = [
         return $this->belongsTo(Pelanggan::class, 'pelanggan_id');
     }
 
-    public function pembayaran()
-    {
-        return $this->hasOne(Pembayaran::class, 'tagihan_id');
-    }
+public function pembayaran()
+{
+    return $this->hasMany(\App\Models\Pembayaran::class, 'tagihan_id');
+}
 
 
 public function layanan()

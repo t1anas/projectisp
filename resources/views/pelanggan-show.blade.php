@@ -93,8 +93,7 @@
                             <i class="bi bi-person-lines-fill"></i>
                         </div>
                         <div>
-                            <div class="header-label-text">Informasi Pelanggan</div>
-                            <div class="header-label-sub">Detail Pelanggan</div>
+                            <div class="header-label-text">Detail Pelanggan</div>
                         </div>
                     </div>
                 </div>
@@ -112,9 +111,19 @@
                             <div class="identity-nik">Kode Pelanggan : {{ $pelanggan->kode_pelanggan ?? '-' }}</div>
                         </div>
                     </div>
-                    <div class="status-badge">
-                        <span class="status-dot"></span> Aktif
-                    </div>
+                    @if($pelanggan->status === 'isolir')
+                    <span class="status-pill status-pending">
+                        <i class="bi bi-hourglass-split"></i> Isolir
+                    </span>
+                    @elseif(strtolower($pelanggan->status) === 'aktif')
+                    <span class="status-pill status-active">
+                        <i class="bi bi-check-circle-fill"></i> Aktif
+                    </span>
+                    @else
+                    <span class="status-pill status-nonactive">
+                        <i class="bi bi-x-circle-fill"></i> Nonaktif
+                    </span>
+                    @endif
                 </div>
 
                 <div class="quick-stats">
@@ -130,6 +139,12 @@
                         <div class="stat-label">Nama Layanan</div>
                         <div class="stat-value">
                             {{ $pelanggan->nama_layanan ?? '-' }}
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">Catatan NOC</div>
+                        <div class="stat-value">
+                            {{ $pelanggan->catatan_noc ?? '-' }}
                         </div>
                     </div>
                 </div>

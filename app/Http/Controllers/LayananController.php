@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Pelanggan;
 use App\Models\Tagihan;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\LayananImport;
 use Illuminate\Support\Facades\Response;
 
 class LayananController extends Controller
@@ -26,7 +28,7 @@ class LayananController extends Controller
             $query->whereDate('created_at', '<=', $request->sampai);
         }
 
-        $pelanggan = $query->get();
+        $pelanggan = $query->paginate();
         $tagihan   = Tagihan::with('pelanggan')->get();
 
         return view('layanan', compact('pelanggan', 'tagihan'));
@@ -85,13 +87,11 @@ class LayananController extends Controller
         $callback = function () use ($pelanggan) {
             $file = fopen('php://output', 'w');
 
-            // Header kolom
             fputcsv($file, [
                 'No', 'Nama', 'Nama Layanan', 'Paket',
                 'Tagihan', 'Status', 'No HP', 'Alamat', 'Aktivasi'
             ]);
 
-            // Isi data
             foreach ($pelanggan as $i => $p) {
                 fputcsv($file, [
                     $i + 1,
@@ -117,4 +117,14 @@ class LayananController extends Controller
         $pelanggan = Pelanggan::with('layanan')->get();
         return view('layanan-cetak', compact('pelanggan'));
     }
+    public function import(Request $request)
+{
+    $request->validate([
+        'file' => 'required|mimes:xlsx,xls,csv|max:2048',
+    ]);
+
+    Excel::import(new LayananImport, $request->file('file'));
+
+    return back()->with('success', 'Data berhasil diimport.');
+}
 }

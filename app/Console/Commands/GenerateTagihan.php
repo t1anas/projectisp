@@ -17,7 +17,9 @@ class GenerateTagihan extends Command
 {
     $hariIni = now()->day;
 
-    $pelanggan = Pelanggan::with('layanan')->get();
+    $pelanggan = Pelanggan::with('layanan')
+    ->where('status', 'aktif')
+    ->get();
 
     foreach ($pelanggan as $p) {
 

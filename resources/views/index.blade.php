@@ -263,23 +263,23 @@
                                 </td>
 
                                 <td>
-                                    @if(strtolower($p->status) === 'aktif')
-                                    <span class="badge rounded-pill bg-success">
-                                        <i class="bi bi-check-circle-fill"></i> Aktif
-                                    </span>
-                                     @elseif(strtolower($p->status) == 'isolir')
-                                        <span class="badge rounded-pill bg-warning">
-                                            <i class="bi bi-x-circle-fill"></i> Isolir
-                                        </span>
-                                    @elseif(strtolower($p->status) === 'pending')
-                                    <span class="badge rounded-pill bg-warning text-dark">
-                                        <i class="bi bi-hourglass-split"></i> Pending
-                                    </span>
-                                    @else
-                                    <span class="badge rounded-pill bg-danger">
-                                        <i class="bi bi-x-circle-fill"></i> Nonaktif
-                                    </span>
-                                    @endif
+                                    @if($p->status === 'isolir')
+                    <span class="status-pill status-pending">
+                        <i class="bi bi-hourglass-split"></i> Isolir
+                    </span>
+                    @elseif(strtolower($p->status) === 'aktif')
+                    <span class="status-pill status-active">
+                        <i class="bi bi-check-circle-fill"></i> Aktif
+                    </span>
+                    @elseif(strtolower($p->status) === 'pending')
+                    <span class="status-pill status-pending">
+                        <i class="bi bi-hourglass-split"></i> Pending
+                    </span>
+                    @else
+                    <span class="status-pill status-nonactive">
+                        <i class="bi bi-x-circle-fill"></i> Nonaktif
+                    </span>
+                    @endif
                                 </td>
 
                                 <td class="text-center">

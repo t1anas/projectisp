@@ -65,15 +65,16 @@ Route::middleware('auth')->group(function () {
         Route::post('/pembayaran/store', [PemasukanController::class, 'store']);
     });
 
-    /* PELANGGAN */
-    Route::prefix('pelanggan')->group(function () {
-        Route::get('/',                  [PelangganController::class, 'index']);
-        Route::post('/store',            [PelangganController::class, 'store']);
-        Route::put('/{id}',              [PelangganController::class, 'update']);
-        Route::delete('/{id}',           [PelangganController::class, 'destroy']);
-        Route::post('/generate-tagihan', [PelangganController::class, 'generateTagihan'])->name('pelanggan.generateTagihan');
-        Route::get('/detail/{id}',       [PelangganDetailController::class, 'show']);
-    });
+/* PELANGGAN */
+Route::prefix('pelanggan')->group(function () {
+    Route::get('/',                      [PelangganController::class, 'index']);
+    Route::post('/store',                [PelangganController::class, 'store']);
+    Route::put('/{id}',                  [PelangganController::class, 'update']);
+    Route::delete('/{id}',               [PelangganController::class, 'destroy']);
+    Route::post('/generate-tagihan',     [PelangganController::class, 'generateTagihan'])->name('pelanggan.generateTagihan');
+    Route::post('/generate-terpilih',    [PelangganController::class, 'generateTagihanTerpilih'])->name('pelanggan.generateTagihanTerpilih'); // ← tambah ini
+    Route::get('/detail/{id}',           [PelangganDetailController::class, 'show']);
+});
 
     Route::get('/instalasi', [PelangganController::class, 'create']);
 
@@ -86,6 +87,7 @@ Route::middleware('auth')->group(function () {
     Route::put('/layanan/{id}',         [LayananController::class, 'update']);
     Route::post('/layanan/{id}/bayar',  [DetailController::class, 'bayar'])->name('tagihan.bayar');
     Route::get('/layanan/{id}',         [DetailController::class, 'index'])->name('layanan.detail');
+    Route::post('/layanan/import', [LayananController::class, 'import'])->name('layanan.import');
 
     /* TAGIHAN */
     Route::resource('tagihan', TagihanController::class);
@@ -93,12 +95,6 @@ Route::middleware('auth')->group(function () {
     Route::get('/tagihan/{id}/kwitansi',  [KwitansiController::class, 'cetak'])->name('kwitansi');
 
 });
-
-/*
-|--------------------------------------------------------------------------
-| Public Routes (No Auth)
-|--------------------------------------------------------------------------
-*/
 
 /* BAYAR LAYANAN */
 Route::post('/layanan/{id}/bayar', [DetailController::class, 'bayar'])->name('detail.bayar');
@@ -131,3 +127,4 @@ Route::get('/pelanggan/{kode}', [PelangganController::class, 'detail']);
 /* SCAN */
 Route::get('/scan',        [ScanController::class, 'index']);
 Route::get('/scan/{kode}', [ScanController::class, 'result']);
+Route::post('/tagihan/bulk-delete', [TagihanController::class, 'bulkDelete'])->name('tagihan.bulkDelete');
