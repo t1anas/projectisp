@@ -39,7 +39,7 @@ class PemasukanController extends Controller
         $metode     = MetodePembayaran::all();
         $layanan    = Layanan::all();
         $tagihan    = Tagihan::all();
-        $pelanggan  = Pelanggan::with(['layanan', 'tagihan'])->get();
+        $pelanggan  = Pelanggan::with(['layanan', 'tagihan.pembayaran'])->get();
 
         return view('pembayaran', compact(
             'pembayaran', 'metode', 'pelanggan', 'layanan', 'tagihan', 'total'
@@ -95,8 +95,6 @@ class PemasukanController extends Controller
             $tagihan->status = 'lunas';
         }
 
-        // BUG FIX: $tagihan->save() sebelumnya tidak dipanggil,
-        // sehingga perubahan status tidak tersimpan ke database.
         $tagihan->save();
 
         return redirect()->route('pembayaran')
@@ -122,8 +120,6 @@ class PemasukanController extends Controller
             'tanggal_bayar' => 'required|date',
             'jumlah_bayar'  => 'required|numeric',
             'metode_id'     => 'required',
-            // BUG FIX: Sebelumnya hanya 'lunas,belum bayar'.
-            // 'belum lunas' ditambahkan agar konsisten dengan seluruh sistem.
             'status'        => 'required|in:lunas,belum bayar,belum lunas',
         ]);
 
@@ -169,7 +165,6 @@ class PemasukanController extends Controller
                 }
             ]);
 
-        // BUG FIX: Typo "diperbaruis" → "diperbarui"
         return redirect()->route('pembayaran')
             ->with('success', 'Data pembayaran berhasil diperbarui');
     }

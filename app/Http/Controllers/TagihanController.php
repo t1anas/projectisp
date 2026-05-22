@@ -96,9 +96,6 @@ class TagihanController extends Controller
             $sudahAdaPembayaran = Pembayaran::where('tagihan_id', $tagihan->id)->exists();
 
             if (!$sudahAdaPembayaran) {
-                // CATATAN: metode_id null karena update manual tidak melewati form bayar.
-                // Pertimbangkan menambahkan field metode_id pada form edit tagihan
-                // jika ingin data pembayaran lebih lengkap.
                 Pembayaran::create([
                     'pelanggan_id'  => $tagihan->pelanggan_id,
                     'layanan_id'    => $tagihan->layanan_id,
@@ -121,9 +118,6 @@ class TagihanController extends Controller
     public function destroy($id)
     {
         $tagihan = Tagihan::findOrFail($id);
-
-        // BUG FIX: Hapus semua pembayaran terkait sebelum menghapus tagihan,
-        // agar tidak ada data orphan di tabel pembayaran.
         Pembayaran::where('tagihan_id', $tagihan->id)->delete();
 
         $tagihan->delete();
@@ -181,8 +175,6 @@ class TagihanController extends Controller
             return back()->with('error', 'Tidak ada data yang dipilih.');
         }
 
-        // BUG FIX: Sebelumnya langsung menghapus tagihan tanpa menghapus
-        // pembayaran terkait, menyebabkan data orphan di tabel pembayaran.
         Pembayaran::whereIn('tagihan_id', $ids)->delete();
 
         Tagihan::whereIn('id', $ids)->delete();

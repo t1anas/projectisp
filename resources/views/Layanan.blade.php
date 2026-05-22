@@ -245,109 +245,123 @@
                 </div>
             </div>
 
-            {{-- TABLE --}}
-            <div class="table-card">
-                <div class="table-card-scroll">
-                    <table class="table table-bordered align-middle custom-table mb-0">
-                        <thead class="table-light text-center fw-bold">
-                            <tr>
-                                <th style="width:40px;">
-                                    <input type="checkbox" id="checkAll"
-                                           style="width:16px;height:16px;cursor:pointer;"
-                                           onchange="toggleAll(this)">
-                                </th>
-                                <th>No</th>
-                                <th>Aktivasi</th>
-                                <th>Nama</th>
-                                <th>Nama Layanan</th>
-                                <th>Tagihan</th>
-                                <th>Paket</th>
-                                <th>Status</th>
-                                <th>Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody class="text-center">
-                            @forelse($pelanggan as $p)
-                            <tr>
-                                <td>
-                                    <input type="checkbox"
-                                           name="pelanggan_ids[]"
-                                           value="{{ $p->id }}"
-                                           class="row-check"
-                                           style="width:16px;height:16px;cursor:pointer;"
-                                           onchange="updateSelected()">
-                                </td>
-                                <td>{{ $loop->iteration }}</td>
-                                <td>{{ $p->created_at->format('d/m/Y') }}</td>
-                                <td class="text-start">
-                                    <div class="clamp-2">{{ $p->nama }}</div>
-                                </td>
-                                <td class="text-start">
-                                    <div class="clamp-2">{{ $p->nama_layanan ?? '-' }}</div>
-                                </td>
-                                <td class="text-start">
-                                    Rp {{ number_format($p->layanan->harga ?? 0, 0, ',', '.') }}
-                                </td>
-                                <td>{{ $p->layanan->nama_paket ?? '-' }}</td>
-                                <td>
-                                    @if(strtolower($p->status) === 'aktif')
-                    <span class="status-pill status-active">
-                        <i class="bi bi-check-circle-fill"></i> Aktif
-                    </span>
-                                    @elseif(strtolower($p->status) === 'isolir')
-                    <span class="status-pill status-isolir">
-                        <i class="bi bi-slash-circle-fill"></i> Isolir
-                    </span>
-                                    @else
-                    <span class="status-pill status-nonactive">
-                        <i class="bi bi-x-circle-fill"></i> Nonaktif
-                    </span>
-                                    @endif
-                                </td>
-                                <td class="text-center">
-                                    <div class="action-group">
-                                        <a href="{{ route('layanan.detail', $p->id) }}"
-                                           class="btn-action btn-action-detail"
-                                           data-tip="Detail">
-                                            <i class="bi bi-eye-fill"></i>
-                                        </a>
-                                        <button type="button"
-                                                class="btn-action btn-action-edit"
-                                                data-bs-toggle="modal"
-                                                data-bs-target="#modalEditPelanggan{{ $p->id }}"
-                                                data-tip="Edit">
-                                            <i class="bi bi-pencil-fill"></i>
-                                        </button>
-                                        <button type="button"
-                                                class="btn-action btn-action-notif"
-                                                data-bs-toggle="modal"
-                                                data-bs-target="#modalNotif{{ $p->id }}"
-                                                data-tip="Notifikasi">
-                                            <i class="bi bi-bell-fill"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                            @empty
-                            <tr>
-                                <td colspan="9" class="text-center py-5"
-                                    style="color:#9ca3af; font-size:14px;">
-                                    <i class="bi bi-inbox"
-                                       style="font-size:30px; display:block; margin-bottom:8px;"></i>
-                                    Tidak ada data yang ditemukan
-                                </td>
-                            </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
+{{-- TABLE --}}
+<div style="padding: 20px;">
+    <div class="detail-card">
 
-                    {{-- Pagination --}}
-                    <div class="mt-3 px-2">
-                        {{ $pelanggan->appends(request()->query())->links() }}
-                    </div>
-                </div>
-            </div>
-            {{-- END TABLE --}}
+        {{-- TABLE SCROLL --}}
+        <div class="table-responsive">
+            <table class="table table-bordered align-middle custom-table mb-0">
+                <thead class="table-light text-center fw-bold">
+                    <tr>
+                        <th style="width:40px;">
+                            <input type="checkbox" id="checkAll"
+                                   style="width:16px;height:16px;cursor:pointer;"
+                                   onchange="toggleAll(this)">
+                        </th>
+                        <th>No</th>
+                        <th style="white-space: nowrap;">Kode Pelanggan</th>
+                        <th>Aktivasi</th>
+                        <th>Nama</th>
+                        <th>Nama Layanan</th>
+                        <th>Tagihan</th>
+                        <th>Paket</th>
+                        <th>Status</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody class="text-center">
+                    @forelse($pelanggan as $p)
+                    <tr>
+                        <td>
+                            <input type="checkbox"
+                                   name="pelanggan_ids[]"
+                                   value="{{ $p->id }}"
+                                   class="row-check"
+                                   style="width:16px;height:16px;cursor:pointer;"
+                                   onchange="updateSelected()">
+                        </td>
+                        <td>{{ $loop->iteration }}</td>
+                        <td style="text-align: left">{{ $p->kode_pelanggan }}</td>
+                        <td>
+                            <div class="date-main">{{ $p->created_at->format('d/m/Y') }}</div>
+                            <div class="date-rel">{{ $p->created_at->diffForHumans() }}</div>
+                        </td>
+                        <td class="text-start">
+                            <div class="clamp-2">{{ $p->nama }}</div>
+                        </td>
+                        <td class="text-start">
+                            <div class="clamp-2">{{ $p->nama_layanan ?? '-' }}</div>
+                        </td>
+                        <td style="white-space: nowrap;">
+                            Rp {{ number_format($p->layanan->harga ?? 0, 0, ',', '.') }}
+                        </td>
+                        <td style="white-space: nowrap;">
+                            {{ $p->layanan->nama_paket ?? '-' }}
+                        </td>
+                        <td>
+                            @if(strtolower($p->status) === 'aktif')
+                                <span class="status-pill status-active">
+                                    <i class="bi bi-check-circle-fill"></i> Aktif
+                                </span>
+                            @elseif(strtolower($p->status) === 'isolir')
+                                <span class="status-pill status-isolir">
+                                    <i class="bi bi-slash-circle-fill"></i> Isolir
+                                </span>
+                            @else
+                                <span class="status-pill status-nonactive">
+                                    <i class="bi bi-x-circle-fill"></i> Nonaktif
+                                </span>
+                            @endif
+                        </td>
+                        <td class="text-center">
+                            <div class="action-group">
+                                <a href="{{ route('layanan.detail', $p->id) }}"
+                                   class="btn-action btn-action-detail"
+                                   data-tip="Detail">
+                                    <i class="bi bi-eye-fill"></i>
+                                </a>
+                                <button type="button"
+                                        class="btn-action btn-action-edit"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#modalEditPelanggan{{ $p->id }}"
+                                        data-tip="Edit">
+                                    <i class="bi bi-pencil-fill"></i>
+                                </button>
+                                <button type="button"
+                                        class="btn-action btn-action-notif"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#modalNotif{{ $p->id }}"
+                                        data-tip="Notifikasi">
+                                    <i class="bi bi-bell-fill"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="9" class="text-center py-5" style="color:#9ca3af; font-size:14px;">
+                            <i class="bi bi-inbox" style="font-size:30px; display:block; margin-bottom:8px;"></i>
+                            Tidak ada data yang ditemukan
+                        </td>
+                    </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+
+        {{-- FOOTER PAGINATION --}}
+        <div class="card-identity-row" style="justify-content:space-between;">
+            <span class="identity-nik">
+                Menampilkan {{ $pelanggan->firstItem() }}–{{ $pelanggan->lastItem() }}
+                dari {{ $pelanggan->total() }} data
+            </span>
+            {{ $pelanggan->appends(request()->query())->links() }}
+        </div>
+
+    </div>
+</div>
+{{-- END TABLE --}}
 
         </div>
         {{-- END OUTER CARD --}}
