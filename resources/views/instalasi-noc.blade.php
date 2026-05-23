@@ -9,146 +9,8 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('inputform.css') }}">
+    <link rel="stylesheet" href="{{ asset('instalasi-noc.css') }}">
 
-    <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f4f6f9; }
-
-        /* Table */
-        .table, .table * { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px; }
-        .table th { font-weight: 600; letter-spacing: 0.3px; }
-        .table td { font-weight: 500; vertical-align: middle; padding: 10px 12px; line-height: 1.5; }
-        .table th:last-child, .table td:last-child { min-width: 120px; white-space: nowrap; }
-
-        /* Clamp */
-        .clamp-2 {
-            display: -webkit-box; -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical; overflow: hidden; max-width: 160px;
-        }
-        .clamp-3 {
-            display: -webkit-box; -webkit-line-clamp: 3;
-            -webkit-box-orient: vertical; overflow: hidden;
-            max-width: 160px; font-size: 12px; color: #6b7280; line-height: 1.4;
-        }
-
-        .date-main { font-size: 12px; font-weight: 600; color: #111827; }
-        .date-rel   { font-size: 11px; color: #9ca3af; margin-top: 2px; }
-
-        .status-pill {
-            display: inline-flex; align-items: center; gap: 6px;
-            padding: 4px 10px; border-radius: 50px;
-            font-size: 11px; font-weight: 700; border: 1px solid transparent;
-        }
-        .status-pill i { font-size: 8px; }
-        .status-active    { background: #e8fff1; color: #0f9d58; border-color: #b7f3cd; }
-        .status-nonactive { background: #fff1f1; color: #dc3545; border-color: #ffc4c4; }
-        .status-pending   { background: #fffbeb; color: #b45309; border-color: #fcd34d; }
-        .status-pengajuan-noc   { background: #eff6ff; color: #2563eb; border-color: #bfdbfe; }
-
-        .layanan-badge {
-            background: #e8fff1; color: #0f9d58; border-radius: 50px;
-            padding: 4px 12px; font-size: 11px; font-weight: 700;
-            border: 1px solid #b7f3cd; white-space: nowrap;
-        }
-
-        .action-group { display: flex; align-items: center; gap: 6px; justify-content: center; flex-wrap: nowrap; }
-        .action-modern {
-            width: 34px; height: 34px; border: none; border-radius: 10px;
-            display: inline-flex; align-items: center; justify-content: center;
-            font-size: 14px; transition: .2s; cursor: pointer; text-decoration: none;
-            flex-shrink: 0;
-        }
-        .action-modern:hover { transform: translateY(-2px); }
-        .btn-detail   { background: #eef4ff; color: #0d6efd; }
-        .btn-detail:hover  { background: #0d6efd; color: #fff; }
-        .btn-approve  { background: #e8fff1; color: #0f9d58; }
-        .btn-approve:hover { background: #16a34a; color: #fff; }
-        .btn-reject   { background: #fff1f1; color: #dc3545; }
-        .btn-reject:hover  { background: #dc2626; color: #fff; }
-
-        /* Modal */
-        .modal-content {
-            border-radius: 18px; border: none; overflow: hidden;
-            box-shadow: 0 20px 60px rgba(0,0,0,.15);
-        }
-        .modal-header-custom {
-            background: #fff; color: #111; padding: 20px 28px 16px;
-            font-size: 17px; font-weight: 800; border-bottom: 1px solid #eee;
-            display: flex; align-items: center; justify-content: space-between;
-        }
-        .modal-header-custom .btn-close { opacity: .5; }
-
-        /* Detail rows */
-        .sec-div {
-            font-size: 11px; font-weight: 800; letter-spacing: 1px;
-            text-transform: uppercase; color: #0f9d58;
-            padding: 14px 0 6px; border-bottom: 1px solid #e8fff1; margin-bottom: 8px;
-        }
-        .d-row {
-            display: flex; align-items: flex-start; gap: 12px;
-            padding: 6px 0; font-size: 13px; border-bottom: 1px solid #f9fafb;
-        }
-        .d-lbl { width: 150px; flex-shrink: 0; color: #6b7280; font-weight: 600; }
-        .d-val  { color: #111827; word-break: break-word; }
-
-        /* Info card (readonly area di modal approve) */
-        .info-readonly {
-            background: #f8fafb;
-            border: 1px solid #e5e7eb;
-            border-radius: 12px;
-            padding: 16px 18px;
-            margin-bottom: 20px;
-        }
-        .info-readonly-title {
-            font-size: 11px; font-weight: 800; letter-spacing: 1px;
-            text-transform: uppercase; color: #6b7280;
-            margin-bottom: 10px;
-        }
-        .info-readonly .d-row {
-            border-bottom: 1px solid #eef0f3;
-        }
-        .info-readonly .d-row:last-child { border-bottom: none; }
-
-        /* Form label & input */
-        .modal-body .form-label  { font-size: 13px; font-weight: 700; color: #374151; }
-        .modal-body .form-control, .modal-body .form-select {
-            font-size: 13px; border-radius: 10px;
-            border: 1px solid #e5e7eb;
-        }
-        .modal-body textarea.form-control { resize: none; }
-        .modal-body .form-text { font-size: 11px; color: #9ca3af; }
-
-        .btn-approve-submit {
-            background: #0f9d58; color: #fff; border: none;
-            border-radius: 10px; font-weight: 700; font-size: 13px;
-            padding: 8px 20px; cursor: pointer; transition: .2s;
-            display: inline-flex; align-items: center; gap: 6px;
-        }
-        .btn-approve-submit:hover { background: #0b7a45; }
-
-        .btn-nonaktif {
-            background: #fff1f1; color: #dc3545; border: 1px solid #ffc4c4;
-            border-radius: 10px; font-weight: 700; font-size: 13px;
-            padding: 8px 20px; cursor: pointer; transition: .2s;
-        }
-        .btn-nonaktif:hover { background: #dc2626; color: #fff; }
-
-        /* Required star */
-        .req { color: #dc3545; }
-
-        /* Divider in approve modal */
-        .approve-divider {
-            border: none; border-top: 1px dashed #d1d5db; margin: 16px 0;
-        }
-        /* Modal approve scrollable fix */
-#modalApprove .modal-dialog {
-    max-height: 90vh;
-}
-
-#modalApprove .modal-body {
-    overflow-y: auto;
-    max-height: 60vh;
-}
-    </style>
 </head>
 <body>
 
@@ -574,7 +436,6 @@
         </div>
     </div>
 </div>
-
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
