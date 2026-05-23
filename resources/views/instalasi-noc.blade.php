@@ -139,6 +139,15 @@
         .approve-divider {
             border: none; border-top: 1px dashed #d1d5db; margin: 16px 0;
         }
+        /* Modal approve scrollable fix */
+#modalApprove .modal-dialog {
+    max-height: 90vh;
+}
+
+#modalApprove .modal-body {
+    overflow-y: auto;
+    max-height: 60vh;
+}
     </style>
 </head>
 <body>
@@ -521,7 +530,6 @@
                 </div>
 
                 <div class="modal-footer" style="border-top:1px solid #eee; padding:14px 28px; gap:8px;">
-                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Batal</button>
                     <button type="submit" class="btn-approve-submit">
                         <i class="bi bi-check-lg"></i> Approve & Selesai
                     </button>

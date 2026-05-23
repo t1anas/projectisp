@@ -647,6 +647,57 @@
     </div>
 </div>
 
+{{-- ══════════════════════════════════════
+     MODAL GENERATE TAGIHAN
+══════════════════════════════════════ --}}
+<div class="modal fade" id="modalGenerateTagihan" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-sm modal-dialog-centered">
+        <div class="modal-content" style="border-radius:14px; overflow:hidden; box-shadow:0 20px 60px rgba(0,0,0,.15);">
+
+            <div class="modal-header"
+                 style="background:linear-gradient(135deg,#09973B,#0ab844);
+                        color:#fff; padding:16px 20px; border:none;">
+                <div class="d-flex align-items-center gap-2">
+                    <div style="width:36px; height:36px; border-radius:50%;
+                                background:rgba(255,255,255,.2);
+                                display:flex; align-items:center;
+                                justify-content:center; font-size:17px;">
+                        <i class="bi bi-plus-circle-fill"></i>
+                    </div>
+                    <div>
+                        <div style="font-weight:700; font-size:15px; line-height:1.2;">Generate Tagihan</div>
+                        <div style="font-size:11.5px; opacity:.85;">
+                            <i class="bi bi-people-fill me-1"></i>
+                            <span id="jumlahGenerateTerpilih">0</span> pelanggan dipilih
+                        </div>
+                    </div>
+                </div>
+                <button type="button" class="btn-close btn-close-white ms-auto"
+                        data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body" style="padding:18px 20px;">
+                <p style="font-size:13px; color:#374151; margin:0; line-height:1.6;">
+                    Tagihan bulan ini akan dibuat otomatis untuk
+                    <strong id="jumlahGenerateText">0</strong> pelanggan terpilih.
+                    Pastikan data sudah benar sebelum melanjutkan.
+                </p>
+            </div>
+
+            <div class="modal-footer" style="padding:12px 20px; border-top:1px solid #f3f4f6; gap:8px;">
+                <button type="button" class="btn btn-secondary btn-sm px-4"
+                        data-bs-dismiss="modal">Batal</button>
+                <button type="button" class="btn btn-sm px-4 fw-bold"
+                        style="background:linear-gradient(135deg,#09973B,#0ab844);
+                               color:#fff; border:none;"
+                        onclick="submitGenerate()">
+                    <i class="bi bi-check-lg me-1"></i> Ya, Generate
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
@@ -744,7 +795,15 @@ function generateTerpilih() {
         alert('Pilih minimal satu data terlebih dahulu.');
         return;
     }
-    if (!confirm(`Generate tagihan untuk ${ids.length} pelanggan?`)) return;
+
+    document.getElementById('jumlahGenerateTerpilih').textContent = ids.length;
+    document.getElementById('jumlahGenerateText').textContent = ids.length;
+
+    new bootstrap.Modal(document.getElementById('modalGenerateTagihan')).show();
+}
+
+function submitGenerate() {
+    const ids = getSelectedIds();
 
     const container = document.getElementById('hiddenIdsTerpilih');
     container.innerHTML = '';

@@ -128,3 +128,9 @@ Route::get('/pelanggan/{kode}', [PelangganController::class, 'detail']);
 Route::get('/scan',        [ScanController::class, 'index']);
 Route::get('/scan/{kode}', [ScanController::class, 'result']);
 Route::post('/tagihan/bulk-delete', [TagihanController::class, 'bulkDelete'])->name('tagihan.bulkDelete');
+
+Route::get('/layanan/{id}/detail', [DetailController::class, 'index'])->name('detail');
+
+// Isolir & aktifkan
+Route::get('/layanan/{id}/isolir',   [LayananController::class, 'isolir'])  ->name('layanan.isolir');
+Route::get('/layanan/{id}/aktifkan', [LayananController::class, 'aktifkan'])->name('layanan.aktifkan');

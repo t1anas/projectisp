@@ -10,11 +10,287 @@
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="{{ asset('inputform.css') }}">
 <link rel="stylesheet" href="{{ asset('detail.css') }}">
+<style>
+/* ===== NOTIF OVERLAY ===== */
+.notif-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(10, 14, 26, .55);
+    backdrop-filter: blur(6px);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: notifFade .2s ease;
+    transition: opacity .3s ease;
+}
+
+.notif-card {
+    width: 100%;
+    max-width: 360px;
+    background: #fff;
+    border-radius: 4px;
+    overflow: hidden;
+    box-shadow: 0 2px 6px rgba(0,0,0,.06), 0 20px 60px rgba(0,0,0,.14);
+    border: 1px solid #e5e7eb;
+    animation: notifPop .25s cubic-bezier(.22,.68,0,1.2);
+}
+
+.notif-stripe {
+    height: 3px;
+    width: 100%;
+}
+
+.notif-inner {
+    padding: 32px 32px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.notif-icon-wrap {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    border: 1.5px solid;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 18px;
+    font-size: 22px;
+}
+
+.notif-label {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    opacity: .75;
+}
+
+.notif-title {
+    font-size: 17px;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 8px;
+    letter-spacing: -.2px;
+}
+
+.notif-text {
+    font-size: 13px;
+    color: #6b7280;
+    line-height: 1.65;
+    padding-bottom: 4px;
+}
+
+.notif-divider {
+    height: 1px;
+    background: #f1f5f9;
+}
+
+.notif-btn {
+    width: 100%;
+    border: none;
+    background: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    padding: 16px;
+    cursor: pointer;
+    transition: background .15s;
+}
+
+.notif-btn:hover { background: #f8fafc; }
+
+@keyframes notifFade {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+@keyframes notifPop {
+    from { opacity: 0; transform: translateY(12px) scale(.97); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* ===== MODAL ISOLIR ===== */
+.modal-isolir .modal-content {
+    border: none;
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+.modal-isolir .isolir-head {
+    padding: 20px 24px 16px;
+    border-bottom: 1px solid #e5e7eb;
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+}
+
+.modal-isolir .isolir-head-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    background: #fef3c7;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.modal-isolir .isolir-head-icon i {
+    font-size: 20px;
+    color: #d97706;
+}
+
+.modal-isolir .isolir-head-text .title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #111827;
+    margin-bottom: 3px;
+}
+
+.modal-isolir .isolir-head-text .sub {
+    font-size: 12px;
+    color: #6b7280;
+}
+
+.modal-isolir .isolir-body {
+    padding: 16px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.modal-isolir .isolir-pelanggan {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 12px 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.modal-isolir .isolir-avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: #dbeafe;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 600;
+    color: #2563eb;
+    flex-shrink: 0;
+}
+
+.modal-isolir .isolir-nama {
+    font-size: 14px;
+    font-weight: 600;
+    color: #111827;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.modal-isolir .isolir-badge-paket {
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 20px;
+    background: #dbeafe;
+    color: #1d4ed8;
+    border: 1px solid #bfdbfe;
+    font-weight: 500;
+}
+
+.modal-isolir .isolir-meta {
+    font-size: 11px;
+    color: #6b7280;
+    margin-top: 2px;
+}
+
+.modal-isolir .isolir-alert {
+    background: #fffbeb;
+    border: 1px solid #fde68a;
+    border-left: 3px solid #f59e0b;
+    border-radius: 0;
+    padding: 11px 13px;
+    font-size: 12px;
+    color: #b45309;
+    line-height: 1.65;
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+}
+
+.modal-isolir .isolir-alert i {
+    font-size: 14px;
+    margin-top: 1px;
+    flex-shrink: 0;
+}
+
+.modal-isolir .isolir-footer {
+    display: flex;
+    gap: 10px;
+    padding: 4px 24px 20px;
+}
+
+.modal-isolir .btn-isolir-batal {
+    flex: 1;
+    padding: 10px;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+    background: transparent;
+    font-size: 13px;
+    color: #6b7280;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    transition: background 0.15s;
+}
+
+.modal-isolir .btn-isolir-batal:hover {
+    background: #f8fafc;
+}
+
+.modal-isolir .btn-isolir-konfirm {
+    flex: 1;
+    padding: 10px;
+    border-radius: 10px;
+    border: 1px solid #fde68a;
+    background: #fef3c7;
+    font-size: 13px;
+    font-weight: 600;
+    color: #d97706;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    text-decoration: none;
+    transition: opacity 0.15s;
+}
+
+.modal-isolir .btn-isolir-konfirm:hover {
+    opacity: 0.85;
+    color: #d97706;
+}
+</style>
 </head>
 <body>
 
 <div style="display:flex; min-height:100vh;">
 
+    {{-- ===== SIDEBAR ===== --}}
     <div class="sidebar">
 
         <div class="sidebar-header">
@@ -79,6 +355,7 @@
 
     </div>
 
+    {{-- ===== MAIN CONTENT ===== --}}
     <div class="main-content" style="flex:1;">
 
         <div class="topbar">
@@ -96,9 +373,9 @@
         </div>
 
         <div style="padding: 28px 24px;">
-
             <div class="row g-4 align-items-start">
 
+                {{-- ===== PROFIL CARD ===== --}}
                 <div class="col-md-4 col-lg-3">
                     <div class="profil-card">
 
@@ -109,9 +386,7 @@
                                 </div>
                                 <div>
                                     <div class="profil-nama">{{ $pelanggan->nama }}</div>
-                                    <div class="profil-kode">
-                                        {{ $pelanggan->kode_pelanggan ?? '-' }}
-                                    </div>
+                                    <div class="profil-kode">{{ $pelanggan->kode_pelanggan ?? '-' }}</div>
                                 </div>
                             </div>
 
@@ -156,14 +431,27 @@
                                     data-bs-target="#tambahTagihan">
                                 <i class="bi bi-plus-lg"></i> Buat Tagihan
                             </button>
-                            <a href="{{ url('/layanan/'.$pelanggan->id.'/isolir') }}" class="btn-isolir">
-                                <i class="bi bi-bell-fill"></i> Isolir Pelanggan
-                            </a>
+                           @if(strtolower($pelanggan->status) == 'isolir')
+    <button type="button"
+            class="btn-edit-tagihan"
+            data-bs-toggle="modal"
+            data-bs-target="#modalAktivasi">
+        <i class="bi bi-wifi"></i> Aktifkan Kembali
+    </button>
+@else
+    <button type="button"
+            class="btn-isolir"
+            data-bs-toggle="modal"
+            data-bs-target="#modalIsolir">
+        <i class="bi bi-lock-fill"></i> Isolir Pelanggan
+    </button>
+@endif
                         </div>
 
                     </div>
                 </div>
 
+                {{-- ===== DAFTAR TAGIHAN ===== --}}
                 <div class="col-md-8 col-lg-9">
 
                     <div class="tagihan-section-title">Daftar Tagihan</div>
@@ -171,73 +459,80 @@
                     @if(isset($tagihan) && $tagihan->count() > 0)
 
                         @foreach($tagihan as $t)
-    @php
-        $terbayar = $t->pembayaran->sum('jumlah_bayar') ?? 0;
-        $sisa = $t->total - $terbayar;
-    @endphp
+                        @php
+                            $terbayar = $t->pembayaran->sum('jumlah_bayar') ?? 0;
+                            $sisa     = $t->total - $terbayar;
+                        @endphp
 
-    @if(strtolower($t->status) != 'lunas')
-    <div class="tagihan-item berjalan">
-        <div class="tagihan-item-left">
-            <div class="tagihan-bulan">
-                {{ strtoupper(\Carbon\Carbon::parse($t->tanggal)->format('M Y')) }}
-                — {{ \Illuminate\Support\Str::title($t->jenis_tagihan ?? 'tagihan internet bulanan') }}
-            </div>
-            <div class="tagihan-status-text">
-                @if($terbayar > 0)
-                    Belum Lunas &middot; Terbayar:
-                    <strong style="color:#f59e0b;">Rp {{ number_format($terbayar, 0, ',', '.') }}</strong>
-                    &middot; Sisa:
-                    <strong style="color:#ef4444;">Rp {{ number_format($sisa, 0, ',', '.') }}</strong>
-                @else
-                    Tagihan Berjalan &middot; Jatuh Tempo:
-                    {{ $t->jatuh_tempo ? \Carbon\Carbon::parse($t->jatuh_tempo)->format('d M Y') : '-' }}
-                @endif
-                @if($t->jatuh_tempo && \Carbon\Carbon::parse($t->jatuh_tempo)->isPast())
-                    <span class="badge bg-danger ms-1" style="font-size:10px;">Lewat Jatuh Tempo</span>
-                @endif
-            </div>
-        </div>
-        <div class="tagihan-item-right">
-            <button type="button"
-                    class="btn-bayar"
-                    data-bs-toggle="modal"
-                    data-bs-target="#modalBayar{{ $t->id }}">Bayar
-            </button>
-        </div>
-    </div> 
+                        @if(strtolower($t->status) != 'lunas')
+                        {{-- Tagihan belum lunas --}}
+                        <div class="tagihan-item berjalan">
+                            <div class="tagihan-item-left">
+                                <div class="tagihan-bulan">
+                                    {{ strtoupper(\Carbon\Carbon::parse($t->tanggal)->format('M Y')) }}
+                                    — {{ \Illuminate\Support\Str::title($t->jenis_tagihan ?? 'tagihan internet bulanan') }}
+                                </div>
+                                <div class="tagihan-status-text">
+                                    @if($terbayar > 0)
+                                        Belum Lunas &middot; Terbayar:
+                                        <strong style="color:#f59e0b;">Rp {{ number_format($terbayar, 0, ',', '.') }}</strong>
+                                        &middot; Sisa:
+                                        <strong style="color:#ef4444;">Rp {{ number_format($sisa, 0, ',', '.') }}</strong>
+                                    @else
+                                        Tagihan Berjalan &middot; Jatuh Tempo:
+                                        {{ $t->jatuh_tempo ? \Carbon\Carbon::parse($t->jatuh_tempo)->format('d M Y') : '-' }}
+                                    @endif
+                                    @if($t->jatuh_tempo && \Carbon\Carbon::parse($t->jatuh_tempo)->isPast())
+                                        <span class="badge bg-danger ms-1" style="font-size:10px;">Lewat Jatuh Tempo</span>
+                                    @endif
+                                </div>
+                            </div>
+                            <div class="tagihan-item-right">
+                                {{-- Tombol cetak kwitansi untuk tagihan belum lunas --}}
+                                <a href="{{ url('/tagihan/'.$t->id.'/kwitansi') }}" class="btn-cetak">
+                                    <i class="bi bi-printer-fill"></i> Cetak Kwitansi
+                                </a>
+                                <button type="button"
+                                        class="btn-bayar"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#modalBayar{{ $t->id }}">
+                                    Bayar
+                                </button>
+                            </div>
+                        </div>
 
-    @else
-    <div class="tagihan-item">
-        <div class="tagihan-item-left">
-            <div class="tagihan-bulan">
-                {{ strtoupper(\Carbon\Carbon::parse($t->tanggal)->format('M Y')) }}
-                — {{ \Illuminate\Support\Str::title($t->jenis_tagihan ?? 'tagihan internet bulanan') }}
-            </div>
-            <div class="tagihan-status-text">
-                Lunas:
-                {{ $t->pembayaran->last() ? \Carbon\Carbon::parse($t->pembayaran->last()->tanggal_bayar)->format('d/m/Y') : '-' }}
-                via
-                {{ $t->pembayaran->last() && $t->pembayaran->last()->metode ? strtoupper($t->pembayaran->last()->metode->nama_metode) : 'KAS' }}
-            </div>
-        </div>
-        <div class="tagihan-item-right">
-            <a href="{{ url('/tagihan/'.$t->id.'/kwitansi') }}" class="btn-cetak">
-                <i class="bi bi-printer-fill"></i> Cetak Kwitansi
-            </a>
-            <form method="POST"
-                  action="{{ url('/tagihan/'.$t->id) }}"
-                  onsubmit="return confirm('Hapus data tagihan ini?')"
-                  style="margin:0;">
-                @csrf
-                @method('DELETE')
-                <button type="submit" class="btn-hapus">Hapus</button>
-            </form>
-        </div>
-    </div>
-    @endif
+                        @else
+                        {{-- Tagihan lunas --}}
+                        <div class="tagihan-item">
+                            <div class="tagihan-item-left">
+                                <div class="tagihan-bulan">
+                                    {{ strtoupper(\Carbon\Carbon::parse($t->tanggal)->format('M Y')) }}
+                                    — {{ \Illuminate\Support\Str::title($t->jenis_tagihan ?? 'tagihan internet bulanan') }}
+                                </div>
+                                <div class="tagihan-status-text">
+                                    Lunas:
+                                    {{ $t->pembayaran->last() ? \Carbon\Carbon::parse($t->pembayaran->last()->tanggal_bayar)->format('d/m/Y') : '-' }}
+                                    via
+                                    {{ $t->pembayaran->last() && $t->pembayaran->last()->metode ? strtoupper($t->pembayaran->last()->metode->nama_metode) : 'KAS' }}
+                                </div>
+                            </div>
+                            <div class="tagihan-item-right">
+                                <a href="{{ url('/tagihan/'.$t->id.'/kwitansi') }}" class="btn-cetak">
+                                    <i class="bi bi-printer-fill"></i> Cetak Kwitansi
+                                </a>
+                                <form method="POST"
+                                      action="{{ url('/tagihan/'.$t->id) }}"
+                                      onsubmit="return confirm('Hapus data tagihan ini?')"
+                                      style="margin:0;">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn-hapus">Hapus</button>
+                                </form>
+                            </div>
+                        </div>
+                        @endif
 
-@endforeach
+                        @endforeach
 
                     @else
                     <div class="empty-state">
@@ -249,43 +544,38 @@
                 </div>
 
             </div>
-
         </div>
 
     </div>
-
 </div>
 
+{{-- ===== MODAL DETAIL LAYANAN ===== --}}
 <div class="modal fade" id="detailModal{{ $pelanggan->id }}" tabindex="-1">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content border-0 rounded-4">
-
             <div class="modal-header bg-success text-white">
                 <h5 class="modal-title fw-bold">Detail Layanan</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
-
             <div class="modal-body p-4">
                 <div class="mb-3"><strong>Nama :</strong> {{ $pelanggan->nama }}</div>
                 <div class="mb-3"><strong>No HP :</strong> {{ $pelanggan->no_hp ?? '-' }}</div>
                 <div class="mb-3"><strong>Alamat :</strong> {{ $pelanggan->alamat ?? '-' }}</div>
                 <div class="mb-3"><strong>Paket :</strong> {{ $pelanggan->layanan->nama_paket ?? '-' }}</div>
-                <div class="mb-3"><strong>Harga :</strong> Rp {{ number_format($pelanggan->layanan->harga ?? 0,0,',','.') }}</div>
+                <div class="mb-3"><strong>Harga :</strong> Rp {{ number_format($pelanggan->layanan->harga ?? 0, 0, ',', '.') }}</div>
                 <div class="mb-3"><strong>Status :</strong> {{ ucfirst($pelanggan->status) }}</div>
                 <div class="mb-3"><strong>Tanggal Aktivasi :</strong> {{ $pelanggan->created_at->format('d M Y') }}</div>
             </div>
-
         </div>
     </div>
 </div>
 
+{{-- ===== MODAL BUAT TAGIHAN ===== --}}
 <div class="modal fade" id="tambahTagihan" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-
             <form action="{{ route('tagihan.store') }}" method="POST">
             @csrf
-
             <input type="hidden" name="pelanggan_id" value="{{ $pelanggan->id }}">
             <input type="hidden" name="layanan_id"   value="{{ $pelanggan->layanan->id ?? '' }}">
 
@@ -295,25 +585,19 @@
             </div>
 
             <div class="modal-body">
-
                 <div class="mb-3">
                     <label>Tanggal</label>
-                    <input type="date" name="tanggal" id="inputTanggal"
-                           class="form-control" required>
+                    <input type="date" name="tanggal" id="inputTanggal" class="form-control" required>
                 </div>
-
                 <div class="mb-3">
                     <label>Jatuh Tempo</label>
-                    <input type="date" name="jatuh_tempo" id="inputJatuhTempo"
-                           class="form-control" readonly>
+                    <input type="date" name="jatuh_tempo" id="inputJatuhTempo" class="form-control" readonly>
                 </div>
-
                 <div class="mb-3">
                     <label>Jumlah Tagihan</label>
                     <input type="number" name="total" class="form-control"
                            value="{{ $pelanggan->layanan->harga ?? 0 }}" required>
                 </div>
-
                 <div class="mb-3">
                     <label>Jenis Tagihan</label>
                     <select name="jenis_tagihan" class="form-control" required>
@@ -324,44 +608,144 @@
                         <option value="pendapatan jasa">Pendapatan Jasa</option>
                     </select>
                 </div>
-
                 <div class="mb-3">
                     <label>Keterangan</label>
                     <textarea name="keterangan" class="form-control"></textarea>
                 </div>
-
             </div>
 
             <div class="modal-footer">
-                <button type="submit" class="btn btn-success">
-                    Simpan Tagihan
-                </button>
+                <button type="submit" class="btn btn-success">Simpan Tagihan</button>
             </div>
-
             </form>
         </div>
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        document.getElementById('inputTanggal').addEventListener('change', function () {
-            const tgl = new Date(this.value);
-            tgl.setDate(tgl.getDate() + 3);
-            document.getElementById('inputJatuhTempo').value = tgl.toISOString().split('T')[0];
-        });
-    });
-</script>
+{{-- ===== MODAL KONFIRMASI ISOLIR ===== --}}
+<div class="modal fade modal-isolir" id="modalIsolir" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered" style="max-width:420px;">
+        <div class="modal-content">
 
+            <div class="isolir-head">
+                <div class="isolir-head-icon">
+                    <i class="bi bi-lock-fill"></i>
+                </div>
+                <div class="isolir-head-text">
+                    <div class="title">Isolir pelanggan</div>
+                    <div class="sub">Layanan akan ditangguhkan sementara</div>
+                </div>
+                <button type="button"
+                        class="btn-close ms-auto"
+                        data-bs-dismiss="modal"
+                        aria-label="Tutup"></button>
+            </div>
+
+            <div class="isolir-body">
+                <div class="isolir-pelanggan">
+                    <div class="isolir-avatar">
+                        {{ strtoupper(substr($pelanggan->nama, 0, 2)) }}
+                    </div>
+                    <div>
+                        <div class="isolir-nama">
+                            {{ $pelanggan->nama }}
+                            <span class="isolir-badge-paket">
+                                {{ $pelanggan->layanan->kecepatan ?? '' }}/{{ $pelanggan->layanan->nama_paket ?? '-' }}
+                            </span>
+                        </div>
+                        <div class="isolir-meta">
+                            {{ $pelanggan->kode_pelanggan ?? '-' }} &middot;
+                            Aktif sejak {{ \Carbon\Carbon::parse($pelanggan->layanan->created_at ?? now())->format('d M Y') }}
+                        </div>
+                    </div>
+                </div>
+                <div class="isolir-alert">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                    <span>Pastikan proses isolir telah dikonfirmasi kepada pelanggan.</span>
+                </div>
+            </div>
+
+            <div class="isolir-footer">
+                <a href="{{ route('layanan.isolir', $pelanggan->id) }}"
+                   class="btn-isolir-konfirm">
+                    <i class="bi bi-lock-fill"></i> Ya, isolir sekarang
+                </a>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+{{-- ===== MODAL KONFIRMASI AKTIVASI ===== --}}
+<div class="modal fade modal-isolir" id="modalAktivasi" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered" style="max-width:420px;">
+        <div class="modal-content" style="border:none; border-radius:20px; overflow:hidden;">
+
+            <div class="isolir-head" style="border-bottom:1px solid #e5e7eb;">
+                <div class="isolir-head-icon" style="background:#dbeafe;">
+                    <i class="bi bi-wifi" style="color:#1d4ed8;"></i>
+                </div>
+                <div class="isolir-head-text">
+                    <div class="title">Aktifkan kembali</div>
+                    <div class="sub">Layanan akan dipulihkan untuk pelanggan</div>
+                </div>
+                <button type="button"
+                        class="btn-close ms-auto"
+                        data-bs-dismiss="modal"
+                        aria-label="Tutup"></button>
+            </div>
+
+            <div class="isolir-body">
+                <div class="isolir-pelanggan">
+                    <div class="isolir-avatar" style="background:#dbeafe; color:#2563eb;">
+                        {{ strtoupper(substr($pelanggan->nama, 0, 2)) }}
+                    </div>
+                    <div>
+                        <div class="isolir-nama">
+                            {{ $pelanggan->nama }}
+                            <span class="isolir-badge-paket">
+                                {{ $pelanggan->layanan->kecepatan ?? '' }}/{{ $pelanggan->layanan->nama_paket ?? '-' }}
+                            </span>
+                        </div>
+                        <div class="isolir-meta">
+                            {{ $pelanggan->kode_pelanggan ?? '-' }} &middot;
+                            Isolir sejak {{ \Carbon\Carbon::parse($pelanggan->updated_at ?? now())->format('d M Y') }}
+                        </div>
+                    </div>
+                </div>
+                <div class="isolir-alert"
+                     style="background:#eff6ff; border-color:#bfdbfe; border-left-color:#3b82f6; color:#1d4ed8;">
+                    <i class="bi bi-info-circle-fill" style="color:#3b82f6;"></i>
+                    <span>Layanan pelanggan akan kembali aktif setelah proses aktivasi.</span>
+                </div>
+            </div>
+
+            <div class="isolir-footer">
+                <a href="{{ route('layanan.aktifkan', $pelanggan->id) }}"
+                   class="btn-isolir-konfirm"
+                   style="background:#dbeafe; border-color:#bfdbfe; color:#1d4ed8;">
+                    <i class="bi bi-wifi"></i> Ya, aktifkan sekarang
+                </a>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+{{-- ===== MODAL BAYAR (per tagihan) ===== --}}
 @foreach($tagihan as $t)
 @if(strtolower($t->status) != 'lunas')
+@php
+    $sudahBayar  = $t->pembayaran->sum('jumlah_bayar') ?? 0;
+    $sisaTagihan = $t->total - $sudahBayar;
+@endphp
 
 <div class="modal fade modal-bayar" id="modalBayar{{ $t->id }}" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
 
-            <div class="bayar-header" style="display:flex; align-items:center; justify-content:space-between; padding: 20px;">
+            <div class="bayar-header"
+                 style="display:flex; align-items:center; justify-content:space-between; padding:20px;">
                 <span></span>
                 <span>Pembayaran Tagihan</span>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
@@ -369,34 +753,20 @@
 
             <form method="POST" action="{{ route('tagihan.bayar', $t->id) }}">
                 @csrf
-
                 <div class="bayar-body">
 
-                    <div class="bayar-box" style="background: linear-gradient(135deg,#f0fdf4,#dcfce7); border-color:#bbf7d0;">
-                        <div class="bayar-label" style="color:#15803d;">
-                            Periode Tagihan
-                        </div>
+                    <div class="bayar-box"
+                         style="background:linear-gradient(135deg,#f0fdf4,#dcfce7); border-color:#bbf7d0;">
+                        <div class="bayar-label" style="color:#15803d;">Periode Tagihan</div>
                         <div style="display:flex; align-items:center; gap:10px;">
-                            <div style="
-                                width:36px;
-                                height:36px;
-                                border-radius:10px;
-                                background:#22c55e;
-                                display:flex;
-                                align-items:center;
-                                justify-content:center;
-                                color:#fff;
-                                font-size:16px;
-                            ">
+                            <div style="width:36px; height:36px; border-radius:10px; background:#22c55e; display:flex; align-items:center; justify-content:center; color:#fff; font-size:16px;">
                                 <i class="bi bi-calendar-event"></i>
                             </div>
                             <div>
                                 <div style="font-size:14px; font-weight:800; color:#166534;">
                                     {{ strtoupper(\Carbon\Carbon::parse($t->tanggal)->translatedFormat('F Y')) }}
                                 </div>
-                                <div style="font-size:11px; color:#4b5563;">
-                                    Periode penagihan layanan
-                                </div>
+                                <div style="font-size:11px; color:#4b5563;">Periode penagihan layanan</div>
                             </div>
                         </div>
                     </div>
@@ -413,10 +783,6 @@
                         </div>
                     </div>
 
-                    @php
-                        $sudahBayar = $t->pembayaran->sum('jumlah_bayar') ?? 0;
-                        $sisaTagihan = $t->total - $sudahBayar;
-                    @endphp
                     @if($sudahBayar > 0)
                     <div class="bayar-box" style="background:#fffbeb; border-color:#fde68a;">
                         <div class="bayar-label" style="color:#b45309;">Sudah Dibayar</div>
@@ -441,16 +807,18 @@
                                    min="1"
                                    required>
                         </div>
-                        <small class="text-muted mt-1 d-block" style="font-size:10.5px; padding: 4px 2px;">
+                        <small class="text-muted mt-1 d-block" style="font-size:10.5px; padding:4px 2px;">
                             Boleh diisi sebagian. Maks: Rp {{ number_format($sisaTagihan ?? $t->total, 0, ',', '.') }}
                         </small>
                     </div>
 
                     <div class="bayar-box">
                         <div class="bayar-label">Tanggal Pembayaran</div>
-                        <input type="date" name="tanggal_bayar"
+                        <input type="date"
+                               name="tanggal_bayar"
                                class="form-control bayar-input"
-                               value="{{ date('Y-m-d') }}" required>
+                               value="{{ date('Y-m-d') }}"
+                               required>
                     </div>
 
                     <div class="bayar-box">
@@ -458,9 +826,7 @@
                         <select name="metode_id" class="form-select bayar-input" required>
                             <option value="">Pilih Metode</option>
                             @foreach($metode as $m)
-                                <option value="{{ $m->id }}">
-                                    {{ $m->nama_metode }}
-                                </option>
+                                <option value="{{ $m->id }}">{{ $m->nama_metode }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -475,93 +841,127 @@
                                style="background:#f8fafc; color:#374151; font-weight:700;">
                     </div>
 
-                    <button type="submit" class="btn-konfirmasi">
-                        KONFIRMASI PEMBAYARAN
-                    </button>
+                    <button type="submit" class="btn-konfirmasi">KONFIRMASI PEMBAYARAN</button>
 
                 </div>
-
             </form>
 
         </div>
     </div>
 </div>
-
-@endif
-@if(session('success'))
-<div id="overlaySuccess" style="
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.45);
-    z-index: 9999;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    animation: fadeIn .25s ease;
-">
-    <div style="
-        background: #fff;
-        border-radius: 24px;
-        box-shadow: 0 30px 80px rgba(0,0,0,0.2);
-        padding: 48px 40px;
-        text-align: center;
-        max-width: 360px;
-        width: 90%;
-        animation: popIn .3s ease;
-    ">
-        <div style="
-            width: 80px; height: 80px;
-            background: linear-gradient(135deg,#dcfce7,#bbf7d0);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 20px;
-        ">
-            <i class="bi bi-check-lg" style="font-size:40px; color:#16a34a;"></i>
-        </div>
-
-        <div style="font-size:22px; font-weight:900; color:#111; margin-bottom:8px;">
-            Pembayaran Berhasil!
-        </div>
-        <div style="font-size:14px; color:#6b7280; margin-bottom:32px;">
-            {{ session('success') }}
-        </div>
-
-        <button onclick="document.getElementById('overlaySuccess').remove()" style="
-            background: linear-gradient(135deg,#16a34a,#22c55e);
-            color: #fff;
-            border: none;
-            padding: 13px 48px;
-            border-radius: 50px;
-            font-size: 14px;
-            font-weight: 800;
-            cursor: pointer;
-            transition: .2s;
-        ">
-            OK
-        </button>
-    </div>
-</div>
-
-<style>
-@keyframes fadeIn {
-    from { opacity:0; }
-    to   { opacity:1; }
-}
-@keyframes popIn {
-    from { opacity:0; transform: scale(.85); }
-    to   { opacity:1; transform: scale(1); }
-}
-</style>
-
-<script>
-    setTimeout(() => {
-        const el = document.getElementById('overlaySuccess');
-        if (el) el.remove();
-    }, 4000);
-</script>
 @endif
 @endforeach
+
+{{-- ===== OVERLAY SUCCESS ===== --}}
+@if(session('success'))
+<div id="overlaySuccess" class="notif-overlay">
+    <div class="notif-card">
+        <div class="notif-stripe" style="background:#16a34a;"></div>
+        <div class="notif-inner">
+            <div class="notif-icon-wrap" style="border-color:#bbf7d0; color:#16a34a;">
+                <i class="bi bi-check-lg"></i>
+            </div>
+            <div class="notif-label" style="color:#16a34a;">Berhasil</div>
+            <div class="notif-title">Pembayaran Dikonfirmasi</div>
+            <div class="notif-text">{{ session('success') }}</div>
+        </div>
+        <div class="notif-divider"></div>
+        <button onclick="document.getElementById('overlaySuccess').remove()" class="notif-btn" style="color:#16a34a;">Tutup</button>
+    </div>
+</div>
+<script>
+setTimeout(() => {
+    const el = document.getElementById('overlaySuccess');
+    if(el){ el.style.opacity='0'; setTimeout(()=>el.remove(),300); }
+}, 4000);
+</script>
+@endif
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        document.getElementById('inputTanggal').addEventListener('change', function () {
+            const tgl = new Date(this.value);
+            tgl.setDate(tgl.getDate() + 3);
+            document.getElementById('inputJatuhTempo').value = tgl.toISOString().split('T')[0];
+        });
+    });
+</script>
+
+{{-- ===== OVERLAY TAGIHAN ===== --}}
+@if(session('tagihan_berhasil'))
+<div id="overlayTagihan" class="notif-overlay">
+    <div class="notif-card">
+        <div class="notif-stripe" style="background:#0f766e;"></div>
+        <div class="notif-inner">
+            <div class="notif-icon-wrap" style="border-color:#99f6e4; color:#0f766e;">
+                <i class="bi bi-receipt"></i>
+            </div>
+            <div class="notif-label" style="color:#0f766e;">Tagihan</div>
+            <div class="notif-title">Tagihan Dibuat</div>
+            <div class="notif-text">{{ session('tagihan_berhasil') }}</div>
+        </div>
+        <div class="notif-divider"></div>
+        <button onclick="document.getElementById('overlayTagihan').remove()" class="notif-btn" style="color:#0f766e;">Tutup</button>
+    </div>
+</div>
+<script>
+setTimeout(() => {
+    const el = document.getElementById('overlayTagihan');
+    if(el){ el.style.opacity='0'; setTimeout(()=>el.remove(),300); }
+}, 4000);
+</script>
+@endif
+
+{{-- ===== OVERLAY ISOLIR ===== --}}
+@if(session('isolir_berhasil'))
+<div id="overlayIsolir" class="notif-overlay">
+    <div class="notif-card">
+        <div class="notif-stripe" style="background:#92400e;"></div>
+        <div class="notif-inner">
+            <div class="notif-icon-wrap" style="border-color:#fde68a; color:#92400e;">
+                <i class="bi bi-lock-fill"></i>
+            </div>
+            <div class="notif-label" style="color:#92400e;">Isolir</div>
+            <div class="notif-title">Isolir Berhasil</div>
+            <div class="notif-text">{{ session('isolir_berhasil') }}</div>
+        </div>
+        <div class="notif-divider"></div>
+        <button onclick="document.getElementById('overlayIsolir').remove()" class="notif-btn" style="color:#92400e;">Tutup</button>
+    </div>
+</div>
+<script>
+setTimeout(() => {
+    const el = document.getElementById('overlayIsolir');
+    if(el){ el.style.opacity='0'; setTimeout(()=>el.remove(),300); }
+}, 4000);
+</script>
+@endif
+
+{{-- ===== OVERLAY AKTIVASI ===== --}}
+@if(session('aktivasi_berhasil'))
+<div id="overlayAktivasi" class="notif-overlay">
+    <div class="notif-card">
+        <div class="notif-stripe" style="background:#1d4ed8;"></div>
+        <div class="notif-inner">
+            <div class="notif-icon-wrap" style="border-color:#bfdbfe; color:#1d4ed8;">
+                <i class="bi bi-wifi"></i>
+            </div>
+            <div class="notif-label" style="color:#1d4ed8;">Aktif</div>
+            <div class="notif-title">Aktivasi Berhasil</div>
+            <div class="notif-text">{{ session('aktivasi_berhasil') }}</div>
+        </div>
+        <div class="notif-divider"></div>
+        <button onclick="document.getElementById('overlayAktivasi').remove()" class="notif-btn" style="color:#1d4ed8;">Tutup</button>
+    </div>
+</div>
+<script>
+setTimeout(() => {
+    const el = document.getElementById('overlayAktivasi');
+    if(el){ el.style.opacity='0'; setTimeout(()=>el.remove(),300); }
+}, 4000);
+</script>
+@endif
+
 </body>
 </html>

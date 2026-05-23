@@ -63,8 +63,7 @@ class TagihanController extends Controller
             'status'        => 'belum bayar',
         ]);
 
-        return back()->with('success', 'Tagihan berhasil ditambahkan');
-    }
+return redirect()->back()->with('tagihan_berhasil', 'Tagihan bulan ini berhasil dibuat.');    }
 
     public function update(Request $request, $id)
     {

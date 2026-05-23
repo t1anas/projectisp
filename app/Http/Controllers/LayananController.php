@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Pelanggan;
 use App\Models\Tagihan;
+use App\Models\Layanan;
+use App\Models\MetodePembayaran;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Imports\LayananImport;
@@ -35,12 +37,19 @@ class LayananController extends Controller
     }
 
     public function detail($id)
-    {
-        $pelanggan = Pelanggan::with(['layanan', 'tagihan'])->findOrFail($id);
-        $tagihan   = $pelanggan->tagihan;
+{
+    $pelanggan = Pelanggan::with('layanan')->findOrFail($id);
 
-        return view('detail', compact('pelanggan', 'tagihan'));
-    }
+    $tagihan = Tagihan::where('pelanggan_id', $id)
+        ->with('pembayaran.metode')
+        ->latest()
+        ->get();
+
+    $layanan = Layanan::all();
+    $metode  = MetodePembayaran::all();
+
+    return view('detail', compact('pelanggan', 'tagihan', 'layanan', 'metode'));
+}
 
     public function edit($id)
     {
@@ -126,5 +135,24 @@ class LayananController extends Controller
     Excel::import(new LayananImport, $request->file('file'));
 
     return back()->with('success', 'Data berhasil diimport.');
+}
+public function isolir($id)
+{
+    $pelanggan = Pelanggan::findOrFail($id);
+    $pelanggan->update(['status' => 'isolir']);
+
+    return redirect()
+        ->route('detail', $id)
+        ->with('isolir_berhasil', 'Layanan ' . $pelanggan->nama . ' berhasil diisolir.');
+}
+
+public function aktifkan($id)
+{
+    $pelanggan = Pelanggan::findOrFail($id);
+    $pelanggan->update(['status' => 'aktif']);
+
+    return redirect()
+        ->route('detail', $id)
+        ->with('aktivasi_berhasil', 'Layanan ' . $pelanggan->nama . ' berhasil diaktifkan kembali.');
 }
 }
