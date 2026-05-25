@@ -427,7 +427,6 @@
                         placeholder="Contoh: Lokasi tidak terjangkau, perangkat tidak tersedia, dsb."></textarea>
                 </div>
                 <div class="modal-footer" style="border-top:1px solid #eee; padding:14px 28px; gap:8px;">
-                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Batal</button>
                     <button type="submit" class="btn-nonaktif">
                         <i class="bi bi-x-lg"></i> Tolak Instalasi
                     </button>

@@ -236,18 +236,13 @@
                                                         data-tip="Edit">
                                                     <i class="bi bi-pencil-fill"></i>
                                                 </button>
-                                                <form action="{{ url('/pelanggan/'.$p->id) }}"
-                                                      method="POST"
-                                                      style="display:inline-block;"
-                                                      onsubmit="return confirm('Yakin hapus data ini?')">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit"
-                                                            class="btn-action btn-action-delete"
-                                                            data-tip="Hapus">
-                                                        <i class="bi bi-trash-fill"></i>
-                                                    </button>
-                                                </form>
+                                               <button type="button"
+        class="action-modern btn-hapus"
+        title="Hapus"
+        data-bs-toggle="modal"
+        data-bs-target="#modalHapus{{ $p->id }}">
+    <i class="bi bi-trash-fill"></i>
+</button>
                                             </div>
                                         </td>
                                     </tr>
@@ -354,6 +349,89 @@
             </div>
         </div>
     </div>
+@endforeach
+
+{{-- MODAL HAPUS PELANGGAN --}}
+@foreach($pelanggan as $p)
+<div class="modal fade" id="modalHapus{{ $p->id }}" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" style="max-width:420px;">
+        <div class="modal-content" style="border:none; border-radius:20px; overflow:hidden;">
+
+            <div style="display:flex; align-items:center; gap:12px; padding:18px 20px;
+                        background:linear-gradient(135deg,#fee2e2,#fecaca);
+                        border-bottom:1px solid #fca5a5;">
+                <div style="width:40px; height:40px; border-radius:50%; background:#fca5a5;
+                            display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+                    <i class="bi bi-trash-fill" style="color:#dc2626; font-size:16px;"></i>
+                </div>
+                <div style="flex:1;">
+                    <div style="font-weight:700; font-size:15px; color:#b91c1c;">Hapus Pelanggan</div>
+                    <div style="font-size:12px; color:#ef4444;">Tindakan ini tidak dapat dibatalkan</div>
+                </div>
+            </div>
+
+            <div style="padding:20px;">
+                <div style="display:flex; align-items:center; gap:12px;
+                            background:#f9fafb; border:1px solid #e5e7eb;
+                            border-radius:12px; padding:14px; margin-bottom:14px;">
+                    <div style="width:42px; height:42px; border-radius:50%;
+                                background:#fee2e2; color:#dc2626;
+                                display:flex; align-items:center; justify-content:center;
+                                font-size:16px; font-weight:700; flex-shrink:0;">
+                        {{ strtoupper(substr($p->nama, 0, 2)) }}
+                    </div>
+                    <div>
+                        <div style="font-size:14px; font-weight:700; color:#111827;">
+                            {{ $p->nama }}
+                            <span style="font-size:11px; font-weight:500; color:#dc2626;
+                                         background:#fee2e2; border:1px solid #fecaca;
+                                         border-radius:6px; padding:1px 8px; margin-left:4px;">
+                                {{ ucfirst($p->status) }}
+                            </span>
+                        </div>
+                        <div style="font-size:12px; color:#6b7280; margin-top:2px;">
+                            {{ $p->kode_pelanggan ?? '-' }} &middot; {{ $p->no_hp ?? '-' }}
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display:flex; align-items:flex-start; gap:10px;
+                            background:#fef2f2; border:1px solid #fecaca;
+                            border-left:4px solid #dc2626;
+                            border-radius:10px; padding:12px 14px; margin-bottom:20px;">
+                    <i class="bi bi-exclamation-triangle-fill" style="color:#dc2626; margin-top:1px; flex-shrink:0;"></i>
+                    <span style="font-size:12.5px; color:#b91c1c; line-height:1.6;">
+                        Semua data pelanggan ini termasuk tagihan dan riwayat pembayaran
+                        akan <strong>dihapus permanen</strong>.
+                    </span>
+                </div>
+
+                <div style="display:flex; gap:8px;">
+                    <button type="button"
+                            class="btn btn-secondary btn-sm"
+                            data-bs-dismiss="modal"
+                            style="flex:1; border-radius:10px; height:40px;">
+                        Batal
+                    </button>
+                    <form method="POST"
+                          action="{{ url('/pelanggan/'.$p->id) }}"
+                          style="flex:1; margin:0;">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit"
+                                style="width:100%; height:40px; border-radius:10px; border:1px solid #fecaca;
+                                       background:#fee2e2; color:#dc2626; font-weight:600;
+                                       font-size:13px; cursor:pointer; display:flex;
+                                       align-items:center; justify-content:center; gap:6px;">
+                            <i class="bi bi-trash-fill"></i> Ya, hapus sekarang
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
 @endforeach
 {{-- END MODAL --}}
 

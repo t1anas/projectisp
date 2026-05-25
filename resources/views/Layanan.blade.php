@@ -651,7 +651,7 @@
      MODAL GENERATE TAGIHAN
 ══════════════════════════════════════ --}}
 <div class="modal fade" id="modalGenerateTagihan" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-sm modal-dialog-centered">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 350px;">
         <div class="modal-content" style="border-radius:14px; overflow:hidden; box-shadow:0 20px 60px rgba(0,0,0,.15);">
 
             <div class="modal-header"
@@ -672,16 +672,34 @@
                         </div>
                     </div>
                 </div>
-                <button type="button" class="btn-close btn-close-white ms-auto"
-                        data-bs-dismiss="modal"></button>
+                
             </div>
 
-            <div class="modal-body" style="padding:18px 20px;">
-                <p style="font-size:13px; color:#374151; margin:0; line-height:1.6;">
-                    Tagihan bulan ini akan dibuat otomatis untuk
-                    <strong id="jumlahGenerateText">0</strong> pelanggan terpilih.
-                    Pastikan data sudah benar sebelum melanjutkan.
-                </p>
+            <div class="modal-body" style="padding:20px 20px 14px; min-height: 250px;">
+
+                {{-- Info box --}}
+                <div style="background:#f0fdf4; border:1px solid #bbf7d0;
+                            border-radius:10px; padding:14px 30px; margin-bottom:4px;">
+                    <div style="display:flex; align-items:flex-start; gap:10px;">
+                        <div style="width:50px; height:32px; border-radius:50%;
+                                    background:#dcfce7; display:flex; align-items:center;
+                                    justify-content:center; font-size:16px;
+                                    color:#16a34a; flex-shrink:0; margin-top:1px;">
+                            <i class="bi bi-info-circle-fill"></i>
+                        </div>
+                        <div>
+                            <div style="font-size:12px; font-weight:600; color:#15803d; margin-bottom:3px;">
+                                Konfirmasi Generate
+                            </div>
+                            <div style="font-size:12.5px; color:#374151; line-height:1.65;">
+                                Tagihan akan dibuat otomatis untuk
+                                <strong id="jumlahGenerateText">0</strong> pelanggan terpilih.
+                                Pastikan data sudah benar sebelum melanjutkan.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
 
             <div class="modal-footer" style="padding:12px 20px; border-top:1px solid #f3f4f6; gap:8px;">
@@ -698,9 +716,49 @@
         </div>
     </div>
 </div>
-
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
+    // Taruh sebelum fungsi lainnya
+function jagoAlert(pesan, callback) {
+    const existing = document.getElementById('jagoAlertModal');
+    if (existing) existing.remove();
+
+    const html = `
+    <div id="jagoAlertModal" style="position:fixed;inset:0;background:rgba(0,0,0,.52);
+         z-index:9999;display:flex;align-items:center;justify-content:center;">
+      <div style="background:#fff;border-radius:16px;overflow:hidden;width:340px;
+                  box-shadow:0 20px 60px rgba(0,0,0,.2);">
+        <div style="background:linear-gradient(135deg,#09973B,#0ab844);
+                    padding:20px;display:flex;flex-direction:column;
+                    align-items:center;gap:10px;">
+          <div style="width:52px;height:52px;border-radius:50%;
+                      background:rgba(255,255,255,.18);display:flex;
+                      align-items:center;justify-content:center;font-size:26px;color:#fff;">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+          </div>
+          <div style="font-size:15px;font-weight:600;color:#fff;">Perhatian</div>
+        </div>
+        <div style="padding:20px 22px 8px;text-align:center;">
+          <p style="font-size:13.5px;color:#555;line-height:1.7;margin:0;">${pesan}</p>
+          
+        </div>
+        <div style="padding:14px 20px 18px;display:flex;justify-content:center;">
+          <button id="jagoAlertOk"
+                  style="padding:9px 40px;border-radius:8px;border:none;
+                         background:linear-gradient(135deg,#09973B,#0ab844);
+                         color:#fff;font-size:13.5px;font-weight:600;cursor:pointer;">
+            <i class="bi bi-check-lg me-1"></i> Mengerti
+          </button>
+        </div>
+      </div>
+    </div>`;
+
+    document.body.insertAdjacentHTML('beforeend', html);
+    document.getElementById('jagoAlertOk').onclick = () => {
+        document.getElementById('jagoAlertModal').remove();
+        if (callback) callback();
+    };
+}
 /* ══════════════════════════════════════
    CHECKBOX HELPERS
 ══════════════════════════════════════ */
@@ -727,7 +785,7 @@ function getSelectedIds() {
 function hapusDataTerpilih() {
     const ids = getSelectedIds();
     if (ids.length === 0) {
-        alert('Pilih minimal satu data terlebih dahulu.');
+       jagoAlert('Pilih minimal satu data terlebih dahulu.');
         return;
     }
     if (!confirm(`Yakin ingin menghapus ${ids.length} data terpilih?\nTindakan ini tidak dapat dibatalkan.`)) return;
@@ -761,7 +819,7 @@ function pilihStatus(el, value) {
 function ubahStatusTerpilih() {
     const ids = getSelectedIds();
     if (ids.length === 0) {
-        alert('Pilih minimal satu data terlebih dahulu.');
+       jagoAlert('Pilih minimal satu data terlebih dahulu.');
         return;
     }
 
@@ -792,7 +850,7 @@ function ubahStatusTerpilih() {
 function generateTerpilih() {
     const ids = getSelectedIds();
     if (ids.length === 0) {
-        alert('Pilih minimal satu data terlebih dahulu.');
+       jagoAlert('Pilih minimal satu data terlebih dahulu.');
         return;
     }
 
