@@ -14,7 +14,8 @@ class PelangganController extends Controller
     public function index(Request $request)
     {
         $query = Pelanggan::with(['layanan', 'site'])
-            ->orderBy('created_at', 'desc');
+            ->orderBy('created_at', 'desc')
+            ->whereNotIn('status', ['pengajuan noc', 'pending']);
 
         if ($request->filled('search')) {
             $query->where('nama', 'like', '%' . $request->search . '%');

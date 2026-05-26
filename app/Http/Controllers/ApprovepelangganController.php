@@ -12,7 +12,8 @@ class ApprovePelangganController extends Controller
     public function index(Request $request)
     {
         $query = Pelanggan::with(['layanan', 'site', 'approvedBy'])
-            ->orderBy('created_at', 'desc');
+            ->orderBy('created_at', 'desc')
+            ->whereNotIn('status', ['pengajuan noc']);
 
         if ($request->filled('status')) {
             $query->where('status', $request->status);

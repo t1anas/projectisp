@@ -15,7 +15,8 @@ class LayananController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Pelanggan::with(['layanan', 'tagihan']);
+        $query = Pelanggan::with(['layanan', 'tagihan'])
+            ->whereNotIn('status', ['pengajuan noc', 'pending']);
 
         if ($request->filled('search')) {
             $query->where('nama', 'like', '%' . $request->search . '%');

@@ -134,7 +134,7 @@
                         </div>
                         <div class="col-md-2">
                             <select name="status" class="form-select">
-                                <option value="">Semua Status</option>
+                                <option value="all" {{ request('status') === 'all' ? 'selected' : '' }}>Semua Status</option>
                                 <option value="pengajuan noc"   {{ request('status') === 'pengajuan noc'   ? 'selected' : '' }}>Pengajuan NOC</option>
                                 <option value="pending"  {{ request('status') === 'pending'  ? 'selected' : '' }}>Pending</option>
                                 <option value="aktif"    {{ request('status') === 'aktif'    ? 'selected' : '' }}>Aktif</option>
@@ -231,26 +231,22 @@
                             </td>
 
                             <td>
-                                <span class="layanan-badge">{{ $p->layanan->nama_paket ?? '—' }}</span>
+                                {{ $p->layanan->nama_paket ?? '—' }}
                             </td>
 
-                            <td>
+                            <td style="white-space: nowrap">
                                 @php $st = strtolower($p->status); @endphp
-                                @if($st === 'pending')
+                                @if($st === 'pengajuan noc')
+                                    <span class="status-pill status-pengajuan-noc">
+                                        <i class="bi bi-hourglass-split"></i> Pengajuan NOC
+                                    </span>
+                                @elseif($st === 'pending')
                                     <span class="status-pill status-pending">
-                                        <i class="bi bi-hourglass-split"></i> Pending
-                                    </span>
-                                @elseif($st === 'aktif')
-                                    <span class="status-pill status-active">
-                                        <i class="bi bi-check-circle-fill"></i> Aktif
-                                    </span>
-                                @elseif($st === 'nonaktif')
-                                    <span class="status-pill status-nonactive">
-                                        <i class="bi bi-x-circle-fill"></i> Nonaktif
+                                        <i class="bi bi-check-circle-fill"></i> Pengajuan Admin
                                     </span>
                                 @else
-                                    <span class="status-pill status-pengajuan-noc">
-                                        <i class="bi bi-arrow-repeat"></i> Pengajuan NOC
+                                    <span class="status-pill status-active">
+                                        <i class="bi bi-arrow-repeat"></i> Sudah Aktif
                                     </span>
                                 @endif
                             </td>
@@ -307,10 +303,6 @@
 
 </div>
 
-
-{{-- ============================================================ --}}
-{{-- MODAL: Detail Pelanggan --}}
-{{-- ============================================================ --}}
 <div class="modal fade" id="modalDetail" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content">
@@ -326,10 +318,6 @@
     </div>
 </div>
 
-
-{{-- ============================================================ --}}
-{{-- MODAL: Approve NOC (dengan input nama_layanan + catatan_noc) --}}
-{{-- ============================================================ --}}
 <div class="modal fade" id="modalApprove" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" style="max-width:520px;">
         <div class="modal-content">

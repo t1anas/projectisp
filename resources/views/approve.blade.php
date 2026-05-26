@@ -224,20 +224,14 @@
                                 <span class="layanan-badge">{{ $p->layanan->nama_paket ?? '—' }}</span>
                             </td>
 
-                            <td>
+                            <td style="white-space:nowrap;">
                                 @if($p->status === 'pending')
-                                    <span class="status-pill status-pending">
-                                        <i class="bi bi-hourglass-split"></i> Pending
-                                    </span>
-                                @elseif(strtolower($p->status) === 'aktif')
-                                    <span class="status-pill status-active">
-                                        <i class="bi bi-check-circle-fill"></i> Aktif
-                                    </span>
+                                <span class="status-pill status-pending">
+                                    <i class="bi bi-hourglass-split"></i> Pending</span>
                                 @else
-                                    <span class="status-pill status-nonactive">
-                                        <i class="bi bi-x-circle-fill"></i> Nonaktif
-                                    </span>
-                                @endif
+                                <span class="status-pill status-active">
+                                    <i class="bi bi-check-circle-fill"></i> Sudah Aktif</span>
+                                    @endif
                             </td>
 
                             <td>

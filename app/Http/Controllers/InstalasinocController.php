@@ -29,9 +29,11 @@ class InstalasiNocController extends Controller
         }
 
         if ($request->filled('status')) {
-            $query->where('status', $request->status);
-        } else {
-            $query->where('status', 'pengajuan noc');
+            if ($request->status === 'all') {
+
+            } else {
+                $query->where('status', $request->status);
+                }
         }
 
         if ($request->filled('layanan_id')) {

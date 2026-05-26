@@ -231,37 +231,169 @@
 <script>
 function downloadQR() {
     const svg      = document.querySelector("#qrcode svg");
-    const filename = "QR_{{ $pelanggan->kode_pelanggan ?? 'pelanggan' }}.png";
+    const filename = "Kartu_{{ $pelanggan->kode_pelanggan ?? 'pelanggan' }}.png";
 
     if (!svg) return alert('QR belum tersedia.');
 
-    const padding = 20; 
-    const size    = 300;
-    const total   = size + (padding * 2);
+    const W = 760, H = 440;
+    const canvas  = document.createElement('canvas');
+    canvas.width  = W;
+    canvas.height = H;
+    const ctx     = canvas.getContext('2d');
+
+    function roundRect(x, y, w, h, r) {
+        ctx.beginPath();
+        ctx.moveTo(x + r, y);
+        ctx.lineTo(x + w - r, y);
+        ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+        ctx.lineTo(x + w, y + h - r);
+        ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+        ctx.lineTo(x + r, y + h);
+        ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+        ctx.lineTo(x, y + r);
+        ctx.quadraticCurveTo(x, y, x + r, y);
+        ctx.closePath();
+    }
+
+    const logoImg = new Image();
+    const qrImg   = new Image();
 
     const svgData   = new XMLSerializer().serializeToString(svg);
     const svgBase64 = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgData)));
 
-    const canvas  = document.createElement('canvas');
-    canvas.width  = total;
-    canvas.height = total;
+    const loadLogo = new Promise(res => { logoImg.onload = res; logoImg.src = '{{ asset("LUOGOOOO.png") }}'; });
+    const loadQR   = new Promise(res => { qrImg.onload  = res; qrImg.src   = svgBase64; });
 
-    const ctx = canvas.getContext('2d');
-    const img = new Image();
+    Promise.all([loadLogo, loadQR]).then(() => {
 
-    img.onload = function () {
+        const grad = ctx.createLinearGradient(0, 0, 0, H);
+        grad.addColorStop(0, '#FAE59E');
+        grad.addColorStop(1, '#09973B');
+        roundRect(0, 0, W, H, 22);
+        ctx.fillStyle = grad;
+        ctx.fill();
+
+        ctx.strokeStyle = 'rgba(255,255,255,0.12)';
+        ctx.lineWidth   = 1;
+        ctx.beginPath();
+        ctx.moveTo(0, 80);
+        ctx.lineTo(W, 80);
+        ctx.stroke();
+
+        ctx.drawImage(logoImg, 14, 18, 44, 44);
+
         ctx.fillStyle = '#ffffff';
-        ctx.fillRect(0, 0, total, total);
+        ctx.font      = 'bold 28px Arial';
+        ctx.textAlign = 'left';
+        ctx.fillText('JAGONET', 72, 47);
 
-        ctx.drawImage(img, padding, padding, size, size);
+        ctx.fillStyle = 'rgba(255,255,255,0.5)';
+        ctx.font      = '11px Arial';
+        ctx.fillText('Internet Service Provider', 73, 64);
+
+        const bodyTop = 100, bodyLeft = 30;
+
+        ctx.fillStyle = 'rgba(255,255,255,0.5)';
+        ctx.font      = '11px Arial';
+        ctx.fillText('NAMA PELANGGAN', bodyLeft, bodyTop + 18);
+
+        ctx.fillStyle = '#ffffff';
+        ctx.font      = 'bold 22px Arial';
+        ctx.fillText('{{ addslashes($pelanggan->nama) }}', bodyLeft, bodyTop + 44);
+
+        ctx.fillStyle = 'rgba(255,255,255,0.5)';
+        ctx.font      = '11px Arial';
+        ctx.fillText('PAKET LAYANAN', bodyLeft, bodyTop + 76);
+
+        ctx.fillStyle = '#ffffff';
+        ctx.font      = 'bold 17px Arial';
+        ctx.fillText('{{ addslashes($pelanggan->layanan->nama_paket ?? "-") }}', bodyLeft, bodyTop + 98);
+
+        ctx.fillStyle = 'rgba(255,255,255,0.5)';
+        ctx.font      = '11px Arial';
+        ctx.fillText('NAMA LAYANAN', bodyLeft, bodyTop + 126);
+
+        ctx.fillStyle = '#e0eaff';
+        ctx.font      = '14px Arial';
+        ctx.fillText('{{ addslashes($pelanggan->nama_layanan ?? "-") }}', bodyLeft, bodyTop + 146);
+
+        ctx.fillStyle = 'rgba(255,255,255,0.5)';
+        ctx.font      = '11px Arial';
+        ctx.fillText('ALAMAT', bodyLeft, bodyTop + 174);
+
+        ctx.fillStyle = 'rgba(255,255,255,0.75)';
+        ctx.font      = '13px Arial';
+        const alamatFull = '{{ addslashes($pelanggan->alamat ?? "-") }}';
+        const words = alamatFull.split(' ');
+        let line1 = '', line2 = '';
+        words.forEach(w => {
+            if ((line1 + ' ' + w).trim().length <= 42) line1 = (line1 + ' ' + w).trim();
+            else line2 = (line2 + ' ' + w).trim();
+        });
+        ctx.fillText(line1, bodyLeft, bodyTop + 194);
+        if (line2) ctx.fillText(line2, bodyLeft, bodyTop + 210);
+
+        ctx.fillStyle = 'rgba(255,255,255,0.4)';
+        ctx.font      = '13px "Courier New"';
+        ctx.fillText('{{ $pelanggan->kode_pelanggan ?? "-" }}', bodyLeft, H - 52);
+
+        @if($pelanggan->status === 'aktif' || strtolower($pelanggan->status) === 'aktif')
+        ctx.fillStyle = '#22c55e';
+        @elseif($pelanggan->status === 'isolir')
+        ctx.fillStyle = '#f59e0b';
+        @else
+        ctx.fillStyle = '#ef4444';
+        @endif
+        roundRect(bodyLeft, H - 42, 56, 22, 11);
+        ctx.fill();
+        ctx.fillStyle = '#ffffff';
+        ctx.font      = 'bold 11px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('{{ strtoupper($pelanggan->status) }}', bodyLeft + 28, H - 26);
+        ctx.textAlign = 'left';
+
+        ctx.strokeStyle = 'rgba(255,255,255,0.15)';
+        ctx.lineWidth   = 1;
+        ctx.beginPath();
+        ctx.moveTo(W - 220, 90);
+        ctx.lineTo(W - 220, H - 20);
+        ctx.stroke();
+
+        const qrSize = 180, qrX = W - 210, qrY = 96;
+
+        ctx.fillStyle = '#ffffff';
+        roundRect(qrX - 10, qrY - 10, qrSize + 20, qrSize + 32, 10);
+        ctx.fill();
+
+        ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
+
+        ctx.fillStyle = '#888888';
+        ctx.font      = '10px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('SCAN QR CODE', qrX + qrSize / 2, qrY + qrSize + 16);
+        ctx.textAlign = 'left';
+
+        ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+        ctx.lineWidth   = 1;
+        ctx.beginPath();
+        ctx.moveTo(0, H - 30);
+        ctx.lineTo(W, H - 30);
+        ctx.stroke();
+
+        ctx.fillStyle = 'rgba(255,255,255,0.3)';
+        ctx.font      = '10px Arial';
+        ctx.fillText('jagonet.id  ·  Layanan 24/7', bodyLeft, H - 12);
+
+        [5, 8, 11, 15].forEach((h, i) => {
+            ctx.fillStyle = 'rgba(255,255,255,0.5)';
+            ctx.fillRect(W - 60 + i * 9, H - 14 - h, 5, h);
+        });
 
         const a    = document.createElement('a');
         a.href     = canvas.toDataURL('image/png');
         a.download = filename;
         a.click();
-    };
-
-    img.src = svgBase64;
+    });
 }
 </script>
 
