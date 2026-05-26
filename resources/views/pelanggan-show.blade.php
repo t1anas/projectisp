@@ -232,19 +232,17 @@
 function downloadQR() {
     const svg      = document.querySelector("#qrcode svg");
     const filename = "Kartu_{{ $pelanggan->kode_pelanggan ?? 'pelanggan' }}.png";
-
     if (!svg) return alert('QR belum tersedia.');
 
-    const W = 760, H = 440;
+    const W = 680, H = 420;
     const canvas  = document.createElement('canvas');
     canvas.width  = W;
     canvas.height = H;
     const ctx     = canvas.getContext('2d');
 
-    function roundRect(x, y, w, h, r) {
+    function rr(x, y, w, h, r) {
         ctx.beginPath();
-        ctx.moveTo(x + r, y);
-        ctx.lineTo(x + w - r, y);
+        ctx.moveTo(x + r, y); ctx.lineTo(x + w - r, y);
         ctx.quadraticCurveTo(x + w, y, x + w, y + r);
         ctx.lineTo(x + w, y + h - r);
         ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
@@ -255,9 +253,22 @@ function downloadQR() {
         ctx.closePath();
     }
 
+    function wrapText(text, maxW, font) {
+        ctx.font = font;
+        const words = text.split(' ');
+        const lines = [];
+        let cur = '';
+        words.forEach(w => {
+            const test = cur ? cur + ' ' + w : w;
+            if (ctx.measureText(test).width <= maxW) { cur = test; }
+            else { if (cur) lines.push(cur); cur = w; }
+        });
+        if (cur) lines.push(cur);
+        return lines;
+    }
+
     const logoImg = new Image();
     const qrImg   = new Image();
-
     const svgData   = new XMLSerializer().serializeToString(svg);
     const svgBase64 = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgData)));
 
@@ -266,133 +277,171 @@ function downloadQR() {
 
     Promise.all([loadLogo, loadQR]).then(() => {
 
-        const grad = ctx.createLinearGradient(0, 0, 0, H);
-        grad.addColorStop(0, '#FAE59E');
-        grad.addColorStop(1, '#09973B');
-        roundRect(0, 0, W, H, 22);
-        ctx.fillStyle = grad;
-        ctx.fill();
+        rr(0, 0, W, H, 22);
+        ctx.fillStyle = '#ffffff'; ctx.fill();
 
-        ctx.strokeStyle = 'rgba(255,255,255,0.12)';
-        ctx.lineWidth   = 1;
-        ctx.beginPath();
-        ctx.moveTo(0, 80);
-        ctx.lineTo(W, 80);
-        ctx.stroke();
+        const HEADER_H = 72;
 
-        ctx.drawImage(logoImg, 14, 18, 44, 44);
+        const hGrad = ctx.createLinearGradient(0, 0, W, 0);
+        hGrad.addColorStop(0,   '#0db84a');
+        hGrad.addColorStop(0.5, '#09973B');
+        hGrad.addColorStop(1,   '#076b2b');
+        ctx.fillStyle = hGrad;
+        ctx.fillRect(0, 0, W, HEADER_H);
 
+        ctx.save();
+        ctx.beginPath(); ctx.arc(W - 20, -20, 90, 0, Math.PI * 2);
+        ctx.strokeStyle = 'rgba(255,255,255,0.06)'; ctx.lineWidth = 22; ctx.stroke();
+        ctx.beginPath(); ctx.arc(W + 10, HEADER_H + 10, 60, 0, Math.PI * 2);
+        ctx.strokeStyle = 'rgba(255,255,255,0.04)'; ctx.lineWidth = 14; ctx.stroke();
+        ctx.restore();
+
+        const aGrad = ctx.createLinearGradient(0, 0, W, 0);
+        aGrad.addColorStop(0, '#FF6B2B'); aGrad.addColorStop(1, '#FF9A5C');
+        ctx.fillStyle = aGrad;
+        ctx.fillRect(0, HEADER_H - 3, W, 3);
+
+        const LOGO_X = 20, LOGO_Y = 16, LOGO_S = 40;
+        ctx.fillStyle = 'rgba(255,255,255,0.18)';
+        rr(LOGO_X, LOGO_Y, LOGO_S, LOGO_S, 9); ctx.fill();
+        ctx.strokeStyle = 'rgba(255,255,255,0.3)'; ctx.lineWidth = 1;
+        rr(LOGO_X, LOGO_Y, LOGO_S, LOGO_S, 9); ctx.stroke();
+        ctx.drawImage(logoImg, LOGO_X, LOGO_Y, LOGO_S, LOGO_S);
+
+        const BX = LOGO_X + LOGO_S + 12;
+        ctx.fillStyle = '#ffffff'; ctx.font = 'bold 16px Arial'; ctx.textAlign = 'left';
+        ctx.fillText('JAGONET', BX, LOGO_Y + 16);
+        ctx.fillStyle = 'rgba(255,255,255,0.5)'; ctx.font = '7px Arial';
+        ctx.fillText('INTERNET SERVICE PROVIDER', BX, LOGO_Y + 28);
+
+        const DIV_X = BX + 150;
+        ctx.strokeStyle = 'rgba(255,255,255,0.25)'; ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(DIV_X, 18); ctx.lineTo(DIV_X, HEADER_H - 10); ctx.stroke();
+
+        const NX       = DIV_X + 16;
+        const nameMaxW = W - NX - 20;
+
+        ctx.fillStyle = 'rgba(255,255,255,0.55)'; ctx.font = '7px Arial';
+        ctx.fillText('PELANGGAN', NX, LOGO_Y + 8);
+
+        const namaText  = '{{ addslashes($pelanggan->nama) }}';
+        const namaLines = wrapText(namaText, nameMaxW, 'bold 15px Arial');
         ctx.fillStyle = '#ffffff';
-        ctx.font      = 'bold 28px Arial';
-        ctx.textAlign = 'left';
-        ctx.fillText('JAGONET', 72, 47);
-
-        ctx.fillStyle = 'rgba(255,255,255,0.5)';
-        ctx.font      = '11px Arial';
-        ctx.fillText('Internet Service Provider', 73, 64);
-
-        const bodyTop = 100, bodyLeft = 30;
-
-        ctx.fillStyle = 'rgba(255,255,255,0.5)';
-        ctx.font      = '11px Arial';
-        ctx.fillText('NAMA PELANGGAN', bodyLeft, bodyTop + 18);
-
-        ctx.fillStyle = '#ffffff';
-        ctx.font      = 'bold 22px Arial';
-        ctx.fillText('{{ addslashes($pelanggan->nama) }}', bodyLeft, bodyTop + 44);
-
-        ctx.fillStyle = 'rgba(255,255,255,0.5)';
-        ctx.font      = '11px Arial';
-        ctx.fillText('PAKET LAYANAN', bodyLeft, bodyTop + 76);
-
-        ctx.fillStyle = '#ffffff';
-        ctx.font      = 'bold 17px Arial';
-        ctx.fillText('{{ addslashes($pelanggan->layanan->nama_paket ?? "-") }}', bodyLeft, bodyTop + 98);
-
-        ctx.fillStyle = 'rgba(255,255,255,0.5)';
-        ctx.font      = '11px Arial';
-        ctx.fillText('NAMA LAYANAN', bodyLeft, bodyTop + 126);
-
-        ctx.fillStyle = '#e0eaff';
-        ctx.font      = '14px Arial';
-        ctx.fillText('{{ addslashes($pelanggan->nama_layanan ?? "-") }}', bodyLeft, bodyTop + 146);
-
-        ctx.fillStyle = 'rgba(255,255,255,0.5)';
-        ctx.font      = '11px Arial';
-        ctx.fillText('ALAMAT', bodyLeft, bodyTop + 174);
-
-        ctx.fillStyle = 'rgba(255,255,255,0.75)';
-        ctx.font      = '13px Arial';
-        const alamatFull = '{{ addslashes($pelanggan->alamat ?? "-") }}';
-        const words = alamatFull.split(' ');
-        let line1 = '', line2 = '';
-        words.forEach(w => {
-            if ((line1 + ' ' + w).trim().length <= 42) line1 = (line1 + ' ' + w).trim();
-            else line2 = (line2 + ' ' + w).trim();
+        namaLines.slice(0, 2).forEach((line, i) => {
+            ctx.font = 'bold 15px Arial';
+            ctx.fillText(line, NX, LOGO_Y + 22 + i * 17);
         });
-        ctx.fillText(line1, bodyLeft, bodyTop + 194);
-        if (line2) ctx.fillText(line2, bodyLeft, bodyTop + 210);
 
-        ctx.fillStyle = 'rgba(255,255,255,0.4)';
-        ctx.font      = '13px "Courier New"';
-        ctx.fillText('{{ $pelanggan->kode_pelanggan ?? "-" }}', bodyLeft, H - 52);
+        const afterNamaY = LOGO_Y + 22 + Math.min(namaLines.length, 2) * 17 + 3;
+        ctx.fillStyle = 'rgba(255,255,255,0.65)'; ctx.font = '9px "Courier New"';
+        ctx.fillText('{{ $pelanggan->kode_pelanggan ?? "JGN-2025-00001" }}', NX, afterNamaY);
 
-        @if($pelanggan->status === 'aktif' || strtolower($pelanggan->status) === 'aktif')
-        ctx.fillStyle = '#22c55e';
+        const LEFT_X = 0;
+        const LEFT_W = 228;
+
+        function cardPath() {
+            ctx.beginPath();
+            ctx.moveTo(LEFT_X, HEADER_H);
+            ctx.lineTo(LEFT_X + LEFT_W, HEADER_H);
+            ctx.lineTo(LEFT_X + LEFT_W, H);
+            ctx.lineTo(LEFT_X, H);
+            ctx.closePath();
+        }
+
+        ctx.save();
+        cardPath();
+        const cardGrad = ctx.createLinearGradient(LEFT_X, HEADER_H, LEFT_X, H);
+        cardGrad.addColorStop(0,   '#0db84a');
+        cardGrad.addColorStop(0.5, '#09973B');
+        cardGrad.addColorStop(1,   '#065f26');
+        ctx.fillStyle = cardGrad; ctx.fill();
+        ctx.restore();
+
+        ctx.save();
+        cardPath(); ctx.clip();
+        ctx.beginPath(); ctx.arc(LEFT_X + LEFT_W - 10, H - 10, 80, 0, Math.PI * 2);
+        ctx.strokeStyle = 'rgba(255,255,255,0.06)'; ctx.lineWidth = 28; ctx.stroke();
+        ctx.restore();
+
+        let cy = HEADER_H + 16;
+        const TX = LEFT_X + 14;
+        const TW = LEFT_W - 28;
+
+        function infoBlock(label, lines, font) {
+            ctx.fillStyle = 'rgba(255,255,255,0.6)'; ctx.font = '7px Arial'; ctx.textAlign = 'left';
+            ctx.fillText(label, TX, cy); cy += 13;
+            ctx.fillStyle = '#ffffff'; ctx.font = font || 'bold 12px Arial';
+            lines.forEach(l => { ctx.fillText(l, TX, cy); cy += 14; });
+            cy += 8;
+        }
+
+        function divider() {
+            ctx.strokeStyle = 'rgba(255,255,255,0.15)'; ctx.lineWidth = 0.5;
+            ctx.beginPath(); ctx.moveTo(TX, cy); ctx.lineTo(TX + TW, cy); ctx.stroke();
+            cy += 10;
+        }
+
+        const paketLines = wrapText('{{ addslashes($pelanggan->layanan->nama_paket ?? "-") }}', TW, 'bold 12px Arial');
+        infoBlock('PAKET', paketLines, 'bold 12px Arial');
+        divider();
+
+        const layananLines = wrapText('{{ addslashes($pelanggan->nama_layanan ?? "-") }}', TW, '11px Arial');
+        infoBlock('NAMA LAYANAN', layananLines.slice(0, 2), '11px Arial');
+        divider();
+
+        const alamatLines = wrapText('{{ addslashes($pelanggan->alamat ?? "-") }}', TW, '10px Arial');
+        infoBlock('ALAMAT', alamatLines.slice(0, 3), '10px Arial');
+        divider();
+
+        infoBlock('NO. HP', ['{{ addslashes($pelanggan->no_hp ?? "-") }}'], '11px Arial');
+
+        const PILL_Y = H - 36;
+        @if($pelanggan->status === 'aktif')
+            const statusColor = '#065f26', statusBg = 'rgba(255,255,255,0.9)', statusBdr = 'rgba(255,255,255,0.5)';
         @elseif($pelanggan->status === 'isolir')
-        ctx.fillStyle = '#f59e0b';
+            const statusColor = '#92400e', statusBg = 'rgba(255,237,180,0.95)', statusBdr = 'rgba(251,191,36,0.6)';
         @else
-        ctx.fillStyle = '#ef4444';
+            const statusColor = '#7f1d1d', statusBg = 'rgba(254,202,202,0.95)', statusBdr = 'rgba(248,113,113,0.6)';
         @endif
-        roundRect(bodyLeft, H - 42, 56, 22, 11);
-        ctx.fill();
-        ctx.fillStyle = '#ffffff';
-        ctx.font      = 'bold 11px Arial';
-        ctx.textAlign = 'center';
-        ctx.fillText('{{ strtoupper($pelanggan->status) }}', bodyLeft + 28, H - 26);
+
+        rr(TX, PILL_Y, 86, 20, 10);
+        ctx.fillStyle = statusBg; ctx.fill();
+        ctx.strokeStyle = statusBdr; ctx.lineWidth = 1;
+        rr(TX, PILL_Y, 86, 20, 10); ctx.stroke();
+        ctx.fillStyle = statusColor;
+        ctx.beginPath(); ctx.arc(TX + 12, PILL_Y + 10, 3.5, 0, Math.PI * 2); ctx.fill();
+        ctx.font = 'bold 8px Arial'; ctx.textAlign = 'center';
+        ctx.fillText('{{ strtoupper($pelanggan->status) }}', TX + 50, PILL_Y + 13);
         ctx.textAlign = 'left';
 
-        ctx.strokeStyle = 'rgba(255,255,255,0.15)';
-        ctx.lineWidth   = 1;
-        ctx.beginPath();
-        ctx.moveTo(W - 220, 90);
-        ctx.lineTo(W - 220, H - 20);
-        ctx.stroke();
+        const VD_X = LEFT_W + 14;
+        ctx.strokeStyle = '#e5e7eb'; ctx.lineWidth = 0.5;
+        ctx.beginPath(); ctx.moveTo(VD_X, HEADER_H + 10); ctx.lineTo(VD_X, H - 16); ctx.stroke();
 
-        const qrSize = 180, qrX = W - 210, qrY = 96;
+        const QR_X      = VD_X + 14;
+        const QR_W      = W - QR_X - 14;
+        const QR_AREA_Y = HEADER_H + 10;
+        const QR_AREA_H = H - QR_AREA_Y - 16;
 
-        ctx.fillStyle = '#ffffff';
-        roundRect(qrX - 10, qrY - 10, qrSize + 20, qrSize + 32, 10);
-        ctx.fill();
+        rr(QR_X, QR_AREA_Y, QR_W, QR_AREA_H, 12);
+        ctx.fillStyle = '#fafafa'; ctx.fill();
+        ctx.strokeStyle = '#e8e8e8'; ctx.lineWidth = 1;
+        rr(QR_X, QR_AREA_Y, QR_W, QR_AREA_H, 12); ctx.stroke();
 
-        ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
+        const QR_PAD = 28;
+        const QR_S   = Math.min(QR_W, QR_AREA_H) - QR_PAD * 2;
+        const QR_LX  = QR_X + (QR_W - QR_S) / 2;
+        const QR_LY  = QR_AREA_Y + (QR_AREA_H - QR_S) / 2 - 8;
+        ctx.drawImage(qrImg, QR_LX, QR_LY, QR_S, QR_S);
 
-        ctx.fillStyle = '#888888';
-        ctx.font      = '10px Arial';
-        ctx.textAlign = 'center';
-        ctx.fillText('SCAN QR CODE', qrX + qrSize / 2, qrY + qrSize + 16);
+        ctx.fillStyle = '#9ca3af'; ctx.font = '8px Arial'; ctx.textAlign = 'center';
+        ctx.fillText('SCAN QR CODE', QR_X + QR_W / 2, QR_AREA_Y + QR_AREA_H - 7);
         ctx.textAlign = 'left';
 
-        ctx.strokeStyle = 'rgba(255,255,255,0.08)';
-        ctx.lineWidth   = 1;
-        ctx.beginPath();
-        ctx.moveTo(0, H - 30);
-        ctx.lineTo(W, H - 30);
-        ctx.stroke();
-
-        ctx.fillStyle = 'rgba(255,255,255,0.3)';
-        ctx.font      = '10px Arial';
-        ctx.fillText('jagonet.id  ·  Layanan 24/7', bodyLeft, H - 12);
-
-        [5, 8, 11, 15].forEach((h, i) => {
-            ctx.fillStyle = 'rgba(255,255,255,0.5)';
-            ctx.fillRect(W - 60 + i * 9, H - 14 - h, 5, h);
-        });
-
-        const a    = document.createElement('a');
-        a.href     = canvas.toDataURL('image/png');
-        a.download = filename;
-        a.click();
+        const link = document.createElement('a');
+        link.href     = canvas.toDataURL('image/png');
+        link.download = filename;
+        link.click();
     });
 }
 </script>
