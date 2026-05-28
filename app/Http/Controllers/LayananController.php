@@ -6,9 +6,11 @@ use App\Models\Pelanggan;
 use App\Models\Tagihan;
 use App\Models\Layanan;
 use App\Models\MetodePembayaran;
+use App\Models\AgendaNoc;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Imports\LayananImport;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Response;
 
 class LayananController extends Controller
@@ -16,7 +18,7 @@ class LayananController extends Controller
     public function index(Request $request)
     {
         $query = Pelanggan::with(['layanan', 'tagihan'])
-            ->whereNotIn('status', ['pengajuan noc', 'pending']);
+            ->whereNotIn('status', ['pengajuan noc']);
 
         if ($request->filled('search')) {
             $query->where('nama', 'like', '%' . $request->search . '%');
@@ -140,20 +142,68 @@ class LayananController extends Controller
 public function isolir($id)
 {
     $pelanggan = Pelanggan::findOrFail($id);
-    $pelanggan->update(['status' => 'isolir']);
+
+    $cek = AgendaNoc::where('pelanggan_id', $id)
+        ->where('status', 'pending')
+        ->exists();
+
+    if ($cek) {
+        return back()->with(
+            'error',
+            'Masih ada pengajuan yang belum diproses NOC.'
+        );
+    }
+
+    $pelanggan->update([
+        'status' => 'pending'
+    ]);
+
+    AgendaNoc::create([
+        'pelanggan_id' => $pelanggan->id,
+        'jenis' => 'isolir',
+        'status' => 'pending',
+        'created_by' => Auth::id(),
+    ]);
 
     return redirect()
         ->route('detail', $id)
-        ->with('isolir_berhasil', 'Layanan ' . $pelanggan->nama . ' berhasil diisolir.');
+        ->with(
+            'isolir_berhasil',
+            'Pengajuan isolir berhasil dikirim ke NOC.'
+        );
 }
 
 public function aktifkan($id)
 {
     $pelanggan = Pelanggan::findOrFail($id);
-    $pelanggan->update(['status' => 'aktif']);
+
+    $cek = AgendaNoc::where('pelanggan_id', $id)
+        ->where('status', 'pending')
+        ->exists();
+
+    if ($cek) {
+        return back()->with(
+            'error',
+            'Masih ada pengajuan yang belum diproses NOC.'
+        );
+    }
+
+    $pelanggan->update([
+        'status' => 'pending'
+    ]);
+
+    AgendaNoc::create([
+        'pelanggan_id' => $pelanggan->id,
+        'jenis' => 'aktivasi',
+        'status' => 'pending',
+        'created_by' => Auth::id(),
+    ]);
 
     return redirect()
         ->route('detail', $id)
-        ->with('aktivasi_berhasil', 'Layanan ' . $pelanggan->nama . ' berhasil diaktifkan kembali.');
+        ->with(
+            'aktivasi_berhasil',
+            'Pengajuan aktivasi berhasil dikirim ke NOC.'
+        );
 }
 }

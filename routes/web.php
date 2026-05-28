@@ -12,6 +12,7 @@ use App\Http\Controllers\KwitansiController;
 use App\Http\Controllers\ApprovePelangganController;
 use App\Http\Controllers\PelangganDetailController;
 use App\Http\Controllers\InstalasinocController;
+use App\Http\Controllers\AgendaNocController;
 use App\Http\Controllers\ScanController;
 use Illuminate\Support\Facades\Route;
 
@@ -35,6 +36,10 @@ Route::get('/home', fn() => redirect('/admin'));
 |--------------------------------------------------------------------------
 */
 Route::middleware('auth')->group(function () {
+
+    Route::get('/agenda-noc', [AgendaNocController::class, 'index'])->name('agenda-noc.index');
+    Route::patch('/agenda-noc/{id}/approve', [AgendaNocController::class, 'approve'])->name('agendanoc.approve');
+    Route::patch('/agenda-noc/{id}/reject',  [AgendaNocController::class, 'reject'])->name('agendanoc.reject');
 
     /* LOGOUT */
     Route::post('/logout', [SesiController::class, 'logout'])->name('logout');

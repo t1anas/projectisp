@@ -42,6 +42,12 @@
             <i class="bi bi-router"></i> Instalasi Baru
         </a>
 
+        @if(Auth::user()->role == 'noc')
+        <a href="{{ url('/agenda-noc') }}" class="menu-item">
+            <i class="bi bi-journal-check"></i> Agenda NOC
+        </a>
+        @endif
+
         @if(Auth::user()->role == 'admin')
             <a href="{{ url('/pemasukan') }}" class="menu-item">
                 <i class="bi bi-wallet2"></i> Pemasukan
@@ -236,13 +242,13 @@
                                                         data-tip="Edit">
                                                     <i class="bi bi-pencil-fill"></i>
                                                 </button>
-                                               <button type="button"
-        class="action-modern btn-hapus"
-        title="Hapus"
-        data-bs-toggle="modal"
-        data-bs-target="#modalHapus{{ $p->id }}">
-    <i class="bi bi-trash-fill"></i>
-</button>
+                                                <button type="button"
+                                                        class="action-modern btn-hapus"
+                                                        title="Hapus"
+                                                        data-bs-toggle="modal"
+                                                        data-bs-target="#modalHapus{{ $p->id }}">
+                                                    <i class="bi bi-trash-fill"></i>
+                                                </button>
                                             </div>
                                         </td>
                                     </tr>

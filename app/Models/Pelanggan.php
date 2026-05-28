@@ -2,6 +2,7 @@
 
 namespace App\Models;
 use App\Models\User;
+use App\Models\AgendaNoc;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -58,5 +59,9 @@ public function rejectedBy()
 {
     return $this->belongsTo(User::class, 'rejected_by');
 }
-    
+
+public function agendaNoc()
+{
+    return $this->hasMany(AgendaNoc::class);
+}  
 }

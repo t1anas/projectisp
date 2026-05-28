@@ -44,6 +44,12 @@
             <i class="bi bi-router"></i> Instalasi Baru
         </a>
 
+        @if(Auth::user()->role == 'noc')
+        <a href="{{ url('/agenda-noc') }}"class="menu-item">
+            <i class="bi bi-journal-check"></i> Agenda NOC
+        </a>
+        @endif
+
         @if(Auth::user()->role == 'admin')
         <a href="{{ url('/pemasukan') }}" class="menu-item">
             <i class="bi bi-wallet2"></i> Pemasukan
@@ -217,6 +223,8 @@
                             <option value="aktif"    {{ request('status') === 'aktif'    ? 'selected' : '' }}>Aktif</option>
                             <option value="isolir"   {{ request('status') === 'isolir'   ? 'selected' : '' }}>Isolir</option>
                             <option value="nonaktif" {{ request('status') === 'nonaktif' ? 'selected' : '' }}>Nonaktif</option>
+                            <option value="pengajuan isolir" {{ request('status') === 'pengajuan isolir' ? 'selected' : '' }}>Pengajuan Isolir</option>
+                            <option value="pengajuan aktivasi" {{ request('status') === 'pengajuan aktivasi' ? 'selected' : '' }}>Pengajuan Aktivasi</option>
                         </select>
 
                         <input type="date" name="dari"
@@ -307,6 +315,18 @@
                             @elseif(strtolower($p->status) === 'isolir')
                                 <span class="status-pill status-isolir">
                                     <i class="bi bi-slash-circle-fill"></i> Isolir
+                                </span>
+                            @elseif(strtolower($p->status) === 'pending')
+                                <span class="status-pill status-pending">
+                                    <i class="bi bi-hourglass-split"></i> Pending
+                                </span> 
+                             @elseif(strtolower($p->status) === 'pengajuan isolir')
+                                <span class="status-pill status-pending">
+                                    <i class="bi bi-hourglass-split"></i> Pengajuan Isolir
+                                </span>
+                            @elseif(strtolower($p->status) === 'pengajuan aktivasi')
+                                <span class="status-pill status-pending">
+                                    <i class="bi bi-hourglass-split"></i> Pengajuan Aktivasi
                                 </span>
                             @else
                                 <span class="status-pill status-nonactive">
@@ -417,6 +437,8 @@
                                 <option value="aktif"    {{ strtolower($p->status) == 'aktif'    ? 'selected' : '' }}>Aktif</option>
                                 <option value="isolir"   {{ strtolower($p->status) == 'isolir'   ? 'selected' : '' }}>Isolir</option>
                                 <option value="nonaktif" {{ strtolower($p->status) == 'nonaktif' ? 'selected' : '' }}>Nonaktif</option>
+                                <option value="pengajuan isolir" {{ strtolower($p->status) == 'pengajuan isolir' ? 'selected' : '' }}>Pengajuan Isolir</option>
+                                <option value="pengajuan aktivasi" {{ strtolower($p->status) == 'pengajuan aktivasi' ? 'selected' : '' }}>Pengajuan Aktivasi</option>
                             </select>
                         </div>
                         <div class="col-md-12">

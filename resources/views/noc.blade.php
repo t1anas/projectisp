@@ -67,7 +67,13 @@
 
 <a href="{{ url($instalasiUrl) }}" class="menu-item">
     <i class="bi bi-router"></i> Instalasi Baru
-</a>    @if(Auth::user()->role == 'admin')
+</a>
+@if(Auth::user()->role == 'noc')
+<a href="{{ url('/agenda-noc') }}" class="menu-item {{ request()->is('agenda-noc*') ? 'active' : '' }}">
+    <i class="bi bi-journal-check"></i> Agenda NOC
+</a>
+@endif
+@if(Auth::user()->role == 'admin')
         <a href="{{ url('/pemasukan') }}" class="menu-item">
             <i class="bi bi-wallet2"></i> Pemasukan
         </a>
