@@ -123,7 +123,7 @@
 
             {{-- FILTER --}}
             <div style="padding:20px; border-bottom:1px solid #eee;">
-                <form method="GET" action="{{ url('/approve-pelanggan') }}">
+                <form method="GET" action="{{ url('/approve') }}">
                     <div class="row g-3 align-items-end">
                         <div class="col-md-3">
                             <input type="text" name="search" class="form-control"

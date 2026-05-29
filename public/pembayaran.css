@@ -148,3 +148,48 @@ body {
 .nav-box:hover .nav-box-arrow {
     background: rgba(255,255,255,0.35);
 }
+
+/*tagihan*/
+        .date-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 50px;
+            font-size: 11px;
+            font-weight: 600;
+            background: #eef2ff;
+            color: #0c0b28;
+            border: 1px solid #dbeafe;
+        }
+        .date-pill i { font-size: 11px; }
+        .modal-content input,
+        .modal-content select,
+        .modal-content textarea { border-radius: 10px; transition: 0.2s; }
+        .modal-content input:focus,
+        .modal-content select:focus,
+        .modal-content textarea:focus {
+            box-shadow: 0 0 0 3px rgba(34,197,94,.15);
+            border-color: #22c55e;
+        }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f4f6f9; }
+        .table td, .table th { vertical-align: middle; }
+        .status-pill {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 4px 10px; border-radius: 50px;
+            font-size: 11px; font-weight: 700; border: 1px solid transparent;
+        }
+        .status-pill i { font-size: 10px; }
+        .status-lunas { background: linear-gradient(135deg, #e8fff1, #d8ffe8); color: #0f9d58; border-color: #b7f3cd; }
+        .status-belum { background: linear-gradient(135deg, #fff1f1, #ffe1e1); color: #dc3545; border-color: #ffc4c4; }
+        .action-group { display: flex; align-items: center; gap: 8px; justify-content: center; }
+        .action-modern { width: 38px; height: 38px; border: none; border-radius: 12px; display: flex; align-items: center; justify-content: center; transition: .25s; box-shadow: 0 6px 14px rgba(0,0,0,.06); cursor: pointer; text-decoration: none; }
+        .action-modern i { font-size: 15px; }
+        .action-modern:hover { transform: translateY(-3px); }
+        .btn-detail { background: linear-gradient(135deg, #eef4ff, #dfeaff); color: #0d6efd; }
+        .btn-detail:hover { background: #0d6efd; color: #fff; }
+        .btn-edit { background: linear-gradient(135deg, #fff7e6, #ffecc2); color: #ff9800; }
+        .btn-edit:hover { background: #ff9800; color: #fff; }
+        .btn-hapus { background: linear-gradient(135deg, #fff1f1, #ffe1e1); color: #dc3545; }
+        .btn-hapus:hover { background: #dc3545; color: #fff; }
+        .filter-box { padding: 20px; border-bottom: 1px solid #eee; }

@@ -33,8 +33,9 @@ class TagihanController extends Controller
         $total     = $tagihan->sum('total');
         $pelanggan = \App\Models\Pelanggan::with('layanan')->get();
         $layanan   = \App\Models\Layanan::all();
+        $totalBayar = $tagihan->sum(fn($t) => $t->pembayaran->sum('jumlah_bayar'));
 
-        return view('tagihan', compact('tagihan', 'total', 'pelanggan', 'layanan'));
+        return view('tagihan', compact('tagihan', 'total', 'pelanggan', 'layanan', 'totalBayar'));
     }
 
     public function store(Request $request)
