@@ -206,4 +206,57 @@ public function aktifkan($id)
             'Pengajuan aktivasi berhasil dikirim ke NOC.'
         );
 }
+
+public function bulkIsolir(Request $request)
+{
+    $ids = $request->ids ?? [];
+
+    foreach ($ids as $id) {
+        $pelanggan = Pelanggan::find($id);
+        if (!$pelanggan) continue;
+
+        // Skip jika sudah ada pengajuan pending
+        $cekAda = AgendaNoc::where('pelanggan_id', $id)
+            ->where('status', 'pending')
+            ->exists();
+
+        if ($cekAda) continue;
+
+        $pelanggan->update(['status' => 'pengajuan isolir']);
+
+        AgendaNoc::create([
+            'pelanggan_id' => $pelanggan->id,
+            'jenis'        => 'isolir',
+            'status'       => 'pending',
+            'created_by'   => Auth::id(),
+        ]);
+    }
+
+    return back()->with('success', 'Pengajuan isolir berhasil dikirim ke NOC.');
+}
+
+public function bulkAktivasi(Request $request)
+{
+    foreach ($request->ids ?? [] as $id) {
+        $pelanggan = Pelanggan::find($id);
+        if (!$pelanggan) continue;
+
+        $cekAda = AgendaNoc::where('pelanggan_id', $id)
+            ->where('status', 'pending')
+            ->exists();
+
+        if ($cekAda) continue;
+
+        $pelanggan->update(['status' => 'pengajuan aktivasi']);
+
+        AgendaNoc::create([
+            'pelanggan_id' => $pelanggan->id,
+            'jenis'        => 'aktivasi',
+            'status'       => 'pending',
+            'created_by'   => Auth::id(),
+        ]);
+    }
+
+    return back()->with('success', 'Pengajuan aktivasi berhasil dikirim ke NOC.');
+}
 }

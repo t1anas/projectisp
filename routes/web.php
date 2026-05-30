@@ -89,6 +89,8 @@ Route::prefix('pelanggan')->group(function () {
     Route::get('/layanan/cetak',        [LayananController::class, 'cetak'])->name('layanan.cetak');
     Route::post('/layanan/bulk-delete', [LayananController::class, 'bulkDelete'])->name('layanan.bulkDelete');
     Route::post('/layanan/bulk-status', [LayananController::class, 'bulkStatus'])->name('layanan.bulkStatus');
+    Route::post('/layanan/bulk-isolir', [LayananController::class, 'bulkIsolir'])->name('layanan.bulkIsolir');
+    Route::post('/layanan/bulk-aktivasi', [LayananController::class, 'bulkAktivasi'])->name('layanan.bulkAktivasi');
     Route::put('/layanan/{id}',         [LayananController::class, 'update']);
     Route::post('/layanan/{id}/bayar',  [DetailController::class, 'bayar'])->name('tagihan.bayar');
     Route::get('/layanan/{id}',         [DetailController::class, 'index'])->name('layanan.detail');

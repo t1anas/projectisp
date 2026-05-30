@@ -162,6 +162,7 @@
                         <tr>
                             <th>ID</th>
                             <th>Pelanggan</th>
+                            <th>Nama Layanan</th>
                             <th>Jenis</th>
                             <th>Status</th>
                             <th>Dibuat Oleh</th>
@@ -178,14 +179,13 @@
                             data-status="{{ strtolower($item->status) }}"
                             data-search="{{ strtolower($item->pelanggan_id . ' ' . ($item->pelanggan->nama ?? '')) }}"
                         >
-                            <td><span class="id-badge">#{{ $item->id }}</span></td>
+                            <td><span class="id-badge">{{ $item->id }}</span></td>
 
                             <td>
-                                <span style="font-weight:700;">#{{ $item->pelanggan_id }}</span>
-                                @if($item->pelanggan)
-                                <div style="font-size:11px; color:var(--muted); margin-top:1px;">{{ $item->pelanggan->nama ?? '' }}</div>
-                                @endif
+                                <span style="font-weight:700;">{{ $item->pelanggan->nama ?? '#'.$item->pelanggan_id }} </span>
                             </td>
+
+                            <td>{{ $item->pelanggan->nama_layanan ?? '—' }}</td>
 
                             <td>
                                 @php
