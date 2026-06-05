@@ -221,7 +221,6 @@
                             </a>
                         </div>
                     </div>
-                </div>
             </div>
 
             <div class="table-responsive px-3 pb-4" style="overflow-x: auto;">
