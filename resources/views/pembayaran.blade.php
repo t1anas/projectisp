@@ -9,6 +9,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('inputform.css') }}">
+    <link rel="stylesheet" href="{{ asset('instalasi-noc.css') }}">
 </head>
 
 <body>
@@ -188,10 +189,39 @@
                     <i class="bi bi-plus-lg"></i> Tambah Pembayaran
                 </button>
 
-                <a href="#" class="btn btn-outline-secondary btn-sm">
-                    <i class="bi bi-download"></i> Export
-                </a>
+                    <div class="kd-container" id="kdContainer">
+                        <button class="kd-btn" id="kdBtn" type="button">
+                            Menu
+                            <i class="bi bi-chevron-down" id="kdChevron" style="font-size:12px; transition:transform .2s;"></i>
+                        </button>
 
+                        <div class="kd-menu" id="kdMenu">
+                            <div class="kd-menu-header">Manajemen File</div>
+                            <a class="kd-item" href="#" data-bs-toggle="modal" data-bs-target="#importModal">
+                                <div class="kd-item-icon icon-import">
+                                    <i class="bi bi-upload"></i>
+                                </div>
+                                <div class="kd-item-text">
+                                    <div class="kd-item-title">Import Excel</div>
+                                    <div class="kd-item-sub">Unggah file .xlsx atau .csv</div>
+                                </div>
+                                <i class="bi bi-chevron-right" style="font-size:12px; color:#94a3b8;"></i>
+                            </a>
+                            
+                            <div class="kd-divider"></div>
+                            <a class="kd-item" href="{{ route('pembayaran.export') }}">
+                                <div class="kd-item-icon icon-export">
+                                    <i class="bi bi-file-earmark-spreadsheet"></i>
+                                </div>
+                                <div class="kd-item-text">
+                                    <div class="kd-item-title">Export Excel</div>
+                                    <div class="kd-item-sub">Unduh data sebagai .xlsx</div>
+                                </div>
+                                <i class="bi bi-chevron-right" style="font-size:12px; color:#94a3b8;"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <div class="table-responsive px-3 pb-4" style="overflow-x: auto;">
@@ -282,7 +312,59 @@
 
     </div>
 </div>
+<!-- MODAL IMPORT EXCEL -->
+<div class="modal fade" id="importModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius:16px; overflow:hidden; border:none;">
 
+            <div style="background:linear-gradient(135deg,#28a745,#20c157);
+                        padding:18px 20px; display:flex; align-items:center;
+                        justify-content:space-between;">
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <div style="width:38px; height:38px; border-radius:10px;
+                                background:rgba(255,255,255,0.2);
+                                display:flex; align-items:center;
+                                justify-content:center; color:#fff; font-size:18px;">
+                        <i class="bi bi-file-earmark-excel"></i>
+                    </div>
+                    <div>
+                        <div style="font-size:14px; font-weight:600; color:#fff;">
+                            Import Data Pembayaran
+                        </div>
+                        <div style="font-size:12px; color:rgba(255,255,255,0.8);">
+                            Unggah file Excel atau CSV
+                        </div>
+                    </div>
+                </div>
+                <button type="button" class="btn-close btn-close-white"
+                        data-bs-dismiss="modal"></button>
+            </div>
+
+            <form action="{{ route('pembayaran.import') }}"
+                  method="POST"
+                  enctype="multipart/form-data">
+                @csrf
+
+                <div class="modal-body">
+                    <label class="form-label fw-semibold">Pilih File Excel</label>
+                    <input type="file" name="file" class="form-control"
+                           accept=".xlsx,.xls,.csv" required>
+                    <small class="text-muted">Format yang didukung: XLSX, XLS, CSV</small>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary"
+                            data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-success fw-bold">
+                        <i class="bi bi-upload me-1"></i> Import
+                    </button>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+</div>
 <!-- MODAL TAMBAH PEMBAYARAN -->
 <div class="modal fade" id="modalPembayaran" tabindex="-1">
     <div class="modal-dialog modal-lg modal-dialog-centered">
@@ -681,7 +763,45 @@ document.addEventListener('DOMContentLoaded', function () {
                 btn.getAttribute('data-status');
         });
     }
+    
+const kdBtn  = document.getElementById('kdBtn');
+const kdMenu = document.getElementById('kdMenu');
+const kdChev = document.getElementById('kdChevron');
+const importModal = document.getElementById('importModal');
 
+if (kdBtn) {
+    kdBtn.addEventListener('click', () => {
+
+        const open = kdMenu.classList.toggle('show');
+
+        kdChev.style.transform = open ? 'rotate(180deg)' : '';
+
+        if (open) {
+            const rect = kdBtn.getBoundingClientRect();
+
+            kdMenu.style.position = 'fixed';
+            kdMenu.style.top      = (rect.bottom + 6) + 'px';
+            kdMenu.style.left     = rect.left + 'px';
+
+            /* kembalikan seperti semula */
+            kdMenu.style.zIndex = '9999';
+        }
+    });
+
+    document.addEventListener('click', e => {
+        if (!document.getElementById('kdContainer').contains(e.target)) {
+            kdMenu.classList.remove('show');
+            kdChev.style.transform = '';
+        }
+    });
+}
+
+if (importModal) {
+    importModal.addEventListener('show.bs.modal', function () {
+        kdMenu.classList.remove('show');
+        kdChev.style.transform = '';
+    });
+}
 });
 </script>
 </body>

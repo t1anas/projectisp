@@ -8,6 +8,9 @@ use App\Models\Tagihan;
 use App\Models\MetodePembayaran;
 use App\Models\Pelanggan;
 use App\Models\Layanan;
+use App\Models\PemasukanExport;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\PembayaranImport;
 
 class PemasukanController extends Controller
 {
@@ -173,4 +176,24 @@ class PemasukanController extends Controller
     {
         return view('pemasukan');
     }
+    public function export()
+{
+    return Excel::download(new PemasukanExport, 'Data_Pemasukan.xlsx');
+}
+public function import(Request $request)
+{
+    $request->validate([
+        'file' => 'required|mimes:xlsx,xls,csv'
+    ]);
+
+    Excel::import(
+        new PembayaranImport,
+        $request->file('file')
+    );
+
+    return back()->with(
+        'success',
+        'Data berhasil diimport'
+    );
+}
 }

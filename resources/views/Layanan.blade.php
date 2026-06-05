@@ -335,11 +335,21 @@
                                         </td>
                                         <td class="text-center">
                                             <div class="action-group">
-                                                <a href="{{ route('layanan.detail', $p->id) }}"
-                                                   class="btn-action btn-action-detail"
-                                                   data-tip="Detail">
-                                                    <i class="bi bi-eye-fill"></i>
-                                                </a>
+                                                @if(Auth::user()->role == 'admin')
+                                                    <a href="{{ route('layanan.detail', $p->id) }}"
+                                                       class="btn-action btn-action-detail"
+                                                       data-tip="Detail">
+                                                        <i class="bi bi-eye-fill"></i>
+                                                    </a>
+                                                @elseif(in_array(Auth::user()->role, ['cs', 'noc']))
+                                                    <button type="button"
+                                                            class="btn-action btn-action-detail"
+                                                            data-bs-toggle="modal"
+                                                            data-bs-target="#modalDetail{{ $p->id }}"
+                                                            data-tip="Detail">
+                                                        <i class="bi bi-eye-fill"></i>
+                                                    </button>
+                                                @endif
                                                 <button type="button"
                                                         class="btn-action btn-action-edit"
                                                         data-bs-toggle="modal"
@@ -359,7 +369,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="9" class="text-center py-5" style="color:#9ca3af; font-size:14px;">
+                                        <td colspan="10" class="text-center py-5" style="color:#9ca3af; font-size:14px;">
                                             <i class="bi bi-inbox" style="font-size:30px; display:block; margin-bottom:8px;"></i>
                                             Tidak ada data yang ditemukan
                                         </td>
@@ -389,6 +399,130 @@
     {{-- END MAIN CONTENT --}}
 
 </div>
+
+
+{{-- MODAL DETAIL (cs & noc) --}}
+@foreach($pelanggan as $p)
+    @if(in_array(Auth::user()->role, ['cs', 'noc']))
+        <div class="modal fade" id="modalDetail{{ $p->id }}" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" style="max-width:560px;">
+                <div class="modal-content" style="border-radius:16px; overflow:hidden; border:none;">
+
+                    {{-- HEADER --}}
+                    <div style="background:#16a34a; padding:18px 20px; display:flex; align-items:center; justify-content:space-between;">
+                        <div style="display:flex; align-items:center; gap:12px;">
+                            <div style="width:38px; height:38px; border-radius:10px; background:rgba(22,14,14,0.12);
+                                        display:flex; align-items:center; justify-content:center; color:#16a34a; font-size:18px;">
+                                <i class="bi bi-person-fill"></i>
+                            </div>
+                            <div>
+                                <div style="font-size:14px; font-weight:600; color:#fff;">Detail Layanan</div>
+                            </div>
+                        </div>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+
+                    {{-- AVATAR ROW --}}
+                    <div style="padding:20px 20px 0; display:flex; align-items:center; gap:14px;">
+                        <div style="width:52px; height:52px; border-radius:14px; background:#EAF3DE;
+                                    display:flex; align-items:center; justify-content:center;
+                                    font-size:18px; font-weight:700; color:#3B6D11; flex-shrink:0;">
+                            {{ strtoupper(substr($p->nama, 0, 2)) }}
+                        </div>
+                        <div>
+                            <div style="font-size:16px; font-weight:700; color:#0c2416;">{{ $p->nama }}</div>
+                            <div style="font-size:12px; color:#6b7280; margin-top:3px; display:flex; align-items:center; gap:6px;">
+                                <i class="bi bi-upc-scan" style="font-size:12px;"></i>
+                                {{ $p->kode_pelanggan }}
+                                &nbsp;·&nbsp;
+                                @php
+                                    $detailStatusMap = [
+                                        'aktif'              => ['bg' => '#EAF3DE', 'color' => '#27500A', 'border' => '#C0DD97', 'icon' => 'check-circle-fill',  'label' => 'Aktif'],
+                                        'isolir'             => ['bg' => '#FAEEDA', 'color' => '#633806', 'border' => '#FAC775', 'icon' => 'slash-circle-fill',  'label' => 'Isolir'],
+                                        'pengajuan isolir'   => ['bg' => '#FEF9C3', 'color' => '#713F12', 'border' => '#FDE68A', 'icon' => 'hourglass-split',    'label' => 'Pengajuan Isolir'],
+                                        'pengajuan aktivasi' => ['bg' => '#DCFCE7', 'color' => '#14532D', 'border' => '#86EFAC', 'icon' => 'hourglass-split',    'label' => 'Pengajuan Aktivasi'],
+                                    ];
+                                    $ds = $detailStatusMap[strtolower($p->status)] ?? ['bg' => '#FCEBEB', 'color' => '#791F1F', 'border' => '#F7C1C1', 'icon' => 'x-circle-fill', 'label' => 'Nonaktif'];
+                                @endphp
+                                <span style="background:{{ $ds['bg'] }}; color:{{ $ds['color'] }}; border:1px solid {{ $ds['border'] }};
+                                             padding:2px 9px; border-radius:50px; font-size:11px; font-weight:600;">
+                                    <i class="bi bi-{{ $ds['icon'] }}" style="font-size:9px;"></i> {{ $ds['label'] }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr style="margin:16px 20px; border-color:#e8ede9; opacity:1;">
+
+                    {{-- KONTAK --}}
+                    <div style="font-size:10px; font-weight:700; letter-spacing:.8px; text-transform:uppercase;
+                                color:#7a9680; padding:0 20px 8px;">Informasi kontak</div>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; padding:0 20px;">
+                        <div style="padding:10px 20px 10px 0; border-bottom:1px solid #f2f5f2;">
+                            <div style="font-size:11px; color:#9cb09e; margin-bottom:4px; display:flex; align-items:center; gap:4px;">
+                                <i class="bi bi-telephone" style="font-size:11px;"></i> No. HP
+                            </div>
+                            <div style="font-size:13px; font-weight:600; color:#1a2e1e;">{{ $p->no_hp ?? '-' }}</div>
+                        </div>
+                        <div style="padding:10px 0; border-bottom:1px solid #f2f5f2;">
+                            <div style="font-size:11px; color:#9cb09e; margin-bottom:4px; display:flex; align-items:center; gap:4px;">
+                                <i class="bi bi-calendar3" style="font-size:11px;"></i> Aktivasi
+                            </div>
+                            <div style="font-size:13px; font-weight:600; color:#1a2e1e;">{{ $p->created_at->format('d/m/Y') }}</div>
+                        </div>
+                        <div style="padding:10px 0; grid-column:1/-1; border-bottom:1px solid #f2f5f2;">
+                            <div style="font-size:11px; color:#9cb09e; margin-bottom:4px; display:flex; align-items:center; gap:4px;">
+                                <i class="bi bi-geo-alt" style="font-size:11px;"></i> Alamat
+                            </div>
+                            <div style="font-size:13px; font-weight:600; color:#1a2e1e;">{{ $p->alamat ?? '-' }}</div>
+                        </div>
+                    </div>
+
+                    <hr style="margin:16px 20px; border-color:#e8ede9; opacity:1;">
+
+                    {{-- LAYANAN --}}
+                    <div style="font-size:10px; font-weight:700; letter-spacing:.8px; text-transform:uppercase;
+                                color:#7a9680; padding:0 20px 8px;">Informasi layanan</div>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; padding:0 20px;">
+                        <div style="padding:10px 20px 10px 0; border-bottom:1px solid #f2f5f2;">
+                            <div style="font-size:11px; color:#9cb09e; margin-bottom:4px; display:flex; align-items:center; gap:4px;">
+                                <i class="bi bi-wifi" style="font-size:11px;"></i> Nama Layanan
+                            </div>
+                            <div style="font-size:13px; font-weight:600; color:#1a2e1e;">{{ $p->nama_layanan ?? '-' }}</div>
+                        </div>
+                        <div style="padding:10px 0; border-bottom:1px solid #f2f5f2;">
+                            <div style="font-size:11px; color:#9cb09e; margin-bottom:4px; display:flex; align-items:center; gap:4px;">
+                                <i class="bi bi-box" style="font-size:11px;"></i> Paket
+                            </div>
+                            <div style="font-size:13px; font-weight:600; color:#1a2e1e;">{{ $p->layanan->nama_paket ?? '-' }}</div>
+                        </div>
+                        <div style="padding:10px 20px 10px 0;">
+                            <div style="font-size:11px; color:#9cb09e; margin-bottom:4px; display:flex; align-items:center; gap:4px;">
+                                <i class="bi bi-receipt" style="font-size:11px;"></i> Tagihan / Bulan
+                            </div>
+                            <div style="font-size:13px; font-weight:700; color:#0a8f3c;">
+                                Rp {{ number_format($p->layanan->harga ?? 0, 0, ',', '.') }}
+                            </div>
+                        </div>
+                        <div style="padding:10px 0;">
+                            <div style="font-size:11px; color:#9cb09e; margin-bottom:4px; display:flex; align-items:center; gap:4px;">
+                                <i class="bi bi-building" style="font-size:11px;"></i> Site
+                            </div>
+                            <div style="font-size:13px; font-weight:600; color:#1a2e1e;">{{ $p->site->nama_site ?? '-' }}</div>
+                        </div>
+                    </div>
+
+                    {{-- FOOTER --}}
+                    <div style="padding:14px 20px; background:#f7faf8; display:flex; align-items:center;
+                                justify-content:flex-end; border-top:1px solid #e8ede9;">
+                        <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    @endif
+@endforeach
 
 
 {{-- MODAL EDIT LAYANAN --}}
@@ -459,7 +593,7 @@
 @endforeach
 
 
-{{-- MODAL NOTIFIKASI--}}
+{{-- MODAL NOTIFIKASI --}}
 @foreach($pelanggan as $p)
     @php $periodeTagihan = \Carbon\Carbon::parse($p->created_at)->subDay(); @endphp
 
@@ -543,7 +677,8 @@
     </div>
 @endforeach
 
-{{-- MODAL IMPORT DATA--}}
+
+{{-- MODAL IMPORT DATA --}}
 <div class="modal fade" id="modalImport" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -573,6 +708,7 @@
     </div>
 </div>
 
+
 {{-- MODAL UBAH STATUS TERPILIH --}}
 <div class="modal fade" id="modalUbahStatus" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-sm modal-dialog-centered">
@@ -599,9 +735,9 @@
                     </p>
 
                     @foreach([
-                        ['value' => 'aktif',    'class' => 'opt-aktif',    'icon' => 'check-circle-fill',  'label' => 'Aktif',    'label-class' => 'text-success', 'desc' => 'Layanan berjalan normal',    'selected' => true],
-                        ['value' => 'isolir',   'class' => 'opt-isolir',   'icon' => 'slash-circle-fill',  'label' => 'Isolir',   'label-class' => 'text-warning', 'desc' => 'Layanan diisolir sementara', 'selected' => false],
-                        ['value' => 'nonaktif', 'class' => 'opt-nonaktif', 'icon' => 'x-circle-fill',      'label' => 'Nonaktif', 'label-class' => 'text-danger',  'desc' => 'Layanan dinonaktifkan',      'selected' => false],
+                        ['value' => 'aktif',    'class' => 'opt-aktif',    'icon' => 'check-circle-fill', 'label' => 'Aktif',    'label-class' => 'text-success', 'desc' => 'Layanan berjalan normal',    'selected' => true],
+                        ['value' => 'isolir',   'class' => 'opt-isolir',   'icon' => 'slash-circle-fill', 'label' => 'Isolir',   'label-class' => 'text-warning', 'desc' => 'Layanan diisolir sementara', 'selected' => false],
+                        ['value' => 'nonaktif', 'class' => 'opt-nonaktif', 'icon' => 'x-circle-fill',     'label' => 'Nonaktif', 'label-class' => 'text-danger',  'desc' => 'Layanan dinonaktifkan',      'selected' => false],
                     ] as $opt)
                     <div class="status-option {{ $opt['class'] }} {{ $opt['selected'] ? 'selected' : '' }}"
                          onclick="pilihStatus(this,'{{ $opt['value'] }}')">
@@ -625,6 +761,7 @@
         </div>
     </div>
 </div>
+
 
 {{-- MODAL GENERATE TAGIHAN --}}
 <div class="modal fade" id="modalGenerateTagihan" tabindex="-1" aria-hidden="true">
@@ -667,6 +804,7 @@
     </div>
 </div>
 
+
 {{-- MODAL AJUKAN ISOLIR TERPILIH --}}
 <div class="modal fade modal-isolir" id="modalIsolirTerpilih" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" style="max-width:420px;">
@@ -708,6 +846,7 @@
         </div>
     </div>
 </div>
+
 
 {{-- MODAL AJUKAN AKTIVASI TERPILIH --}}
 <div class="modal fade modal-isolir" id="modalAktivasiTerpilih" tabindex="-1" aria-hidden="true">
@@ -752,6 +891,7 @@
     </div>
 </div>
 
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
 function jagoAlert(pesan, callback) {
@@ -787,8 +927,8 @@ const saveStorage = (ids, names) => {
     sessionStorage.setItem(SKN, JSON.stringify(names));
 };
 
-const getNama    = row       => row?.querySelector('td:nth-child(5) .clamp-2')?.textContent.trim() ?? '-';
-const makeInput  = (name, value) => Object.assign(document.createElement('input'), { type: 'hidden', name, value });
+const getNama   = row => row?.querySelector('td:nth-child(5) .clamp-2')?.textContent.trim() ?? '-';
+const makeInput = (name, value) => Object.assign(document.createElement('input'), { type: 'hidden', name, value });
 
 const injectIds = (containerId, ids) => {
     const container = document.getElementById(containerId);

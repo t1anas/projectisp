@@ -135,3 +135,51 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f4f6f9; }
     overflow-y: auto;
     max-height: 60vh;
 }
+.kd-container { position: relative; display: inline-block; }
+
+.kd-btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 6px 12px; border-radius: 10px;
+    border: 1px solid #cd1b1b;
+    background: #cd1b1b; color: #ffffff;
+    font-size: 13.5px; font-weight: 500;
+    height: 31px;
+    cursor: pointer; transition: background .15s;
+}
+.kd-btn:hover { background: #651f1f; }
+
+.kd-menu {
+    display: none; position: absolute; top: calc(100% + 6px); left: 0;
+    min-width: 230px; background: #fff;
+   border: 1px solid #e2e8f0; border-radius: 14px;
+overflow: hidden; z-index: 9999;
+box-shadow: 0 8px 24px rgba(0,0,0,0.10);
+}
+.kd-menu.show { display: block; }
+
+.kd-menu-header {
+    padding: 10px 14px 8px;
+    font-size: 11px; font-weight: 600; letter-spacing: .06em;
+    color: #94a3b8; text-transform: uppercase;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.kd-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 11px 14px; cursor: pointer;
+    transition: background .12s; text-decoration: none; color: #1e293b;
+}
+.kd-item:hover { background: #f8fafc; }
+
+.kd-item-icon {
+    width: 32px; height: 32px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px; flex-shrink: 0;
+}
+.icon-import { background: #eff6ff; color: #2563eb; }
+.icon-export { background: #f0fdf4; color: #16a34a; }
+
+.kd-item-text { flex: 1; }
+.kd-item-title { font-size: 13.5px; font-weight: 600; line-height: 1; }
+.kd-item-sub { font-size: 12px; color: #94a3b8; margin-top: 2px; }
+.kd-divider { height: 1px; background: #f1f5f9; margin: 4px 0; }
