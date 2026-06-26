@@ -9,48 +9,67 @@
     <link rel="stylesheet" href="{{ asset('inputform.css') }}">
     <link rel="stylesheet" href="{{ asset('scan.css') }}">
     <script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
-    
-    
+
+
 </head>
 <body>
 
-<div style="display:flex; min-height:100vh;">
+<div class="page-layout">
 
-    <div class="sidebar">
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+    <div class="sidebar" id="appSidebar">
         <div class="sidebar-header">
-            <div class="hamburger"><span></span><span></span><span></span></div>
+            <div class="hamburger" onclick="toggleSidebar()"><span></span><span></span><span></span></div>
             <span class="logo-text">JAGONET</span>
         </div>
+
         <div class="section-label">Main Board</div>
+
         <a href="{{ Auth::user()->dashboard_url }}" class="menu-item">
             <i class="bi bi-speedometer2"></i> Dashboard
         </a>
-        <a href="{{ url('/layanan') }}" class="menu-item">
+        <a href="{{ url('/layanan') }}" class="menu-item active">
             <i class="bi bi-wifi"></i> Data Layanan
         </a>
+
         @php
             $instalasiUrl = match(Auth::user()->role) {
                 'cs'    => '/instalasi',
                 'admin' => '/approve',
                 'noc'   => '/instalasi-noc',
-                default => '/instalasi',
+                default => '/instalasi'
             };
         @endphp
+
         <a href="{{ url($instalasiUrl) }}" class="menu-item">
             <i class="bi bi-router"></i> Instalasi Baru
         </a>
-        @if(Auth::user()->role === 'admin')
+
+        @if(Auth::user()->role == 'cs')
+        <a href="{{ route('agenda.cs') }}" class="menu-item">
+            <i class="bi bi-arrow-down-up"></i>Agenda CS
+        </a>
+        @endif
+
+        @if(Auth::user()->role == 'noc')
+            <a href="{{ url('/agenda-noc') }}" class="menu-item">
+                <i class="bi bi-journal-check"></i> Agenda NOC
+            </a>
+        @endif
+
+        @if(Auth::user()->role == 'admin')
             <a href="{{ url('/pemasukan') }}" class="menu-item">
                 <i class="bi bi-wallet2"></i> Pemasukan
             </a>
         @endif
+
         <div class="section-label">Pelanggan</div>
+
         <a href="{{ url('/pelanggan') }}" class="menu-item">
             <i class="bi bi-people"></i> Data Pelanggan
         </a>
-        <a href="{{ url('/scan') }}" class="menu-item active">
-            <i class="bi bi-qr-code-scan"></i> Scan QR
-        </a>
+
         <div class="profile-section">
             <div class="admin-card">
                 <div class="admin-avatar">
@@ -70,7 +89,12 @@
         </div>
     </div>
 
-    <div class="main-content" style="flex:1; display:flex; align-items:center; justify-content:center;">
+        <div class="d-flex align-items-center gap-3" style="margin-bottom: 16px;">
+        <button type="button" class="btn-sidebar-toggle d-lg-none" onclick="toggleSidebar()">
+            <i class="bi bi-list"></i>
+        </button>
+    </div>
+    <div class="main-content scan-page-content">
 
         <div class="scanner-card">
 
@@ -118,11 +142,6 @@
                     <button class="btn-lanjut" onclick="cariManual()">Lanjutkan</button>
                 </div>
 
-                <div class="tip">
-                    <i class="bi bi-lightbulb"></i>
-                    Pastikan QR code terlihat jelas dalam frame kamera
-                </div>
-
             </div>
         </div>
 
@@ -130,6 +149,10 @@
 </div>
 
 <script>
+    function toggleSidebar() {
+    document.getElementById('appSidebar').classList.toggle('show');
+    document.getElementById('sidebarOverlay').classList.toggle('show');
+}
     let html5QrCode;
 
     function onScanSuccess(url) {
@@ -155,7 +178,7 @@
         ).then(() => {
             const s = document.getElementById('statusBox');
             s.className = 'status-box success';
-            s.innerHTML = '<i class="bi bi-camera-video-fill"></i> Kamera aktif — arahkan ke QR code';
+            s.innerHTML = '<i class="bi bi-camera-video-fill"></i> Kamera aktif';
         }).catch(() => {
             const s = document.getElementById('statusBox');
             s.className = 'status-box error';

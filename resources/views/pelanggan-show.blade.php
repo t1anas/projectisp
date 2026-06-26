@@ -7,20 +7,17 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('inputform.css') }}">
-    <style>
-        #qrcode svg { width: 140px !important; height: 140px !important; }
-    </style>
+
 </head>
 <body>
 
 <div style="display:flex; min-height:100vh;">
 
-    {{-- SIDEBAR --}}
-    <div class="sidebar">
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+    <div class="sidebar" id="appSidebar">
         <div class="sidebar-header">
-            <div class="hamburger">
-                <span></span><span></span><span></span>
-            </div>
+            <div class="hamburger" onclick="toggleSidebar()"><span></span><span></span><span></span></div>
             <span class="logo-text">JAGONET</span>
         </div>
 
@@ -38,7 +35,7 @@
                 'cs'    => '/instalasi',
                 'admin' => '/approve',
                 'noc'   => '/instalasi-noc',
-                default => '/instalasi',
+                default => '/instalasi'
             };
         @endphp
 
@@ -46,7 +43,19 @@
             <i class="bi bi-router"></i> Instalasi Baru
         </a>
 
-        @if(Auth::user()->role === 'admin')
+        @if(Auth::user()->role == 'cs')
+        <a href="{{ route('agenda.cs') }}" class="menu-item">
+            <i class="bi bi-arrow-down-up"></i>Agenda CS
+        </a>
+        @endif
+
+        @if(Auth::user()->role == 'noc')
+            <a href="{{ url('/agenda-noc') }}" class="menu-item">
+                <i class="bi bi-journal-check"></i> Agenda NOC
+            </a>
+        @endif
+
+        @if(Auth::user()->role == 'admin')
             <a href="{{ url('/pemasukan') }}" class="menu-item">
                 <i class="bi bi-wallet2"></i> Pemasukan
             </a>
@@ -76,11 +85,16 @@
             </form>
         </div>
     </div>
-    {{-- END SIDEBAR --}}
 
     {{-- CONTENT --}}
-    <div class="container py-4 d-flex justify-content-center" style="margin-left:240px;">
+    <div class="container py-4 d-flex justify-content-center detail-content-area">
         <div class="content-wrapper">
+
+            <div class="detail-page-topbar">
+                <button type="button" class="btn-sidebar-toggle d-lg-none" onclick="toggleSidebar()">
+                    <i class="bi bi-list"></i>
+                </button>
+            </div>
 
             {{-- HEADER --}}
             <div class="header-card">
@@ -229,6 +243,10 @@
 </div>
 
 <script>
+    function toggleSidebar() {
+    document.getElementById('appSidebar').classList.toggle('show');
+    document.getElementById('sidebarOverlay').classList.toggle('show');
+}
 function downloadQR() {
     const svg      = document.querySelector("#qrcode svg");
     const filename = "Kartu_{{ $pelanggan->kode_pelanggan ?? 'pelanggan' }}.png";
@@ -324,7 +342,7 @@ function downloadQR() {
         ctx.fillStyle = 'rgba(255,255,255,0.55)'; ctx.font = '7px Arial';
         ctx.fillText('PELANGGAN', NX, LOGO_Y + 8);
 
-        const namaText  = '{{ addslashes($pelanggan->nama) }}';
+        const namaText  = '{{ addslashes(str_replace(["\r\n", "\r", "\n"], " ", $pelanggan->nama)) }}';
         const namaLines = wrapText(namaText, nameMaxW, 'bold 15px Arial');
         ctx.fillStyle = '#ffffff';
         namaLines.slice(0, 2).forEach((line, i) => {
@@ -381,19 +399,19 @@ function downloadQR() {
             cy += 10;
         }
 
-        const paketLines = wrapText('{{ addslashes($pelanggan->layanan->nama_paket ?? "-") }}', TW, 'bold 12px Arial');
+        const paketLines = wrapText('{{ addslashes(str_replace(["\r\n", "\r", "\n"], " ", $pelanggan->layanan->nama_paket ?? "-")) }}', TW, 'bold 12px Arial');
         infoBlock('PAKET', paketLines, 'bold 12px Arial');
         divider();
 
-        const layananLines = wrapText('{{ addslashes($pelanggan->nama_layanan ?? "-") }}', TW, '11px Arial');
+        const layananLines = wrapText('{{ addslashes(str_replace(["\r\n", "\r", "\n"], " ", $pelanggan->nama_layanan ?? "-")) }}', TW, '11px Arial');
         infoBlock('NAMA LAYANAN', layananLines.slice(0, 2), '11px Arial');
         divider();
 
-        const alamatLines = wrapText('{{ addslashes($pelanggan->alamat ?? "-") }}', TW, '10px Arial');
+        const alamatLines = wrapText('{{ addslashes(str_replace(["\r\n", "\r", "\n"], " ", $pelanggan->alamat ?? "-")) }}', TW, '10px Arial');
         infoBlock('ALAMAT', alamatLines.slice(0, 3), '10px Arial');
         divider();
 
-        infoBlock('NO. HP', ['{{ addslashes($pelanggan->no_hp ?? "-") }}'], '11px Arial');
+        infoBlock('NO. HP', ['{{ addslashes(str_replace(["\r\n", "\r", "\n"], " ", $pelanggan->no_hp ?? "-")) }}'], '11px Arial');
 
         const PILL_Y = H - 36;
         @if($pelanggan->status === 'aktif')

@@ -17,6 +17,7 @@ class AgendaNoc extends Model
         'catatan',
         'created_by',
         'approved_by',
+        'layanan_baru_id',
         'approved_at',
     ];
 
@@ -33,6 +34,11 @@ class AgendaNoc extends Model
     public function approvedBy()
     {
         return $this->belongsTo(User::class, 'approved_by');
+    }
+
+    public function layananBaru()
+    {
+        return $this->belongsTo(Layanan::class, 'layanan_baru_id');
     }
     
 }

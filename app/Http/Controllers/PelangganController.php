@@ -6,6 +6,7 @@ use App\Models\Pelanggan;
 use App\Models\Tagihan;
 use App\Models\Site;
 use App\Models\Layanan;
+use App\Models\AgendaNoc;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -122,6 +123,8 @@ public function generateTagihanTerpilih(Request $request)
     foreach ($pelanggan as $p) {
         if (!$p->layanan) continue;
 
+        $hariAktivasi = \Carbon\Carbon::parse($p->created_at)->day;
+
         $tagihanTerakhir = Tagihan::where('pelanggan_id', $p->id)
             ->orderByDesc('tahun')
             ->orderByDesc('bulan')
@@ -131,10 +134,10 @@ public function generateTagihanTerpilih(Request $request)
             $bulanBaru = \Carbon\Carbon::create(
                 $tagihanTerakhir->tahun,
                 $tagihanTerakhir->bulan,
-                1
+                $hariAktivasi
             )->addMonth();
         } else {
-            $bulanBaru = now();
+            $bulanBaru = \Carbon\Carbon::create(now()->year, now()->month, $hariAktivasi);
         }
 
         $sudahAda = Tagihan::where('pelanggan_id', $p->id)
@@ -147,7 +150,7 @@ public function generateTagihanTerpilih(Request $request)
                 'pelanggan_id'  => $p->id,
                 'layanan_id'    => $p->layanan->id,
                 'jenis_tagihan' => 'tagihan internet bulanan',
-                'tanggal'       => $bulanBaru->startOfMonth(),
+                'tanggal'       => $bulanBaru->startOfDay(),
                 'bulan'         => $bulanBaru->month,
                 'tahun'         => $bulanBaru->year,
                 'jatuh_tempo'   => $bulanBaru->copy()->addDays(3),
@@ -159,4 +162,50 @@ public function generateTagihanTerpilih(Request $request)
 
     return back()->with('success', 'Tagihan berhasil digenerate.');
 }
+
+public function formUpgrade($id)
+    {
+        $pelanggan = Pelanggan::with('layanan')
+            ->findOrFail($id);
+
+        $layanan = Layanan::all();
+
+        return view('upgrade', compact('pelanggan', 'layanan'));
+    }
+
+    public function simpanUpgrade(Request $request)
+    {
+        $request->validate([
+            'pelanggan_id'    => 'required|exists:pelanggan,id',
+            'layanan_baru_id' => 'required|exists:layanan,id',
+            'jenis_perubahan' => 'nullable|in:upgrade,downgrade',
+            'catatan'         => 'nullable|string|max:1000',
+        ]);
+
+        $pelanggan   = Pelanggan::with('layanan')->findOrFail($request->pelanggan_id);
+        $layananBaru = Layanan::findOrFail($request->layanan_baru_id);
+
+        if ($request->layanan_baru_id == $pelanggan->layanan_id) {
+            return back()->withErrors(['layanan_baru_id' => 'Paket baru tidak boleh sama dengan paket aktif.']);
+        }
+
+        if ($request->jenis_perubahan) {
+            $jenis = $request->jenis_perubahan === 'upgrade'
+                ? 'upgrade_layanan' : 'downgrade_layanan';
+        } else {
+            $jenis = $layananBaru->harga > $pelanggan->layanan->harga
+                ? 'upgrade_layanan' : 'downgrade_layanan';
+        }
+
+        AgendaNoc::create([
+            'pelanggan_id'    => $pelanggan->id,
+            'layanan_baru_id' => $layananBaru->id,
+            'jenis'           => $jenis,
+            'status'          => 'pending',
+            'catatan'         => $request->catatan,
+            'created_by'      => auth()->id(),
+        ]);
+
+        return redirect('/pelanggan')->with('success', 'Permintaan upgrade/downgrade berhasil diajukan.');
+    }
 }

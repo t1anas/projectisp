@@ -14,15 +14,23 @@
 <body>
 <div style="display:flex; min-height:100vh;">
 
-    {{-- SIDEBAR --}}
-    <div class="sidebar">
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+    <div class="sidebar" id="appSidebar">
         <div class="sidebar-header">
-            <div class="hamburger"><span></span><span></span><span></span></div>
+            <div class="hamburger" onclick="toggleSidebar()"><span></span><span></span><span></span></div>
             <span class="logo-text">JAGONET</span>
         </div>
+
         <div class="section-label">Main Board</div>
-        <a href="{{ Auth::user()->dashboard_url }}" class="menu-item"><i class="bi bi-speedometer2"></i> Dashboard</a>
-        <a href="{{ url('/layanan') }}" class="menu-item"><i class="bi bi-wifi"></i> Data Layanan</a>
+
+        <a href="{{ Auth::user()->dashboard_url }}" class="menu-item">
+            <i class="bi bi-speedometer2"></i> Dashboard
+        </a>
+        <a href="{{ url('/layanan') }}" class="menu-item">
+            <i class="bi bi-wifi"></i> Data Layanan
+        </a>
+
         @php
             $instalasiUrl = match(Auth::user()->role) {
                 'cs'    => '/instalasi',
@@ -31,19 +39,40 @@
                 default => '/instalasi'
             };
         @endphp
+
         <a href="{{ url($instalasiUrl) }}" class="menu-item">
             <i class="bi bi-router"></i> Instalasi Baru
         </a>
+
+        @if(Auth::user()->role == 'cs')
+        <a href="{{ route('agenda.cs') }}" class="menu-item">
+            <i class="bi bi-arrow-down-up"></i>Agenda CS
+        </a>
+        @endif
+
+        @if(Auth::user()->role == 'noc')
+            <a href="{{ url('/agenda-noc') }}" class="menu-item">
+                <i class="bi bi-journal-check"></i> Agenda NOC
+            </a>
+        @endif
+
         @if(Auth::user()->role == 'admin')
             <a href="{{ url('/pemasukan') }}" class="menu-item active">
                 <i class="bi bi-wallet2"></i> Pemasukan
             </a>
         @endif
+
         <div class="section-label">Pelanggan</div>
-        <a href="{{ url('/pelanggan') }}" class="menu-item"><i class="bi bi-people"></i> Data Pelanggan</a>
+
+        <a href="{{ url('/pelanggan') }}" class="menu-item">
+            <i class="bi bi-people"></i> Data Pelanggan
+        </a>
+
         <div class="profile-section">
             <div class="admin-card">
-                <div class="admin-avatar"><i class="bi bi-person-fill text-white"></i></div>
+                <div class="admin-avatar">
+                    <i class="bi bi-person-fill text-white"></i>
+                </div>
                 <div>
                     <div class="admin-role">{{ strtoupper(Auth::user()->role) }}</div>
                     <div class="admin-name">{{ Auth::user()->name }}</div>
@@ -51,7 +80,9 @@
             </div>
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
-                <button type="submit" class="logout-btn"><i class="bi bi-box-arrow-right"></i> LOG OUT</button>
+                <button type="submit" class="logout-btn">
+                    <i class="bi bi-box-arrow-right"></i> LOG OUT
+                </button>
             </form>
         </div>
     </div>
@@ -74,9 +105,14 @@
         @endif
 
         <div class="topbar">
+            <div class="d-flex align-items-center gap-3">
+                <button type="button" class="btn-sidebar-toggle d-lg-none" onclick="toggleSidebar()">
+                    <i class="bi bi-list"></i>
+                </button>
             <div>
                 <div class="page-title">Data Tagihan</div>
                 <div class="page-sub">Kelola semua tagihan pelanggan internet</div>
+            </div>
             </div>
             <div class="breadcrumb-area">
                 <i class="bi bi-house-door"></i>
@@ -139,7 +175,7 @@
                                    value="{{ request('bulan') }}">
                         </div>
                         <div class="col-md-2">
-                            <button type="submit" class="btn btn-success w-100">
+                            <button type="submit" class="btn btn-sm btn-search-jago w-100">
                                 <i class="bi bi-search"></i>
                             </button>
                         </div>
@@ -164,7 +200,7 @@
                             <th>Layanan</th>
                             <th style="white-space: nowrap">Total</th>
                             <th style="white-space: nowrap;">Jumlah Terbayar</th>
-                            <th>Jenis Tagihan</th>
+                            <th style="white-space: nowrap">Jenis Tagihan</th>
                             <th>Status</th>
                             <th>Aksi</th>
                         </tr>
@@ -192,7 +228,7 @@
                                 <td>{{ optional($t->layanan)->nama_paket ?? '-' }}</td>
                                 <td class="text-start fw-semibold" style="white-space: nowrap">Rp {{ number_format($t->total, 0, ',', '.') }}</td>
                                 <td class="text-start fw-semibold" style="white-space: nowrap">Rp {{ number_format($t->pembayaran->sum('jumlah_bayar'), 0, ',', '.') }}</td>
-                                <td>{{ $t->jenis_tagihan }}</td>
+                                <td class>{{ $t->jenis_tagihan }}</td>
                                 <td style="white-space: nowrap">
                                     @if($t->status == 'lunas')
                                         <span class="status-pill status-lunas"><i class="bi bi-check-circle-fill"></i> Lunas</span>
@@ -559,6 +595,10 @@ function updateLayanan(select) {
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
+    function toggleSidebar() {
+    document.getElementById('appSidebar').classList.toggle('show');
+    document.getElementById('sidebarOverlay').classList.toggle('show');
+}
 function toggleAll(master) {
     document.querySelectorAll('.row-check').forEach(cb => cb.checked = master.checked);
     updateSelected();

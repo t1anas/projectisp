@@ -63,6 +63,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/scan',              fn() => view('scan_cs'));
         Route::post('/pembayaran/store', [PemasukanController::class, 'store']);
     });
+    Route::get('/agenda-cs',[AgendaNocController::class, 'agendaCs'])->name('agenda.cs');
 
     /* PELANGGAN */
     Route::prefix('pelanggan')->group(function () {
@@ -137,3 +138,14 @@ Route::get('/layanan/{id}/detail', [DetailController::class, 'index'])->name('de
 /* ISOLIR & AKTIFKAN */
 Route::get('/layanan/{id}/isolir',   [LayananController::class, 'isolir'])->name('layanan.isolir');
 Route::get('/layanan/{id}/aktifkan', [LayananController::class, 'aktifkan'])->name('layanan.aktifkan');
+
+/* UPGRADE DOWNGRADE */
+Route::get(
+    '/pelanggan/{id}/upgrade',
+    [PelangganController::class, 'formUpgrade']
+)->name('upgrade');
+
+Route::post(
+    '/pelanggan/upgrade',
+    [PelangganController::class, 'simpanUpgrade']
+)->name('upgrade.store');

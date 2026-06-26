@@ -15,13 +15,11 @@
 <body>
 <div style="display:flex; min-height:100vh;">
 
-    <!-- SIDEBAR -->
-    <div class="sidebar">
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 
+    <div class="sidebar" id="appSidebar">
         <div class="sidebar-header">
-            <div class="hamburger">
-                <span></span><span></span><span></span>
-            </div>
+            <div class="hamburger" onclick="toggleSidebar()"><span></span><span></span><span></span></div>
             <span class="logo-text">JAGONET</span>
         </div>
 
@@ -30,28 +28,39 @@
         <a href="{{ Auth::user()->dashboard_url }}" class="menu-item">
             <i class="bi bi-speedometer2"></i> Dashboard
         </a>
-
         <a href="{{ url('/layanan') }}" class="menu-item">
             <i class="bi bi-wifi"></i> Data Layanan
         </a>
 
-                @php
-    $instalasiUrl = match(Auth::user()->role) {
-        'cs'    => '/instalasi',
-        'admin' => '/approve',
-        'noc'   => '/instalasi-noc',
-        default => '/instalasi'
-    };
-@endphp
+        @php
+            $instalasiUrl = match(Auth::user()->role) {
+                'cs'    => '/instalasi',
+                'admin' => '/approve',
+                'noc'   => '/instalasi-noc',
+                default => '/instalasi'
+            };
+        @endphp
 
-<a href="{{ url($instalasiUrl) }}" class="menu-item">
-    <i class="bi bi-router"></i> Instalasi Baru
-</a>
+        <a href="{{ url($instalasiUrl) }}" class="menu-item">
+            <i class="bi bi-router"></i> Instalasi Baru
+        </a>
+
+        @if(Auth::user()->role == 'cs')
+        <a href="{{ route('agenda.cs') }}" class="menu-item">
+            <i class="bi bi-arrow-down-up"></i>Agenda CS
+        </a>
+        @endif
+
+        @if(Auth::user()->role == 'noc')
+            <a href="{{ url('/agenda-noc') }}" class="menu-item">
+                <i class="bi bi-journal-check"></i> Agenda NOC
+            </a>
+        @endif
 
         @if(Auth::user()->role == 'admin')
-        <a href="{{ url('/pemasukan') }}" class="menu-item active">
-            <i class="bi bi-wallet2"></i> Pemasukan
-        </a>
+            <a href="{{ url('/pemasukan') }}" class="menu-item active">
+                <i class="bi bi-wallet2"></i> Pemasukan
+            </a>
         @endif
 
         <div class="section-label">Pelanggan</div>
@@ -60,7 +69,6 @@
             <i class="bi bi-people"></i> Data Pelanggan
         </a>
 
-        <!-- PROFILE -->
         <div class="profile-section">
             <div class="admin-card">
                 <div class="admin-avatar">
@@ -78,18 +86,21 @@
                 </button>
             </form>
         </div>
-
     </div>
-    <!-- END SIDEBAR -->
 
     <!-- MAIN CONTENT -->
     <div class="main-content" style="flex:1;">
 
         <!-- TOPBAR -->
         <div class="topbar">
+            <div class="d-flex align-items-center gap-3">
+                <button type="button" class="btn-sidebar-toggle d-lg-none" onclick="toggleSidebar()">
+                    <i class="bi bi-list"></i>
+                </button>
             <div>
                 <div class="page-title">Pemasukan</div>
                 <div class="page-sub">Kelola transaksi keuangan pelanggan</div>
+            </div>
             </div>
             <div class="breadcrumb-area">
                 <i class="bi bi-house-door"></i>
@@ -158,5 +169,11 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    function toggleSidebar() {
+        document.getElementById('appSidebar').classList.toggle('show');
+        document.getElementById('sidebarOverlay').classList.toggle('show');
+    }
+</script>
 </body>
 </html>

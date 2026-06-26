@@ -16,10 +16,11 @@
 
 <div style="display:flex; min-height:100vh;">
 
-    {{-- SIDEBAR --}}
-    <div class="sidebar">
+   <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+    <div class="sidebar" id="appSidebar">
         <div class="sidebar-header">
-            <div class="hamburger"><span></span><span></span><span></span></div>
+            <div class="hamburger" onclick="toggleSidebar()"><span></span><span></span><span></span></div>
             <span class="logo-text">JAGONET</span>
         </div>
 
@@ -37,7 +38,7 @@
                 'cs'    => '/instalasi',
                 'admin' => '/approve',
                 'noc'   => '/instalasi-noc',
-                default => '/instalasi',
+                default => '/instalasi'
             };
         @endphp
 
@@ -45,13 +46,19 @@
             <i class="bi bi-router"></i> Instalasi Baru
         </a>
 
-        @if(Auth::user()->role == 'noc')
-        <a href="{{ url('/agenda-noc') }}" class="menu-item">
-            <i class="bi bi-journal-check"></i> Agenda NOC
+        @if(Auth::user()->role == 'cs')
+        <a href="{{ route('agenda.cs') }}" class="menu-item">
+            <i class="bi bi-arrow-down-up"></i>Agenda CS
         </a>
         @endif
 
-        @if(Auth::user()->role === 'admin')
+        @if(Auth::user()->role == 'noc')
+            <a href="{{ url('/agenda-noc') }}" class="menu-item">
+                <i class="bi bi-journal-check"></i> Agenda NOC
+            </a>
+        @endif
+
+        @if(Auth::user()->role == 'admin')
             <a href="{{ url('/pemasukan') }}" class="menu-item">
                 <i class="bi bi-wallet2"></i> Pemasukan
             </a>
@@ -81,16 +88,20 @@
             </form>
         </div>
     </div>
-    {{-- END SIDEBAR --}}
 
     {{-- MAIN CONTENT --}}
     <div class="main-content" style="flex:1;">
 
         {{-- TOPBAR --}}
         <div class="topbar">
+            <div class="d-flex align-items-center gap-3">
+            <button type="button" class="btn-sidebar-toggle d-lg-none" onclick="toggleSidebar()">
+                <i class="bi bi-list"></i>
+            </button>
             <div>
                 <div class="page-title">Instalasi NOC</div>
                 <div class="page-sub">Kelola proses instalasi jaringan pelanggan baru</div>
+            </div>
             </div>
             <div class="breadcrumb-area">
                 <i class="bi bi-house-door"></i>
@@ -432,7 +443,10 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    /* ── Helpers ── */
+    function toggleSidebar() {
+        document.getElementById('appSidebar').classList.toggle('show');
+        document.getElementById('sidebarOverlay').classList.toggle('show');
+    }
     const rowHtml = (lbl, val) =>
         `<div class="d-row">
             <span class="d-lbl">${lbl}</span>
@@ -448,7 +462,6 @@
         nonaktif: '<span class="status-pill status-nonactive"><i class="bi bi-x-circle-fill"></i> Nonaktif</span>',
     };
 
-    /* ── Modal: Detail ── */
     function openDetail(p) {
         const lokasi = p.lokasi_link
             ? `<a href="${p.lokasi_link}" target="_blank" style="color:#0f9d58;">
@@ -482,7 +495,6 @@
         new bootstrap.Modal(document.getElementById('modalDetail')).show();
     }
 
-    /* ── Modal: Approve NOC ── */
     function openApprove(p) {
         document.getElementById('apv-nama').textContent   = p.nama ?? '—';
         document.getElementById('apv-paket').innerHTML    =
@@ -492,17 +504,14 @@
         document.getElementById('apv-alamat').textContent = p.alamat ?? '—';
         document.getElementById('apv-site').textContent   = p.site?.nama_site ?? '—';
 
-        // Set action form → route approve NOC
         document.getElementById('approveForm').action = `/instalasi-noc/${p.id}/approve`;
 
-        // Reset input
         document.getElementById('apv-input-nama-layanan').value = '';
         document.querySelector('#approveForm textarea[name="catatan_noc"]').value = '';
 
         new bootstrap.Modal(document.getElementById('modalApprove')).show();
     }
 
-    /* ── Modal: Reject ── */
     function openReject(id, nama) {
         document.getElementById('rejectForm').action      = `/instalasi-noc/${id}/reject`;
         document.getElementById('rejectName').textContent = nama;

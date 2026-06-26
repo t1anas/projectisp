@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Agenda NOC</title>
+<title>Agenda CS</title>
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
@@ -45,13 +45,13 @@
         </a>
 
         @if(Auth::user()->role == 'cs')
-        <a href="{{ route('agenda.cs') }}" class="menu-item">
+        <a href="{{ route('agenda.cs') }}" class="menu-item active">
             <i class="bi bi-arrow-down-up"></i>Agenda CS
         </a>
         @endif
 
         @if(Auth::user()->role == 'noc')
-            <a href="{{ url('/agenda-noc') }}" class="menu-item active">
+            <a href="{{ url('/agenda-noc') }}" class="menu-item">
                 <i class="bi bi-journal-check"></i> Agenda NOC
             </a>
         @endif
@@ -95,16 +95,16 @@
                 <i class="bi bi-list"></i>
             </button>
             <div>
-                <div class="page-title">Agenda NOC</div>
-                <div class="page-sub">Kelola agenda dan jadwal teknisi NOC</div>
+                <div class="page-title">Agenda CS</div>
+                <div class="page-sub">Monitoring pengajuan upgrade dan downgrade layanan</div>
             </div>
-            </div>
+        </div>
             <div class="breadcrumb-area">
                 <i class="bi bi-house-door"></i>
                 <span class="sep">/</span>
-                <span>NOC</span>
+                <span>CS</span>
                 <span class="sep">/</span>
-                <span class="current">Agenda NOC</span>
+                <span class="current">Agenda CS</span>
             </div>
         </div>
 
@@ -126,7 +126,7 @@
         <div class="stats-row">
             <div class="stat-card">
                 <div class="stat-icon blue"><i class="bi bi-journal-text"></i></div>
-                <div><div class="stat-val">{{ $total }}</div><div class="stat-lbl">Total Agenda</div></div>
+                <div><div class="stat-val">{{ $total }}</div><div class="stat-lbl">Total Pengajuan</div></div>
             </div>
             <div class="stat-card">
                 <div class="stat-icon yellow"><i class="bi bi-hourglass-split"></i></div>
@@ -146,10 +146,10 @@
 
             <div class="form-card-header" style="border-radius:18px 18px 0 0; justify-content:space-between; flex-wrap:wrap; gap:12px;">
                 <div style="display:flex; align-items:center; gap:12px;">
-                    <div class="icon-wrap"><i class="bi bi-journal-check"></i></div>
+                    <div class="icon-wrap"><i class="bi bi-arrow-down-up"></i></div>
                     <div>
-                        <div class="form-card-title">Daftar Agenda NOC</div>
-                        <div class="form-card-sub">Setujui atau tolak agenda yang masuk</div>
+                        <div class="form-card-title">Daftar Pengajuan Upgrade / Downgrade</div>
+                        <div class="form-card-sub">Pantau status pengajuan perubahan paket layanan</div>
                     </div>
                 </div>
                 <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
@@ -159,12 +159,8 @@
                     </div>
                     <select class="filter-select-white" id="filterJenis" onchange="filterTable()">
                         <option value="">Semua Jenis</option>
-                        <option value="instalasi">Instalasi</option>
-                        <option value="gangguan">Gangguan</option>
-                        <option value="maintenance">Maintenance</option>
-                        <option value="survey">Survey</option>
-                        <option value="relokasi">Relokasi</option>
-                        <option value="isolir">Isolir</option>
+                        <option value="upgrade_layanan">Upgrade</option>
+                        <option value="downgrade_layanan">Downgrade</option>
                     </select>
                     <select class="filter-select-white" id="filterStatus" onchange="filterTable()">
                         <option value="">Semua Status</option>
@@ -181,14 +177,12 @@
                         <tr>
                             <th>ID</th>
                             <th>Pelanggan</th>
-                            <th>Nama Layanan</th>
+                            <th>Paket Saat Ini</th>
+                            <th>Paket Baru</th>
                             <th>Jenis</th>
                             <th>Status</th>
-                            <th>Dibuat Oleh</th>
-                            <th>Disetujui Oleh</th>
-                            <th>Approved At</th>
-                            <th>Created At</th>
-                            <th>Aksi</th>
+                            <th>Catatan</th>
+                            <th>Tanggal</th>
                         </tr>
                     </thead>
                     <tbody id="agendaBody">
@@ -201,24 +195,19 @@
                             <td><span class="id-badge">{{ $item->id }}</span></td>
 
                             <td>
-                                <span style="font-weight:700;">{{ $item->pelanggan->nama ?? '#'.$item->pelanggan_id }} </span>
+                                <span style="font-weight:700;">{{ $item->pelanggan->nama ?? '#'.$item->pelanggan_id }}</span>
                             </td>
 
-                            <td>{{ $item->pelanggan->nama_layanan ?? '—' }}</td>
+                            <td>{{ $item->pelanggan->layanan->nama_paket ?? '—' }}</td>
+
+                            <td>{{ $item->layananBaru->nama_paket ?? '—' }}</td>
 
                             <td>
-                                @php
-                                    $jenisClass = match(strtolower($item->jenis)) {
-                                        'instalasi'   => 'jenis-instalasi',
-                                        'gangguan'    => 'jenis-gangguan',
-                                        'maintenance' => 'jenis-maintenance',
-                                        'survey'      => 'jenis-survey',
-                                        'relokasi'    => 'jenis-relokasi',
-                                        'isolir'      => 'jenis-isolir',
-                                        default       => 'jenis-default',
-                                    };
-                                @endphp
-                                <span class="jenis-badge {{ $jenisClass }}">{{ ucfirst($item->jenis) }}</span>
+                                @if($item->jenis == 'upgrade_layanan')
+                                    <span class="jenis-badge jenis-instalasi">Upgrade</span>
+                                @else
+                                    <span class="jenis-badge jenis-relokasi">Downgrade</span>
+                                @endif
                             </td>
 
                             <td>
@@ -236,20 +225,7 @@
                                 </span>
                             </td>
 
-                            <td>{{ $item->createdBy->name ?? '—' }}</td>
-
-                            <td>{{ $item->approvedBy->name ?? '—' }}</td>
-
-                            <td>
-                                @if($item->approved_at)
-                                <div class="datetime-text">
-                                    <span class="date-part">{{ \Carbon\Carbon::parse($item->approved_at)->format('d M Y') }}</span><br>
-                                    {{ \Carbon\Carbon::parse($item->approved_at)->format('H:i') }}
-                                </div>
-                                @else
-                                <span style="color:var(--muted); font-size:12px;">—</span>
-                                @endif
-                            </td>
+                            <td>{{ $item->catatan ?? '—' }}</td>
 
                             <td>
                                 <div class="datetime-text">
@@ -258,31 +234,13 @@
                                 </div>
                             </td>
 
-                            <td>
-                                @if($item->status == 'pending')
-                                <div class="action-group">
-                                    <button
-                                        class="action-modern btn-approve"
-                                        title="Setujui"
-                                        onclick="openModal('approve', {{ $item->id }}, '{{ ucfirst($item->jenis) }}', '{{ $item->pelanggan->nama ?? '#'.$item->pelanggan_id }}')"
-                                    ><i class="bi bi-check-lg"></i></button>
-                                    <button
-                                        class="action-modern btn-reject"
-                                        title="Tolak"
-                                        onclick="openModal('reject', {{ $item->id }}, '{{ ucfirst($item->jenis) }}', '{{ $item->pelanggan->nama ?? '#'.$item->pelanggan_id }}')"
-                                    ><i class="bi bi-x-lg"></i></button>
-                                </div>
-                                @else
-                                <span style="color:var(--muted); font-size:12px; font-style:italic;">Diproses</span>
-                                @endif
-                            </td>
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="9">
+                            <td colspan="8">
                                 <div class="empty-state">
                                     <i class="bi bi-journal-x"></i>
-                                    <p>Belum ada agenda yang tersedia.</p>
+                                    <p>Belum ada pengajuan yang tersedia.</p>
                                 </div>
                             </td>
                         </tr>
@@ -294,29 +252,13 @@
             <div class="pagination-bar">
                 <div>
                     Menampilkan <strong style="color:var(--text);" id="visibleCount">{{ $agenda->count() }}</strong>
-                    dari <strong style="color:var(--text);">{{ $agenda->count() }}</strong> agenda
+                    dari <strong style="color:var(--text);">{{ $agenda->count() }}</strong> pengajuan
                 </div>
             </div>
 
         </div>
 
         <div style="height:28px;"></div>
-    </div>
-</div>
-
-<div class="modal-backdrop-custom" id="confirmModal">
-    <div class="modal-box">
-        <div class="modal-icon" id="modalIcon"><i id="modalIconInner"></i></div>
-        <div class="modal-title" id="modalTitle"></div>
-        <div class="modal-desc"  id="modalDesc"></div>
-        <div class="modal-actions">
-            <button class="modal-btn-cancel" onclick="closeModal()">Batal</button>
-            <form id="modalForm" method="POST" style="display:inline;">
-                @csrf
-                @method('PATCH')
-                <button type="submit" class="modal-btn-confirm" id="modalConfirmBtn"></button>
-            </form>
-        </div>
     </div>
 </div>
 
@@ -342,44 +284,6 @@ function filterTable() {
     const vc = document.getElementById('visibleCount');
     if (vc) vc.textContent = visible;
 }
-
-function openModal(type, id, jenis, nama) {
-    const modal = document.getElementById('confirmModal');
-    const icon  = document.getElementById('modalIcon');
-    const iconI = document.getElementById('modalIconInner');
-    const title = document.getElementById('modalTitle');
-    const desc  = document.getElementById('modalDesc');
-    const btn   = document.getElementById('modalConfirmBtn');
-    const form  = document.getElementById('modalForm');
-
-    if (type === 'approve') {
-        icon.className  = 'modal-icon approve';
-        iconI.className = 'bi bi-check-circle-fill';
-        title.textContent = 'Setujui Agenda?';
-        desc.textContent  = `Kamu akan menyetujui agenda ${jenis} untuk pelanggan ${nama}.`;
-        btn.className   = 'modal-btn-confirm approve';
-        btn.innerHTML   = '<i class="bi bi-check-lg"></i> Ya, Setujui';
-        form.action     = `/agenda-noc/${id}/approve`;
-    } else {
-        icon.className  = 'modal-icon reject';
-        iconI.className = 'bi bi-x-circle-fill';
-        title.textContent = 'Tolak Agenda?';
-        desc.textContent  = `Kamu akan menolak agenda ${jenis} untuk pelanggan ${nama}.`;
-        btn.className   = 'modal-btn-confirm reject';
-        btn.innerHTML   = '<i class="bi bi-x-lg"></i> Ya, Tolak';
-        form.action     = `/agenda-noc/${id}/reject`;
-    }
-
-    modal.classList.add('show');
-}
-
-function closeModal() {
-    document.getElementById('confirmModal').classList.remove('show');
-}
-
-document.getElementById('confirmModal').addEventListener('click', function(e) {
-    if (e.target === this) closeModal();
-});
 </script>
 </body>
 </html>

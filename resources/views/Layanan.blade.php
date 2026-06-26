@@ -12,12 +12,13 @@
 </head>
 <body>
 
-<div style="display:flex; min-height:100vh;">
+<div class="page-wrap">
 
-    {{-- SIDEBAR --}}
-    <div class="sidebar">
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+    <div class="sidebar" id="appSidebar">
         <div class="sidebar-header">
-            <div class="hamburger"><span></span><span></span><span></span></div>
+            <div class="hamburger" onclick="toggleSidebar()"><span></span><span></span><span></span></div>
             <span class="logo-text">JAGONET</span>
         </div>
 
@@ -42,6 +43,12 @@
         <a href="{{ url($instalasiUrl) }}" class="menu-item">
             <i class="bi bi-router"></i> Instalasi Baru
         </a>
+
+        @if(Auth::user()->role == 'cs')
+        <a href="{{ route('agenda.cs') }}" class="menu-item">
+            <i class="bi bi-arrow-down-up"></i>Agenda CS
+        </a>
+        @endif
 
         @if(Auth::user()->role == 'noc')
             <a href="{{ url('/agenda-noc') }}" class="menu-item">
@@ -85,7 +92,6 @@
     {{-- MAIN CONTENT--}}
     <div class="main-content">
 
-        {{-- Flash Messages --}}
         @if(session('success'))
             <div class="alert alert-success alert-dismissible fade show m-3">
                 <i class="bi bi-check-circle-fill me-2"></i>{{ session('success') }}
@@ -100,11 +106,15 @@
             </div>
         @endif
 
-        {{-- TOPBAR --}}
         <div class="topbar">
-            <div>
-                <div class="page-title">Data Layanan</div>
-                <div class="page-sub">Kelola data layanan pelanggan internet</div>
+            <div class="d-flex align-items-center gap-3">
+                <button type="button" class="btn-sidebar-toggle d-lg-none" onclick="toggleSidebar()">
+                    <i class="bi bi-list"></i>
+                </button>
+                <div>
+                    <div class="page-title">Data Layanan</div>
+                    <div class="page-sub">Kelola data layanan pelanggan internet</div>
+                </div>
             </div>
             <div class="breadcrumb-area">
                 <i class="bi bi-house-door"></i>
@@ -125,7 +135,6 @@
                 </div>
                 <div>
                     <div class="form-card-title">Data Layanan</div>
-                    <div class="form-card-sub">Daftar seluruh layanan pelanggan</div>
                 </div>
             </div>
 
@@ -172,7 +181,6 @@
                         </ul>
                     </div>
 
-                    {{-- Tombol Menu --}}
                     <div class="dropdown">
                         <button class="btn-menu dropdown-toggle"
                                 type="button"
@@ -200,7 +208,6 @@
                         </ul>
                     </div>
 
-                    {{-- Generate Tagihan --}}
                     <form method="POST"
                           action="{{ route('pelanggan.generateTagihanTerpilih') }}"
                           id="formGenerateTerpilih"
@@ -209,27 +216,21 @@
                         <div id="hiddenIdsTerpilih"></div>
                         <button type="button"
                                 onclick="generateTerpilih()"
-                                class="btn btn-sm"
-                                style="height:40px; display:inline-flex; align-items:center; gap:5px;
-                                       white-space:nowrap; border:none; color:#fff;
-                                       background:linear-gradient(135deg,#09973B,#0ab844);">
+                                class="btn btn-sm btn-generate-tagihan">
                             <i class="bi bi-plus-lg"></i> Generate Tagihan
                         </button>
                     </form>
 
-                    {{-- Filter --}}
                     <form method="GET" action="{{ url('/layanan') }}"
                           class="d-flex align-items-center gap-2 flex-wrap">
 
                         <input type="text" name="search"
-                               class="form-control form-control-sm"
-                               style="width:180px; height:40px;"
+                               class="form-control form-control-sm filter-search"
                                placeholder="Cari pelanggan..."
                                value="{{ request('search') }}">
 
                         <select name="status"
-                                class="form-select form-select-sm"
-                                style="width:160px; height:40px;">
+                                class="form-select form-select-sm filter-status">
                             <option value="">Semua Status</option>
                             <option value="aktif"              {{ request('status') === 'aktif'              ? 'selected' : '' }}>Aktif</option>
                             <option value="isolir"             {{ request('status') === 'isolir'             ? 'selected' : '' }}>Isolir</option>
@@ -239,16 +240,14 @@
                         </select>
 
                         <input type="date" name="dari"
-                               class="form-control form-control-sm"
-                               style="width:145px; height:40px;"
+                               class="form-control form-control-sm filter-date"
                                value="{{ request('dari') }}">
 
                         <input type="date" name="sampai"
-                               class="form-control form-control-sm"
-                               style="width:145px; height:40px;"
+                               class="form-control form-control-sm filter-date"
                                value="{{ request('sampai') }}">
 
-                        <button type="submit" class="btn btn-success btn-sm px-3" style="height:40px;">
+                        <button type="submit" class="btn btn-sm btn-search-jago">
                             <i class="bi bi-search"></i>
                         </button>
 
@@ -268,7 +267,6 @@
             <div style="padding: 20px;">
                 <div class="detail-card">
 
-                    {{-- TABLE SCROLL --}}
                     <div class="table-responsive">
                         <table class="table table-bordered align-middle custom-table mb-0">
                             <thead class="table-light text-center fw-bold">
@@ -312,13 +310,13 @@
                                         <td class="text-start">
                                             <div class="clamp-2">{{ $p->nama_layanan ?? '-' }}</div>
                                         </td>
-                                        <td style="white-space: nowrap;">
+                                        <td class="tagihan-col">
                                             Rp {{ number_format($p->layanan->harga ?? 0, 0, ',', '.') }}
                                         </td>
-                                        <td style="white-space: nowrap;">
+                                        <td class="tagihan-col">
                                             {{ $p->layanan->nama_paket ?? '-' }}
                                         </td>
-                                        <td>
+                                        <td style="white-space: nowrap;">
                                             @php
                                                 $statusMap = [
                                                     'aktif'              => ['class' => 'status-active',   'icon' => 'check-circle-fill', 'label' => 'Aktif'],
@@ -379,7 +377,6 @@
                         </table>
                     </div>
 
-                    {{-- FOOTER PAGINATION --}}
                     <div class="card-identity-row" style="justify-content:space-between;">
                         <span class="identity-nik">
                             Menampilkan {{ $pelanggan->firstItem() }}–{{ $pelanggan->lastItem() }}
@@ -400,121 +397,107 @@
 
 </div>
 
-
-{{-- MODAL DETAIL (cs & noc) --}}
 @foreach($pelanggan as $p)
     @if(in_array(Auth::user()->role, ['cs', 'noc']))
-        <div class="modal fade" id="modalDetail{{ $p->id }}" tabindex="-1" aria-hidden="true">
+        <div class="modal fade modal-detail" id="modalDetail{{ $p->id }}" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered" style="max-width:560px;">
-                <div class="modal-content" style="border-radius:16px; overflow:hidden; border:none;">
+                <div class="modal-content">
 
-                    {{-- HEADER --}}
-                    <div style="background:#16a34a; padding:18px 20px; display:flex; align-items:center; justify-content:space-between;">
-                        <div style="display:flex; align-items:center; gap:12px;">
-                            <div style="width:38px; height:38px; border-radius:10px; background:rgba(22,14,14,0.12);
-                                        display:flex; align-items:center; justify-content:center; color:#16a34a; font-size:18px;">
+                    <div class="modal-detail-header">
+                        <div class="modal-detail-header-inner">
+                            <div class="modal-detail-header-icon">
                                 <i class="bi bi-person-fill"></i>
                             </div>
                             <div>
-                                <div style="font-size:14px; font-weight:600; color:#fff;">Detail Layanan</div>
+                                <div class="modal-detail-header-title">Detail Layanan</div>
                             </div>
                         </div>
                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                     </div>
 
-                    {{-- AVATAR ROW --}}
-                    <div style="padding:20px 20px 0; display:flex; align-items:center; gap:14px;">
-                        <div style="width:52px; height:52px; border-radius:14px; background:#EAF3DE;
-                                    display:flex; align-items:center; justify-content:center;
-                                    font-size:18px; font-weight:700; color:#3B6D11; flex-shrink:0;">
+                    <div class="modal-detail-avatar-row">
+                        <div class="modal-detail-avatar">
                             {{ strtoupper(substr($p->nama, 0, 2)) }}
                         </div>
                         <div>
-                            <div style="font-size:16px; font-weight:700; color:#0c2416;">{{ $p->nama }}</div>
-                            <div style="font-size:12px; color:#6b7280; margin-top:3px; display:flex; align-items:center; gap:6px;">
+                            <div class="modal-detail-nama">{{ $p->nama }}</div>
+                            <div class="modal-detail-sub">
                                 <i class="bi bi-upc-scan" style="font-size:12px;"></i>
                                 {{ $p->kode_pelanggan }}
                                 &nbsp;·&nbsp;
                                 @php
                                     $detailStatusMap = [
-                                        'aktif'              => ['bg' => '#EAF3DE', 'color' => '#27500A', 'border' => '#C0DD97', 'icon' => 'check-circle-fill',  'label' => 'Aktif'],
-                                        'isolir'             => ['bg' => '#FAEEDA', 'color' => '#633806', 'border' => '#FAC775', 'icon' => 'slash-circle-fill',  'label' => 'Isolir'],
-                                        'pengajuan isolir'   => ['bg' => '#FEF9C3', 'color' => '#713F12', 'border' => '#FDE68A', 'icon' => 'hourglass-split',    'label' => 'Pengajuan Isolir'],
-                                        'pengajuan aktivasi' => ['bg' => '#DCFCE7', 'color' => '#14532D', 'border' => '#86EFAC', 'icon' => 'hourglass-split',    'label' => 'Pengajuan Aktivasi'],
+                                        'aktif'              => ['class' => 'modal-detail-status-aktif',        'icon' => 'check-circle-fill',  'label' => 'Aktif'],
+                                        'isolir'             => ['class' => 'modal-detail-status-isolir',       'icon' => 'slash-circle-fill',  'label' => 'Isolir'],
+                                        'pengajuan isolir'   => ['class' => 'modal-detail-status-peng-isolir',  'icon' => 'hourglass-split',    'label' => 'Pengajuan Isolir'],
+                                        'pengajuan aktivasi' => ['class' => 'modal-detail-status-peng-aktivasi','icon' => 'hourglass-split',    'label' => 'Pengajuan Aktivasi'],
                                     ];
-                                    $ds = $detailStatusMap[strtolower($p->status)] ?? ['bg' => '#FCEBEB', 'color' => '#791F1F', 'border' => '#F7C1C1', 'icon' => 'x-circle-fill', 'label' => 'Nonaktif'];
+                                    $ds = $detailStatusMap[strtolower($p->status)] ?? ['class' => 'modal-detail-status-nonaktif', 'icon' => 'x-circle-fill', 'label' => 'Nonaktif'];
                                 @endphp
-                                <span style="background:{{ $ds['bg'] }}; color:{{ $ds['color'] }}; border:1px solid {{ $ds['border'] }};
-                                             padding:2px 9px; border-radius:50px; font-size:11px; font-weight:600;">
+                                <span class="modal-detail-status-pill {{ $ds['class'] }}">
                                     <i class="bi bi-{{ $ds['icon'] }}" style="font-size:9px;"></i> {{ $ds['label'] }}
                                 </span>
                             </div>
                         </div>
                     </div>
 
-                    <hr style="margin:16px 20px; border-color:#e8ede9; opacity:1;">
+                    <hr class="modal-detail-divider">
 
-                    {{-- KONTAK --}}
-                    <div style="font-size:10px; font-weight:700; letter-spacing:.8px; text-transform:uppercase;
-                                color:#7a9680; padding:0 20px 8px;">Informasi kontak</div>
-                    <div style="display:grid; grid-template-columns:1fr 1fr; padding:0 20px;">
-                        <div style="padding:10px 20px 10px 0; border-bottom:1px solid #f2f5f2;">
-                            <div style="font-size:11px; color:#9cb09e; margin-bottom:4px; display:flex; align-items:center; gap:4px;">
-                                <i class="bi bi-telephone" style="font-size:11px;"></i> No. HP
+                    <div class="modal-detail-section-label">Informasi kontak</div>
+                    <div class="modal-detail-grid">
+                        <div class="modal-detail-cell">
+                            <div class="modal-detail-field-label">
+                                <i class="bi bi-telephone"></i> No. HP
                             </div>
-                            <div style="font-size:13px; font-weight:600; color:#1a2e1e;">{{ $p->no_hp ?? '-' }}</div>
+                            <div class="modal-detail-field-value">{{ $p->no_hp ?? '-' }}</div>
                         </div>
-                        <div style="padding:10px 0; border-bottom:1px solid #f2f5f2;">
-                            <div style="font-size:11px; color:#9cb09e; margin-bottom:4px; display:flex; align-items:center; gap:4px;">
-                                <i class="bi bi-calendar3" style="font-size:11px;"></i> Aktivasi
+                        <div class="modal-detail-cell-right">
+                            <div class="modal-detail-field-label">
+                                <i class="bi bi-calendar3"></i> Aktivasi
                             </div>
-                            <div style="font-size:13px; font-weight:600; color:#1a2e1e;">{{ $p->created_at->format('d/m/Y') }}</div>
+                            <div class="modal-detail-field-value">{{ $p->created_at->format('d/m/Y') }}</div>
                         </div>
-                        <div style="padding:10px 0; grid-column:1/-1; border-bottom:1px solid #f2f5f2;">
-                            <div style="font-size:11px; color:#9cb09e; margin-bottom:4px; display:flex; align-items:center; gap:4px;">
-                                <i class="bi bi-geo-alt" style="font-size:11px;"></i> Alamat
+                        <div class="modal-detail-cell-full">
+                            <div class="modal-detail-field-label">
+                                <i class="bi bi-geo-alt"></i> Alamat
                             </div>
-                            <div style="font-size:13px; font-weight:600; color:#1a2e1e;">{{ $p->alamat ?? '-' }}</div>
+                            <div class="modal-detail-field-value">{{ $p->alamat ?? '-' }}</div>
                         </div>
                     </div>
 
-                    <hr style="margin:16px 20px; border-color:#e8ede9; opacity:1;">
+                    <hr class="modal-detail-divider">
 
-                    {{-- LAYANAN --}}
-                    <div style="font-size:10px; font-weight:700; letter-spacing:.8px; text-transform:uppercase;
-                                color:#7a9680; padding:0 20px 8px;">Informasi layanan</div>
-                    <div style="display:grid; grid-template-columns:1fr 1fr; padding:0 20px;">
-                        <div style="padding:10px 20px 10px 0; border-bottom:1px solid #f2f5f2;">
-                            <div style="font-size:11px; color:#9cb09e; margin-bottom:4px; display:flex; align-items:center; gap:4px;">
-                                <i class="bi bi-wifi" style="font-size:11px;"></i> Nama Layanan
+                    <div class="modal-detail-section-label">Informasi layanan</div>
+                    <div class="modal-detail-grid">
+                        <div class="modal-detail-cell">
+                            <div class="modal-detail-field-label">
+                                <i class="bi bi-wifi"></i> Nama Layanan
                             </div>
-                            <div style="font-size:13px; font-weight:600; color:#1a2e1e;">{{ $p->nama_layanan ?? '-' }}</div>
+                            <div class="modal-detail-field-value">{{ $p->nama_layanan ?? '-' }}</div>
                         </div>
-                        <div style="padding:10px 0; border-bottom:1px solid #f2f5f2;">
-                            <div style="font-size:11px; color:#9cb09e; margin-bottom:4px; display:flex; align-items:center; gap:4px;">
-                                <i class="bi bi-box" style="font-size:11px;"></i> Paket
+                        <div class="modal-detail-cell-right">
+                            <div class="modal-detail-field-label">
+                                <i class="bi bi-box"></i> Paket
                             </div>
-                            <div style="font-size:13px; font-weight:600; color:#1a2e1e;">{{ $p->layanan->nama_paket ?? '-' }}</div>
+                            <div class="modal-detail-field-value">{{ $p->layanan->nama_paket ?? '-' }}</div>
                         </div>
-                        <div style="padding:10px 20px 10px 0;">
-                            <div style="font-size:11px; color:#9cb09e; margin-bottom:4px; display:flex; align-items:center; gap:4px;">
-                                <i class="bi bi-receipt" style="font-size:11px;"></i> Tagihan / Bulan
+                        <div class="modal-detail-cell-last-left">
+                            <div class="modal-detail-field-label">
+                                <i class="bi bi-receipt"></i> Tagihan / Bulan
                             </div>
-                            <div style="font-size:13px; font-weight:700; color:#0a8f3c;">
+                            <div class="modal-detail-field-value-green">
                                 Rp {{ number_format($p->layanan->harga ?? 0, 0, ',', '.') }}
                             </div>
                         </div>
-                        <div style="padding:10px 0;">
-                            <div style="font-size:11px; color:#9cb09e; margin-bottom:4px; display:flex; align-items:center; gap:4px;">
-                                <i class="bi bi-building" style="font-size:11px;"></i> Site
+                        <div class="modal-detail-cell-last-right">
+                            <div class="modal-detail-field-label">
+                                <i class="bi bi-building"></i> Site
                             </div>
-                            <div style="font-size:13px; font-weight:600; color:#1a2e1e;">{{ $p->site->nama_site ?? '-' }}</div>
+                            <div class="modal-detail-field-value">{{ $p->site->nama_site ?? '-' }}</div>
                         </div>
                     </div>
 
-                    {{-- FOOTER --}}
-                    <div style="padding:14px 20px; background:#f7faf8; display:flex; align-items:center;
-                                justify-content:flex-end; border-top:1px solid #e8ede9;">
+                    <div class="modal-detail-footer">
                         <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Tutup</button>
                     </div>
 
@@ -524,8 +507,6 @@
     @endif
 @endforeach
 
-
-{{-- MODAL EDIT LAYANAN --}}
 @foreach($pelanggan as $p)
     <div class="modal fade" id="modalEditPelanggan{{ $p->id }}" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered">
@@ -592,14 +573,12 @@
     </div>
 @endforeach
 
-
-{{-- MODAL NOTIFIKASI --}}
 @foreach($pelanggan as $p)
     @php $periodeTagihan = \Carbon\Carbon::parse($p->created_at)->subDay(); @endphp
 
-    <div class="modal fade" id="modalNotif{{ $p->id }}" tabindex="-1" aria-hidden="true">
+    <div class="modal fade modal-notif" id="modalNotif{{ $p->id }}" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-md modal-dialog-centered">
-            <div class="modal-content" style="border-radius:12px; overflow:hidden;">
+            <div class="modal-content">
 
                 <div class="modal-header"
                      style="background:linear-gradient(135deg,#28a745,#20c157); color:#fff;">
@@ -612,22 +591,20 @@
                 <div class="modal-body">
 
                     <div class="border rounded p-3 mb-3">
-                        <div class="fw-bold text-uppercase mb-2"
-                             style="font-size:11px; letter-spacing:.5px; color:#555;">
+                        <div class="notif-section-label">
                             Tagihan Internet Bulanan
                         </div>
-                        <div style="font-size:13.5px; color:#444; line-height:1.75;">
+                        <div class="notif-section-text">
                             Nama Pelanggan : {{ $p->nama }}<br>
                             Periode Tagihan : {{ $periodeTagihan->translatedFormat('F Y') }}
                         </div>
                     </div>
 
                     <div class="border rounded p-3 mb-3">
-                        <div class="fw-bold text-uppercase mb-2"
-                             style="font-size:11px; letter-spacing:.5px; color:#555;">
+                        <div class="notif-section-label">
                             Isolir Layanan
                         </div>
-                        <div style="font-size:13.5px; color:#444; line-height:1.75;">
+                        <div class="notif-section-text">
                             Yth. {{ $p->nama }},<br>
                             Kami informasikan bahwa layanan internet Anda saat ini
                             <strong>diisolir</strong> dikarenakan tagihan
@@ -636,12 +613,10 @@
                         </div>
                     </div>
 
-                    <div class="fw-bold text-uppercase mb-2"
-                         style="font-size:11px; letter-spacing:.5px; color:#555;">
+                    <div class="notif-section-label">
                         Preview Pesan
                     </div>
-                    <div class="border rounded p-3 mb-3"
-                         style="font-size:13.5px; color:#333; line-height:1.8; background:#f9f9f9;">
+                    <div class="border rounded p-3 mb-3 notif-preview-box">
                         <strong>TAGIHAN INTERNET BULANAN</strong><br><br>
                         Nama Pelanggan : {{ $p->nama }}<br>
                         Periode Tagihan : {{ $periodeTagihan->translatedFormat('F Y') }}<br>
@@ -677,8 +652,6 @@
     </div>
 @endforeach
 
-
-{{-- MODAL IMPORT DATA --}}
 <div class="modal fade" id="modalImport" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -708,8 +681,6 @@
     </div>
 </div>
 
-
-{{-- MODAL UBAH STATUS TERPILIH --}}
 <div class="modal fade" id="modalUbahStatus" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-sm modal-dialog-centered">
         <div class="modal-content">
@@ -730,7 +701,7 @@
                 </div>
 
                 <div class="modal-body">
-                    <p class="isolir-confirm-text" style="margin-bottom:14px;">
+                    <p class="isolir-confirm-text">
                         Pilih status baru yang akan diterapkan pada data terpilih:
                     </p>
 
@@ -762,10 +733,8 @@
     </div>
 </div>
 
-
-{{-- MODAL GENERATE TAGIHAN --}}
-<div class="modal fade" id="modalGenerateTagihan" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" style="max-width:400px;">
+<div class="modal fade modal-generate" id="modalGenerateTagihan" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
 
             <div class="form-card-header" style="border-radius:0;">
@@ -782,10 +751,10 @@
             </div>
 
             <div class="modal-body p-4 text-center">
-                <div style="font-size:14px; font-weight:700; color:#111827; margin-bottom:6px;">
+                <div class="modal-generate-title">
                     Buat tagihan untuk <span id="jumlahGenerateText">0</span> pelanggan?
                 </div>
-                <div style="font-size:12.5px; color:#6b7280; line-height:1.7;">
+                <div class="modal-generate-desc">
                     Tagihan akan dibuat otomatis untuk semua pelanggan terpilih.
                     Pastikan data sudah benar sebelum melanjutkan.
                 </div>
@@ -804,8 +773,6 @@
     </div>
 </div>
 
-
-{{-- MODAL AJUKAN ISOLIR TERPILIH --}}
 <div class="modal fade modal-isolir" id="modalIsolirTerpilih" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" style="max-width:420px;">
         <div class="modal-content">
@@ -847,8 +814,6 @@
     </div>
 </div>
 
-
-{{-- MODAL AJUKAN AKTIVASI TERPILIH --}}
 <div class="modal fade modal-isolir" id="modalAktivasiTerpilih" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" style="max-width:420px;">
         <div class="modal-content">
@@ -856,9 +821,9 @@
                 @csrf
                 <div id="hiddenIdsAktivasi"></div>
 
-                <div class="isolir-head" style="border-bottom:1px solid #e5e7eb;">
-                    <div class="isolir-head-icon" style="background:#dcfce7;">
-                        <i class="bi bi-check-circle-fill" style="color:#16a34a;"></i>
+                <div class="isolir-head aktivasi-head">
+                    <div class="isolir-head-icon aktivasi-head-icon">
+                        <i class="bi bi-check-circle-fill aktivasi-head-icon"></i>
                     </div>
                     <div class="isolir-head-text">
                         <div class="title">Ajukan Aktivasi</div>
@@ -881,8 +846,7 @@
                     <button type="button" class="btn-isolir-batal" data-bs-dismiss="modal">
                         <i class="bi bi-x-lg"></i> Batal
                     </button>
-                    <button type="submit" class="btn-isolir-konfirm"
-                            style="background:#dcfce7;border-color:#86efac;color:#15803d;">
+                    <button type="submit" class="btn-isolir-konfirm btn-aktivasi-konfirm">
                         <i class="bi bi-check-circle-fill"></i> Ya, Ajukan Aktivasi
                     </button>
                 </div>
@@ -914,6 +878,11 @@ function jagoAlert(pesan, callback) {
         document.getElementById('jagoAlertModal').remove();
         callback?.();
     };
+}
+
+function toggleSidebar() {
+    document.getElementById('appSidebar').classList.toggle('show');
+    document.getElementById('sidebarOverlay').classList.toggle('show');
 }
 
 const SK  = 'layanan_selected_ids';

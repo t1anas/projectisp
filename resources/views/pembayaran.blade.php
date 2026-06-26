@@ -15,13 +15,11 @@
 <body>
 <div style="display:flex; min-height:100vh;">
 
-    <!-- SIDEBAR -->
-    <div class="sidebar">
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 
+    <div class="sidebar" id="appSidebar">
         <div class="sidebar-header">
-            <div class="hamburger">
-                <span></span><span></span><span></span>
-            </div>
+            <div class="hamburger" onclick="toggleSidebar()"><span></span><span></span><span></span></div>
             <span class="logo-text">JAGONET</span>
         </div>
 
@@ -30,7 +28,6 @@
         <a href="{{ Auth::user()->dashboard_url }}" class="menu-item">
             <i class="bi bi-speedometer2"></i> Dashboard
         </a>
-
         <a href="{{ url('/layanan') }}" class="menu-item">
             <i class="bi bi-wifi"></i> Data Layanan
         </a>
@@ -48,6 +45,18 @@
             <i class="bi bi-router"></i> Instalasi Baru
         </a>
 
+        @if(Auth::user()->role == 'cs')
+        <a href="{{ route('agenda.cs') }}" class="menu-item">
+            <i class="bi bi-arrow-down-up"></i>Agenda CS
+        </a>
+        @endif
+
+        @if(Auth::user()->role == 'noc')
+            <a href="{{ url('/agenda-noc') }}" class="menu-item">
+                <i class="bi bi-journal-check"></i> Agenda NOC
+            </a>
+        @endif
+
         @if(Auth::user()->role == 'admin')
             <a href="{{ url('/pemasukan') }}" class="menu-item active">
                 <i class="bi bi-wallet2"></i> Pemasukan
@@ -61,27 +70,22 @@
         </a>
 
         <div class="profile-section">
-
             <div class="admin-card">
                 <div class="admin-avatar">
                     <i class="bi bi-person-fill text-white"></i>
                 </div>
-
                 <div>
                     <div class="admin-role">{{ strtoupper(Auth::user()->role) }}</div>
                     <div class="admin-name">{{ Auth::user()->name }}</div>
                 </div>
             </div>
-
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
                 <button type="submit" class="logout-btn">
                     <i class="bi bi-box-arrow-right"></i> LOG OUT
                 </button>
             </form>
-
         </div>
-
     </div>
 
     <!-- MAIN CONTENT -->
@@ -102,10 +106,14 @@
         @endif
 
         <div class="topbar">
-
+            <div class="d-flex align-items-center gap-3">
+                <button type="button" class="btn-sidebar-toggle d-lg-none" onclick="toggleSidebar()">
+                    <i class="bi bi-list"></i>
+                </button>
             <div>
                 <div class="page-title">Pemasukan</div>
                 <div class="page-sub">Kelola transaksi pembayaran pelanggan</div>
+            </div>
             </div>
 
             <div class="breadcrumb-area">
@@ -171,11 +179,10 @@
                         </div>
 
                         <div class="col-md-1 d-flex align-items-end">
-                            <button type="submit" class="btn btn-success w-100">
+                            <button type="submit" class="btn btn-sm btn-search-jago w-100">
                                 <i class="bi bi-search"></i>
                             </button>
                         </div>
-
                     </div>
 
                 </div>
@@ -643,6 +650,10 @@
 @endforeach
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
+    function toggleSidebar() {
+    document.getElementById('appSidebar').classList.toggle('show');
+    document.getElementById('sidebarOverlay').classList.toggle('show');
+}
 document.addEventListener('DOMContentLoaded', function () {
 
     const selPelanggan = document.getElementById('pelanggan');

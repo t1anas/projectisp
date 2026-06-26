@@ -13,10 +13,11 @@
 
 <div style="display:flex; min-height:100vh;">
 
-    {{-- SIDEBAR --}}
-    <div class="sidebar">
+   <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+    <div class="sidebar" id="appSidebar">
         <div class="sidebar-header">
-            <div class="hamburger"><span></span><span></span><span></span></div>
+            <div class="hamburger" onclick="toggleSidebar()"><span></span><span></span><span></span></div>
             <span class="logo-text">JAGONET</span>
         </div>
 
@@ -42,10 +43,16 @@
             <i class="bi bi-router"></i> Instalasi Baru
         </a>
 
-        @if(Auth::user()->role == 'noc')
-        <a href="{{ url('/agenda-noc') }}" class="menu-item">
-            <i class="bi bi-journal-check"></i> Agenda NOC
+        @if(Auth::user()->role == 'cs')
+        <a href="{{ route('agenda.cs') }}" class="menu-item">
+            <i class="bi bi-arrow-down-up"></i>Agenda CS
         </a>
+        @endif
+
+        @if(Auth::user()->role == 'noc')
+            <a href="{{ url('/agenda-noc') }}" class="menu-item">
+                <i class="bi bi-journal-check"></i> Agenda NOC
+            </a>
         @endif
 
         @if(Auth::user()->role == 'admin')
@@ -78,16 +85,20 @@
             </form>
         </div>
     </div>
-    {{-- END SIDEBAR --}}
 
     {{-- MAIN CONTENT --}}
     <div class="main-content">
 
         {{-- TOPBAR --}}
         <div class="topbar">
+            <div class="d-flex align-items-center gap-3">
+            <button type="button" class="btn-sidebar-toggle d-lg-none" onclick="toggleSidebar()">
+                <i class="bi bi-list"></i>
+            </button>
             <div>
                 <div class="page-title">Data Pelanggan</div>
                 <div class="page-sub">Daftar seluruh pelanggan terdaftar</div>
+            </div>
             </div>
             <div class="breadcrumb-area">
                 <i class="bi bi-house-door"></i>
@@ -108,7 +119,6 @@
                 </div>
                 <div>
                     <div class="form-card-title">Data Pelanggan</div>
-                    <div class="form-card-sub">List pelanggan yang sudah terdaftar</div>
                 </div>
             </div>
 
@@ -116,13 +126,13 @@
                 <form method="GET" action="{{ url('/pelanggan') }}">
                     <div class="d-flex align-items-center gap-2 flex-wrap">
 
-                        <a href="/instalasi" class="btn btn-sm" style="height:34px; display:inline-flex; align-items:center; gap:5px; white-space:nowrap; background:linear-gradient(135deg,#09973B,#0ab844); color:#fff; border:none;">
+                        <a href="/instalasi" class="btn btn-sm btn-tambah-pelanggan" >
                             <i class="bi bi-plus-lg"></i> Tambah Pelanggan
                         </a>
 
                         <input type="text" name="search"
                                class="form-control form-control-sm"
-                               style="width:180px; height:40px;"
+                               style="width:230px; height:40px;"
                                placeholder="Cari nama..."
                                value="{{ request('search') }}">
 
@@ -136,15 +146,15 @@
 
                         <input type="date" name="dari"
                                class="form-control form-control-sm"
-                               style="width:145px; height:40px;"
+                               style="width:150px; height:40px;"
                                value="{{ request('dari') }}">
 
                         <input type="date" name="sampai"
                                class="form-control form-control-sm"
-                               style="width:145px; height:40px;"
+                               style="width:150px; height:40px;"
                                value="{{ request('sampai') }}">
 
-                        <button type="submit" class="btn btn-success btn-sm px-3" style="height:40px;">
+                        <button type="submit" class="btn btn-sm btn-search-jago" style="width: 150px;">
                             <i class="bi bi-search"></i>
                         </button>
 
@@ -222,6 +232,14 @@
                                                 <span class="status-pill status-pending">
                                                     <i class="bi bi-hourglass-split"></i> Pending
                                                 </span>
+                                            @elseif(strtolower($p->status) === 'pengajuan isolir')
+                                                <span class="status-pill status-pending">
+                                                    <i class="bi bi-hourglass-split"></i> Pengajuan Isolir
+                                                </span>
+                                            @elseif(strtolower($p->status) === 'pengajuan aktivasi')
+                                                <span class="status-pill status-pending">
+                                                    <i class="bi bi-hourglass-split"></i> Pengajuan Aktivasi
+                                                </span>
                                             @else
                                                 <span class="status-pill status-nonactive">
                                                     <i class="bi bi-x-circle-fill"></i> Nonaktif
@@ -243,12 +261,17 @@
                                                     <i class="bi bi-pencil-fill"></i>
                                                 </button>
                                                 <button type="button"
-                                                        class="action-modern btn-hapus"
+                                                        class="btn-action btn-action-delete"
                                                         title="Hapus"
                                                         data-bs-toggle="modal"
                                                         data-bs-target="#modalHapus{{ $p->id }}">
                                                     <i class="bi bi-trash-fill"></i>
                                                 </button>
+                                                <a href="{{ route('upgrade', $p->id) }}"
+                                                    class="btn-action btn-action-warning"
+                                                    data-tip="Upgrade/Downgrade">
+                                                    <i class="bi bi-arrow-down-up"></i>
+                                                </a>
                                             </div>
                                         </td>
                                     </tr>
@@ -442,5 +465,11 @@
 {{-- END MODAL --}}
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    function toggleSidebar() {
+        document.getElementById('appSidebar').classList.toggle('show');
+        document.getElementById('sidebarOverlay').classList.toggle('show');
+    }
+</script>
 </body>
 </html>

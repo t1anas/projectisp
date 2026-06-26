@@ -159,3 +159,10 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f4f6f9; }
             text-align: center; font-size: 11px; color: #9ca3af;
             display: flex; align-items: center; justify-content: center; gap: 4px;
         }
+
+        .scan-page-content {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}

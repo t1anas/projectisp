@@ -34,6 +34,15 @@ public function approve($id)
             'status' => 'aktif'
         ]);
 
+    } elseif (
+        $agenda->jenis == 'upgrade_layanan' ||
+        $agenda->jenis == 'downgrade_layanan'
+    ) {
+
+        $agenda->pelanggan->update([
+            'layanan_id' => $agenda->layanan_baru_id
+        ]);
+
     }
 
     $agenda->update([
@@ -70,4 +79,23 @@ public function approve($id)
     ]);
 
     return back()->with('success', 'Pengajuan ditolak');
-}}
+}
+public function agendaCs()
+{
+    $agenda = AgendaNoc::with([
+        'pelanggan',
+        'layananBaru'
+    ])
+    ->whereIn('jenis', [
+        'upgrade_layanan',
+        'downgrade_layanan'
+    ])
+    ->latest()
+    ->get();
+
+    return view(
+        'agenda-cs',
+        compact('agenda')
+    );
+}
+}
