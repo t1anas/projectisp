@@ -161,36 +161,58 @@
                 </button>
                 <div>
                     <div class="page-title">Dashboard</div>
-                    <div class="page-sub">Selamat datang kembali, {{ Auth::user()->name }} 👋</div>
+                    <div class="page-sub">Selamat datang kembali, {{ Auth::user()->name }}</div>
                 </div>
             </div>
             <div style="font-size:13px; color:#aaa;">{{ \Carbon\Carbon::now()->translatedFormat('l, d F Y') }}</div>
         </div>
 
         <!-- STAT CARDS -->
+<!-- STAT CARDS -->
+        @php
+            $totalUpgrade   = $agenda->whereIn('jenis', ['upgrade_layanan', 'downgrade_layanan'])->count();
+            $pendingUpgrade = $agenda->whereIn('jenis', ['upgrade_layanan', 'downgrade_layanan'])->where('status', 'pending')->count();
+            $ditolakUpgrade = $agenda->whereIn('jenis', ['upgrade_layanan', 'downgrade_layanan'])->where('status', 'ditolak')->count();
+
+            $totalIsolir   = $agenda->where('jenis', 'isolir')->count();
+            $pendingIsolir = $agenda->where('jenis', 'isolir')->where('status', 'pending')->count();
+            $ditolakIsolir = $agenda->where('jenis', 'isolir')->where('status', 'ditolak')->count();
+
+            $totalAktivasi   = $agenda->where('jenis', 'aktivasi')->count();
+            $pendingAktivasi = $agenda->where('jenis', 'aktivasi')->where('status', 'pending')->count();
+            $ditolakAktivasi = $agenda->where('jenis', 'aktivasi')->where('status', 'ditolak')->count();
+        @endphp
+
         <div class="stat-grid">
             <div class="stat-card">
-                <div class="stat-icon green"><i class="bi bi-person-check-fill"></i></div>
+                <div class="stat-icon blue"><i class="bi bi-arrow-up-circle-fill"></i></div>
                 <div>
-                    <div class="stat-label">Pelanggan Aktif</div>
-                    <div class="stat-value">248</div>
+                    <div class="stat-label">Upgrade / Downgrade</div>
+                    <div class="stat-value">{{ $totalUpgrade }}</div>
                 </div>
-                <span class="stat-badge up">↑ Aktif</span>
+                <span class="stat-badge" style="background:#fff7e6; color:#b8860b;">
+                    {{ $pendingUpgrade }} pending · {{ $ditolakUpgrade }} ditolak
+                </span>
             </div>
             <div class="stat-card">
                 <div class="stat-icon red"><i class="bi bi-person-x-fill"></i></div>
                 <div>
-                    <div class="stat-label">Pelanggan Isolir</div>
-                    <div class="stat-value">34</div>
+                    <div class="stat-label">Isolir</div>
+                    <div class="stat-value">{{ $totalIsolir }}</div>
                 </div>
-                <span class="stat-badge down">Isolir</span>
+                <span class="stat-badge" style="background:#fff7e6; color:#b8860b;">
+                    {{ $pendingIsolir }} pending · {{ $ditolakIsolir }} ditolak
+                </span>
             </div>
             <div class="stat-card">
-                <div class="stat-icon blue"><i class="bi bi-people-fill"></i></div>
+                <div class="stat-icon green"><i class="bi bi-person-check-fill"></i></div>
                 <div>
-                    <div class="stat-label">Total Pelanggan</div>
-                    <div class="stat-value">282</div>
+                    <div class="stat-label">Aktivasi</div>
+                    <div class="stat-value">{{ $totalAktivasi }}</div>
                 </div>
+                <span class="stat-badge" style="background:#fff7e6; color:#b8860b;">
+                    {{ $pendingAktivasi }} pending · {{ $ditolakAktivasi }} ditolak
+                </span>
             </div>
         </div>
 
